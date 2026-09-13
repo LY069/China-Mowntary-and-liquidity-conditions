@@ -102,6 +102,8 @@ def pick(df, *candidates):
 def as_month(value) -> str | None:
     """Normalise whatever akshare returns for a date into 'YYYY-MM'."""
     s = str(value).strip()
+    if " " in s or "T" in s:                      # ISO datetime -> date part
+        s = s.replace("T", " ").split(" ", 1)[0]
     for fmt in ("%Y-%m-%d", "%Y%m%d", "%Y-%m", "%Y年%m月份", "%Y年%m月"):
         try:
             return datetime.strptime(s, fmt).strftime("%Y-%m")
@@ -113,7 +115,13 @@ def as_month(value) -> str | None:
 
 
 def as_day(value) -> str | None:
+    """Normalise a date. East Money serves ISO datetimes ("2025-05-15 00:00:00")
+    and akshare does not convert 生效时间 at all, so the trailing time component
+    reached us intact — that alone made the entire RRR fetch return nothing."""
     s = str(value).strip()
+    if " " in s or "T" in s:                      # ISO datetime -> date part
+        s = s.replace("T", " ").split(" ", 1)[0]
+    s = s.replace("年", "-").replace("月", "-").replace("日", "")
     for fmt in ("%Y-%m-%d", "%Y%m%d", "%Y/%m/%d"):
         try:
             return datetime.strptime(s, fmt).strftime("%Y-%m-%d")
@@ -297,18 +305,74 @@ def fetch_cgb_curve(ak, start):
     return out
 
 
+def _ncd_records(symbol_code, s_, e_):
+    """Call the CFETS closing-curve endpoint directly.
+
+    akshare's wrapper does `del temp_df["newDateValue"]` and then assigns column
+    names positionally. Upstream stopped returning that key, so the wrapper now
+    raises KeyError and the NCD series vanished from the refresh entirely. This
+    issues the same request but tolerates the key being present or absent.
+    """
+    import requests
+    r = requests.get(
+        "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
+        params={"lang": "CN", "reference": "1,2,3", "bondType": symbol_code,
+                "startDate": f"{s_[:4]}-{s_[4:6]}-{s_[6:]}",
+                "endDate": f"{e_[:4]}-{e_[4:6]}-{e_[6:]}",
+                "termId": "1", "pageNum": "1", "pageSize": "50"},
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                               "AppleWebKit/537.36 (KHTML, like Gecko) "
+                               "Chrome/108.0.0.0 Safari/537.36"},
+        timeout=30)
+    r.raise_for_status()
+    out = []
+    for rec in ((r.json() or {}).get("records") or []):
+        rec = {k: v for k, v in rec.items() if k != "newDateValue"}
+        vals = list(rec.values())
+        if len(vals) < 3:
+            continue
+        day = as_day(vals[0])                      # 日期, 期限, 到期收益率
+        if day is None:
+            continue
+        try:
+            num = float(vals[2])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(num):
+            out.append([day, round(num, 4)])
+    return out
+
+
 def fetch_ncd(ak, start):
-    df = ak.bond_china_close_return(symbol="同业存单(AAA)", period="1",
-                                    start_date=start.replace("-", "") + "01",
-                                    end_date=TODAY.replace("-", ""))
-    dcol = pick(df, "日期", "date")
-    vcol = pick(df, "到期收益率", "收益率")
-    prov = {"source_name": "CFETS closing yield curve, AAA NCD (ClsYldCurvHis) via akshare",
-            "source_url": f"{CFETS}/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
+    # This endpoint also caps a request at one calendar month
+    # ("结束日期和开始日期不要超过 1 个月" in akshare's docstring), so it has to be
+    # walked rather than asked for a multi-year span.
+    try:
+        name_code = ak.bond_china_close_return_map()
+        code = name_code[name_code["cnLabel"] == "同业存单(AAA)"]["value"].values[0]
+    except Exception as e:                         # noqa: BLE001
+        print(f"    skip ncd_1y_aaa: could not resolve the curve code ({e})")
+        return {}
+    obs, failures = [], 0
+    for s_, e_ in _month_spans(start):
+        try:
+            obs.extend(_ncd_records(code, s_, e_))
+        except Exception as e:                     # noqa: BLE001
+            failures += 1
+            if failures <= 3:
+                print(f"    ncd {s_[:6]}: {e}")
+    if failures:
+        print(f"    ncd: {failures} month window(s) failed")
+    if not obs:
+        return {}
+    merged = sorted({d: v for d, v in obs}.items())
+    prov = {"source_name": "CFETS closing yield curve, AAA NCD (ClsYldCurvHis), called directly",
+            "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
             "retrieved": TODAY, "confidence": "partial"}
-    return {"ncd_1y_aaa": (daily(df, dcol, vcol), prov,
-                           "1-year maturity point of the AAA negotiable CD curve. Run "
-                           "ak.bond_china_close_return_map() first to confirm the curve label.")}
+    return {"ncd_1y_aaa": ([[d, v] for d, v in merged], prov,
+                           "1-year point of the AAA negotiable CD curve. Fetched by calling "
+                           "CFETS directly rather than through akshare, whose wrapper breaks "
+                           "on the current response schema.")}
 
 
 def fetch_rrr(ak, start):
@@ -326,11 +390,13 @@ def fetch_rrr(ak, start):
             print(f"    skip {sid}: {e}")
             continue
         obs = daily(df, dcol, col)
+        if not obs:
+            print(f"    {sid}: no observations parsed from {dcol!r}/{col!r}")
+            continue
         out[sid] = (obs, prov,
                     "Step series keyed on the EFFECTIVE date (生效时间), not the announcement "
-                    "date. Reconcile against PBoC announcements before relying on it — the "
-                    "seed series was truncated precisely because a mirror had incomplete "
-                    "change dates.")
+                    "date. akshare leaves that column as an ISO datetime string. Reconcile "
+                    "against PBoC announcements before relying on it.")
     return out
 
 

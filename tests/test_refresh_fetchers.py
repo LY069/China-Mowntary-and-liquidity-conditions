@@ -84,16 +84,9 @@ class FakeAk:
             "10年": [1.75], "30年": [2.05],
         })
 
-    def bond_china_close_return(self, symbol, period, start_date, end_date):
-        assert symbol == "同业存单(AAA)", symbol
-        assert period == "1", period
-        return pd.DataFrame({
-            "日期": ["2026-01-05", "2026-01-06"],
-            "期限": [1.0, 1.0],
-            "到期收益率": [1.92, 1.90],
-            "即期收益率": [1.92, 1.90],
-            "远期收益率": [1.93, 1.91],
-        })
+    def bond_china_close_return_map(self):
+        return pd.DataFrame({"cnLabel": ["国债", "同业存单(AAA)"],
+                             "value": ["CYCC000", "CYCC999"]})
 
     def rate_interbank(self, market, symbol, indicator):
         assert symbol in ("Shibor人民币", "Hibor人民币"), symbol
@@ -103,7 +96,8 @@ class FakeAk:
 
     def macro_china_reserve_requirement_ratio(self):
         return pd.DataFrame({
-            "公布时间": ["2025-05-07"], "生效时间": ["2025-05-15"],
+            # akshare does NOT date-convert these; East Money serves ISO datetimes
+            "公布时间": ["2025-05-07 00:00:00"], "生效时间": ["2025-05-15 00:00:00"],
             "大型金融机构-调整前": [9.5], "大型金融机构-调整后": [9.0],
             "中小金融机构-调整前": [6.5], "中小金融机构-调整后": [6.0],
         })
@@ -143,9 +137,49 @@ def main():
     check("cgb_1y picked exactly, not from '10年'", r["cgb_1y"][0][0], ("2024-03-15", 1.5))
     check("cgb_10y", r["cgb_10y"][0][0], ("2024-03-15", 1.75))
 
-    print("\nNCD — AAA curve, 1-year point")
-    r = rd.fetch_ncd(ak, "2026-01")
-    check("ncd_1y_aaa", r["ncd_1y_aaa"][0], [("2026-01-05", 1.92), ("2026-01-06", 1.9)])
+    print("\nNCD — direct CFETS call, tolerant of the schema change that broke akshare")
+    calls = []
+
+    def fake_records(code, s_, e_):
+        calls.append((code, s_, e_))
+        # Old schema carried newDateValue; upstream dropped it, which is exactly
+        # what made akshare's `del temp_df["newDateValue"]` raise KeyError.
+        if s_.startswith("202601"):
+            return [[rd.as_day("2026-01-05"), 1.92]]
+        return [[rd.as_day("2026-02-05"), 1.90]]
+
+    real = rd._ncd_records
+    rd._ncd_records = fake_records
+    try:
+        r = rd.fetch_ncd(ak, "2026-01")
+    finally:
+        rd._ncd_records = real
+    check("curve code resolved from cnLabel/value", calls[0][0], "CYCC999")
+    check("walked month by month", [c[1] for c in calls][:2], ["20260101", "20260201"])
+    check("ncd_1y_aaa", r["ncd_1y_aaa"][0], [["2026-01-05", 1.92], ["2026-02-05", 1.9]])
+
+    print("\n_ncd_records parses records with and without newDateValue")
+    import json as _json
+
+    class FakeResp:
+        def __init__(self, payload): self._p = payload
+        def raise_for_status(self): pass
+        def json(self): return self._p
+
+    import requests as _rq
+    saved = _rq.get
+    for label, rec in [
+        ("old schema (newDateValue present)",
+         {"newDateValue": "x", "d": "2026-03-02", "term": "1", "ytm": "1.88"}),
+        ("new schema (newDateValue absent)",
+         {"d": "2026-03-02", "term": "1", "ytm": "1.88"}),
+    ]:
+        _rq.get = lambda *a, **k: FakeResp({"records": [rec]})
+        try:
+            got = rd._ncd_records("CYCC999", "20260301", "20260331")
+        finally:
+            _rq.get = saved
+        check(label, got, [["2026-03-02", 1.88]])
 
     print("\ninterbank — SHIBOR and CNH HIBOR")
     r = rd.fetch_interbank(ak, "2026-01")
