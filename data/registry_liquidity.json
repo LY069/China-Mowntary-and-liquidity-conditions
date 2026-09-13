@@ -1,0 +1,313 @@
+{
+  "dr007": {
+    "name": "DR007",
+    "name_zh": "银行间存款类机构7天质押式回购利率",
+    "block": "liquidity",
+    "group": "Money market rates",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": true,
+    "read": "The weighted 7-day pledged repo rate among depository institutions only, against interest-rate-bond collateral. The PBoC's designated benchmark from 2016 until the 2026 shift to the overnight tenor, because it strips out credit and collateral-quality noise.",
+    "implications": {
+      "growth": "No direct read on growth. It measures the cost of settlement balances, not the cost of credit.",
+      "inflation": "None directly.",
+      "policy": "The operational target. The PBoC steers DR007 around the 7-day OMO rate; persistent deviation is the clearest statement of operational intent."
+    },
+    "false_signals": "A very low DR007 is routinely misread as aggressive easing. It just as often reflects weak credit demand — banks cannot lend, so reserves pile up and the money market clears cheap. Loose money market, tight credit is the defining Chinese configuration."
+  },
+  "dr007_omo_spread": {
+    "name": "DR007 − 7d OMO spread",
+    "name_zh": "DR007与逆回购利率利差",
+    "block": "liquidity",
+    "group": "Money market rates",
+    "unit": "bp",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": true,
+    "derived": "dr007 - omo_7d",
+    "read": "The deviation of actual bank funding costs from the policy rate the PBoC is targeting. The workhorse China liquidity gauge for a decade — but note that the Q1 2026 Monetary Policy Report moved the declared operating anchor to the OVERNIGHT tenor, so from 2026 the policy-relevant deviation is DR001 − policy rate, bounded at ±25bp. Track both; weight DR001 from 2026 forward.",
+    "implications": {
+      "growth": "None directly, but a persistently negative spread signals that liquidity is not being absorbed by credit creation.",
+      "inflation": "None.",
+      "policy": "Negative and widening means the PBoC is supplying more than the system needs, or credit demand is absent. Positive and widening means deliberate restraint or a funding squeeze. Still the best long history available, but it is no longer the series the PBoC is steering."
+    },
+    "thresholds": {
+      "loose": -15,
+      "neutral_low": -15,
+      "neutral_high": 20,
+      "tight": 40
+    },
+    "false_signals": "Quarter-ends, tax payment weeks and the Chinese New Year cash drain produce mechanical spikes that carry no policy information. Judge the spread on its 20-day average, not the daily print."
+  },
+  "r007": {
+    "name": "R007",
+    "name_zh": "银行间7天质押式回购利率(全市场)",
+    "block": "liquidity",
+    "group": "Money market rates",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": false,
+    "read": "The all-market 7-day repo rate, including non-bank financial institutions and lower-quality collateral.",
+    "implications": {
+      "growth": "None directly.",
+      "inflation": "None.",
+      "policy": "Useful only in combination with DR007 — the gap is the informative part."
+    },
+    "false_signals": "R007 spikes can reflect a single stressed non-bank borrower rather than system-wide conditions."
+  },
+  "r_dr_spread": {
+    "name": "R007 − DR007 spread",
+    "name_zh": "R007与DR007利差",
+    "block": "liquidity",
+    "group": "Money market rates",
+    "unit": "bp",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": true,
+    "derived": "r007 - dr007",
+    "read": "The premium non-banks pay over banks for the same tenor. A direct measure of funding stratification — whether liquidity is reaching beyond the large banks.",
+    "implications": {
+      "growth": "None directly.",
+      "inflation": "None.",
+      "policy": "A widening gap signals stress at the non-bank periphery and leverage unwinding. It is the early-warning indicator for bond-market deleveraging episodes and the one to watch for financial stability risk."
+    },
+    "thresholds": {
+      "loose": 10,
+      "neutral_low": 10,
+      "neutral_high": 40,
+      "tight": 80
+    },
+    "false_signals": "Quarter-end MPA assessment mechanically widens the spread as banks withdraw from lending to non-banks. Strip quarter-end dates before interpreting."
+  },
+  "ncd_1y_aaa": {
+    "name": "1-year AAA NCD rate",
+    "name_zh": "1年期AAA同业存单利率",
+    "block": "liquidity",
+    "group": "Bank funding",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": true,
+    "read": "The rate joint-stock banks pay for 1-year wholesale funding. The marginal cost of bank liabilities, and the best read on term funding pressure beyond overnight.",
+    "implications": {
+      "growth": "Indirect — bank funding costs set the floor under lending rates.",
+      "inflation": "None.",
+      "policy": "Rising NCD rates compress margins and limit how far banks can cut lending rates. The PBoC watches this as a transmission constraint."
+    },
+    "false_signals": "Year-end and quarter-end regulatory ratios distort issuance and pricing. Also driven by government bond supply waves that force banks to fund inventory."
+  },
+  "ncd_mlf_spread": {
+    "name": "1y NCD − 1y MLF spread",
+    "name_zh": "同业存单与MLF利差",
+    "block": "liquidity",
+    "group": "Bank funding",
+    "unit": "bp",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": true,
+    "derived": "ncd_1y_aaa - mlf_1y",
+    "read": "Whether banks can fund themselves in the market more cheaply than from the central bank. The classic gauge of bank liability pressure.",
+    "implications": {
+      "growth": "Indirect.",
+      "inflation": "None.",
+      "policy": "A positive spread means market funding is dearer than central bank funding — banks will take up MLF and the PBoC faces pressure to inject. A negative spread means ample liquidity and weak MLF demand."
+    },
+    "thresholds": {
+      "loose": -20,
+      "neutral_low": -20,
+      "neutral_high": 15,
+      "tight": 30
+    },
+    "false_signals": "Since the MLF's 2024 demotion to a liquidity tool with multi-price bidding, this spread is less of a policy signal and more a pure funding-pressure gauge."
+  },
+  "excess_reserve_ratio": {
+    "name": "Excess reserve ratio",
+    "name_zh": "超额准备金率",
+    "block": "liquidity",
+    "group": "Bank funding",
+    "unit": "%",
+    "freq": "Q",
+    "looser_when": "higher",
+    "core": true,
+    "read": "Banks' voluntary reserves at the PBoC above the required minimum — the true buffer stock of system liquidity. Published quarterly in the Monetary Policy Report.",
+    "implications": {
+      "growth": "A high ratio alongside weak credit is direct evidence of a transmission blockage — the fuel is in the tank but the engine is not turning.",
+      "inflation": "None directly.",
+      "policy": "Roughly 1.5% is the conventional comfort threshold. Below that, funding markets turn fragile and the PBoC typically injects."
+    },
+    "false_signals": "The structural downtrend reflects better liquidity management technology, not persistent tightening. Compare with the same quarter a year earlier, not with a decade ago."
+  },
+  "net_injection_3m": {
+    "name": "PBoC net liquidity injection, 3m sum",
+    "name_zh": "央行净投放(3个月累计)",
+    "block": "liquidity",
+    "group": "Central bank operations",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "higher",
+    "core": true,
+    "read": "Net central bank liquidity provision across all channels — open market reverse repos, MLF, outright reverse repos, PSL and government bond purchases, less maturities.",
+    "implications": {
+      "growth": "None directly; this is plumbing, not stance.",
+      "inflation": "None.",
+      "policy": "The clearest revealed preference of the PBoC's operational intent, especially when read against the calendar of bond supply and tax payments it is offsetting."
+    },
+    "false_signals": "Large gross injections often merely offset maturities, tax drains or bond issuance. Always judge net, and judge against what needed offsetting — a big injection in a heavy tax month is neutral, not loose."
+  },
+  "outright_repo": {
+    "name": "Outright reverse repo operations",
+    "name_zh": "买断式逆回购",
+    "block": "liquidity",
+    "group": "Central bank operations",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "higher",
+    "core": false,
+    "read": "A tool introduced in October 2024 providing 3- and 6-month liquidity against outright-transferred collateral, filling the gap between short OMOs and 1-year MLF.",
+    "implications": {
+      "growth": "None directly.",
+      "inflation": "None.",
+      "policy": "Its creation signalled a deliberate shift away from MLF dependence and toward finer control of the medium-term funding curve. Rising reliance on it is part of the MLF's demotion."
+    },
+    "false_signals": "Short history — no cycle-tested behavioural norms yet. Interpret with caution."
+  },
+  "fiscal_deposits": {
+    "name": "Government deposits at the PBoC, change",
+    "name_zh": "财政存款变动",
+    "block": "liquidity",
+    "group": "Autonomous factors",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "lower",
+    "core": false,
+    "read": "Money moving between the banking system and the Treasury Single Account. A rise drains bank reserves; a fall injects them. Entirely outside the PBoC's control and one of the largest swing factors in Chinese liquidity.",
+    "implications": {
+      "growth": "A sustained build-up means fiscal money is being raised but not spent — a genuine drag on demand as well as liquidity.",
+      "inflation": "Indirect via fiscal impulse.",
+      "policy": "The PBoC's operations are largely designed to offset this. January, April, May, July and October are the heavy tax-drain months; December is the big spending release."
+    },
+    "false_signals": "Purely seasonal in most months. Only the deviation from the seasonal norm carries information."
+  },
+  "govt_bond_issuance": {
+    "name": "Government bond net issuance",
+    "name_zh": "政府债券净融资",
+    "block": "liquidity",
+    "group": "Autonomous factors",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "lower",
+    "core": false,
+    "read": "Central plus local government bond supply absorbed by the banking system. Heavy supply drains reserves and crowds bank balance sheets.",
+    "implications": {
+      "growth": "Positive for growth via the fiscal channel, negative for near-term bank liquidity — the two effects run in opposite directions and on different timescales.",
+      "inflation": "Supports demand and therefore prices, with a lag.",
+      "policy": "Heavy issuance windows reliably coincide with PBoC liquidity support; the central bank explicitly coordinates to prevent supply from tightening money markets."
+    },
+    "false_signals": "Boosts headline TSF without representing private credit demand. A TSF beat driven entirely by government bonds is not evidence of recovering credit appetite."
+  },
+  "cgb_10y": {
+    "name": "10-year CGB yield",
+    "name_zh": "10年期国债收益率",
+    "block": "liquidity",
+    "group": "Bond market",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": true,
+    "read": "The benchmark long rate — jointly a growth-expectations, inflation-expectations and liquidity signal.",
+    "implications": {
+      "growth": "Falling yields in China have mostly signalled deteriorating nominal growth expectations rather than easy policy.",
+      "inflation": "The clearest market-based read on entrenched deflation expectations.",
+      "policy": "The PBoC has publicly resisted disorderly declines, warning on duration risk and one-way bets. Very low yields are therefore both a signal of and a constraint on policy."
+    },
+    "false_signals": "A falling 10-year yield is not a loosening of monetary conditions — it is usually the market pricing a worse nominal growth path. Reading a bond rally as stimulus is the most common analytical error in Chinese macro."
+  },
+  "cgb_1y": {
+    "name": "1-year CGB yield",
+    "name_zh": "1年期国债收益率",
+    "block": "liquidity",
+    "group": "Bond market",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": false,
+    "read": "The short end, tightly anchored to expected policy rates and money market conditions.",
+    "implications": {
+      "growth": "Minimal direct read.",
+      "inflation": "Minimal.",
+      "policy": "The market's expected path for the policy rate over the coming year. Trades below the OMO rate when cuts are expected."
+    },
+    "false_signals": "Distorted by bank and money-fund demand for short collateral at quarter-ends."
+  },
+  "term_spread": {
+    "name": "10y − 1y CGB term spread",
+    "name_zh": "10年-1年国债期限利差",
+    "block": "liquidity",
+    "group": "Bond market",
+    "unit": "bp",
+    "freq": "D",
+    "looser_when": "higher",
+    "core": true,
+    "derived": "cgb_10y - cgb_1y",
+    "read": "The slope of the curve. Steepening normally signals recovering growth and inflation expectations; flattening signals the opposite or a duration-chasing squeeze.",
+    "implications": {
+      "growth": "A sustained steepening is one of the better market-based confirmations that reflation is taking hold.",
+      "inflation": "Embeds the market's inflation expectations, which in China are currently very low.",
+      "policy": "Extreme flatness alongside heavy long-end demand is what prompted PBoC verbal and operational intervention in the bond market."
+    },
+    "false_signals": "In China the curve is heavily shaped by bank balance-sheet demand and regulatory treatment, so it is a noisier growth signal than in developed markets."
+  },
+  "credit_spread_aa": {
+    "name": "3y AA+ MTN spread over CGB",
+    "name_zh": "3年期AA+中票信用利差",
+    "block": "liquidity",
+    "group": "Bond market",
+    "unit": "bp",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": false,
+    "read": "The compensation demanded for corporate credit risk — the price of risk rather than the price of liquidity.",
+    "implications": {
+      "growth": "Widening spreads tighten financing conditions for the marginal private borrower ahead of any move in bank lending rates.",
+      "inflation": "None directly.",
+      "policy": "Sharp widening, especially in urban investment (城投) bonds, triggers targeted support rather than broad easing."
+    },
+    "false_signals": "Implicit government support compresses spreads on quasi-sovereign issuers, so the series understates true credit risk. Spread compression can reflect an asset shortage (资产荒) rather than improving fundamentals."
+  },
+  "cnh_hibor_on": {
+    "name": "Overnight CNH HIBOR",
+    "name_zh": "离岸人民币隔夜拆借利率",
+    "block": "liquidity",
+    "group": "Offshore",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": false,
+    "read": "Offshore renminbi funding cost in Hong Kong. Spikes are the classic fingerprint of deliberate offshore liquidity tightening to squeeze short sellers.",
+    "implications": {
+      "growth": "None directly.",
+      "inflation": "None.",
+      "policy": "A sharp spike is an unambiguous signal of FX defence, and tells you the currency constraint is binding on domestic easing."
+    },
+    "false_signals": "Thin offshore market — spikes can be technical. Confirm against the CNH-CNY spread before concluding intervention."
+  },
+  "shibor_3m": {
+    "name": "3-month SHIBOR",
+    "name_zh": "3个月Shibor",
+    "block": "liquidity",
+    "group": "Bank funding",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": false,
+    "read": "A quoted (not transacted) term rate. Retains relevance as a floating-rate benchmark but has lost ground to DR and NCD rates as a conditions gauge.",
+    "implications": {
+      "growth": "None directly.",
+      "inflation": "None.",
+      "policy": "Secondary confirmation of term funding pressure."
+    },
+    "false_signals": "Quote-based and sticky — it can lag genuine moves in transacted funding costs."
+  }
+}

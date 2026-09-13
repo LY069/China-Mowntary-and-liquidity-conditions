@@ -1,0 +1,79 @@
+{
+  "mci": {
+    "name": "Monetary Conditions Index",
+    "name_zh": "货币condition指数",
+    "block": "monetary",
+    "description": "A standardised composite of the medium-term policy stance as transmitted to the real economy. Each component is converted to a z-score over the common sample, signed so that positive means LOOSER, and averaged with the weights below. Weights are judgemental, chosen to reflect the relative importance of the price of credit, the quantity of credit and the exchange rate in a bank-dominated, capital-controlled economy.",
+    "interpretation": "Positive = monetary conditions looser than the sample average; negative = tighter. The index measures the stance relative to history, not relative to what the economy needs.",
+    "components": [
+      {
+        "id": "real_lending_rate",
+        "weight": 0.3,
+        "sign": -1,
+        "why": "The true real cost of credit — the most policy-relevant single variable. CPI-deflated in this build."
+      },
+      {
+        "id": "real_policy_rate",
+        "weight": 0.15,
+        "sign": -1,
+        "why": "The stance at the short end, as experienced after inflation."
+      },
+      {
+        "id": "tsf_stock_yoy",
+        "weight": 0.2,
+        "sign": 1,
+        "why": "The quantity of credit reaching the real economy."
+      },
+      {
+        "id": "credit_impulse",
+        "weight": 0.2,
+        "sign": 1,
+        "why": "The acceleration of credit, which is what moves activity."
+      },
+      {
+        "id": "reer",
+        "weight": 0.15,
+        "sign": -1,
+        "why": "The external leg of monetary conditions; appreciation tightens."
+      }
+    ]
+  },
+  "lci": {
+    "name": "Liquidity Conditions Index",
+    "name_zh": "流动性condition指数",
+    "block": "liquidity",
+    "description": "A standardised composite of short-horizon funding conditions in the banking system and money markets. Built from spreads rather than levels, so it measures conditions relative to the policy rate rather than the level of rates — this keeps it independent of the monetary stance by construction.",
+    "interpretation": "Positive = interbank liquidity looser than the sample average; negative = tighter. Deliberately says nothing about credit conditions for the real economy — that is the MCI's job. The gap between the two indices is the analytically interesting object.",
+    "components": [
+      {
+        "id": "dr007_omo_spread",
+        "weight": 0.35,
+        "sign": -1,
+        "why": "The benchmark deviation of actual funding cost from the policy rate."
+      },
+      {
+        "id": "r_dr_spread",
+        "weight": 0.15,
+        "sign": -1,
+        "why": "Whether liquidity reaches beyond the large banks to the non-bank periphery."
+      },
+      {
+        "id": "ncd_omo_spread",
+        "weight": 0.25,
+        "sign": -1,
+        "why": "Term funding pressure on bank liabilities, measured against the policy rate. Substitutes for the conventional NCD-versus-MLF spread, which is no longer computable now that the MLF has no single announced rate."
+      },
+      {
+        "id": "excess_reserve_ratio",
+        "weight": 0.25,
+        "sign": 1,
+        "why": "The buffer stock of genuinely surplus reserves in the system."
+      }
+    ]
+  },
+  "divergence": {
+    "name": "Transmission gap (LCI − MCI)",
+    "description": "The signature China diagnostic. A large positive gap means the money market is awash while credit conditions for the real economy remain tight — liquidity is being supplied but not transmitted. This is the quantitative expression of 'pushing on a string'.",
+    "interpretation": "Gap > 1 standard deviation: transmission is impaired; more liquidity provision will not help and the binding constraint is credit demand, not supply. Gap < -1: credit is being extended despite tight funding, typically late-cycle or policy-directed lending."
+  }
+}

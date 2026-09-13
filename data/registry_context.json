@@ -1,0 +1,108 @@
+{
+  "cpi_yoy": {
+    "name": "CPI",
+    "name_zh": "居民消费价格指数同比",
+    "block": "context",
+    "group": "Prices & activity",
+    "unit": "% y/y",
+    "freq": "M",
+    "looser_when": "higher",
+    "core": true,
+    "read": "Headline consumer inflation. The deflator for the real policy rate and the clearest evidence on whether reflation is arriving.",
+    "implications": {
+      "growth": "Persistent near-zero or negative CPI signals demand deficiency rather than supply abundance.",
+      "inflation": "The target variable. China's implicit ~3% ceiling has not been a binding constraint for years; the risk is entirely on the downside.",
+      "policy": "Sub-target inflation is the primary justification for easing and the reason the real policy rate keeps drifting up absent nominal cuts."
+    },
+    "false_signals": "Heavily influenced by pork and fresh food. Always cross-check against core CPI, which strips food and energy."
+  },
+  "core_cpi_yoy": {
+    "name": "Core CPI",
+    "name_zh": "核心CPI同比",
+    "block": "context",
+    "group": "Prices & activity",
+    "unit": "% y/y",
+    "freq": "Q",
+    "looser_when": "higher",
+    "core": true,
+    "read": "CPI excluding food and energy — the underlying demand signal and the right deflator for the real policy rate.",
+    "implications": {
+      "growth": "The cleanest price-side read on domestic demand and the output gap.",
+      "inflation": "The series to watch for genuine reflation. A durable turn here is the confirmation that easing is working.",
+      "policy": "Sustained weak core CPI is the strongest technical case for further cuts."
+    },
+    "false_signals": "Services weights and administered prices (rents, utilities, healthcare) dampen the cyclical signal relative to other economies.",
+    "notes": "Quarterly in this build; only a handful of observations were verifiable. The published series is monthly."
+  },
+  "ppi_yoy": {
+    "name": "PPI",
+    "name_zh": "工业生产者出厂价格指数同比",
+    "block": "context",
+    "group": "Prices & activity",
+    "unit": "% y/y",
+    "freq": "M",
+    "looser_when": "higher",
+    "core": true,
+    "read": "Factory-gate prices. The key determinant of industrial profits and the price variable most sensitive to credit and the investment cycle.",
+    "implications": {
+      "growth": "Maps directly to industrial profits, which drive corporate capex and hiring. Prolonged PPI deflation squeezes the corporate sector's capacity to invest.",
+      "inflation": "The first place a credit-driven reflation shows up. Also China's main export of disinflation to the world.",
+      "policy": "Extended PPI deflation combined with excess capacity has pushed policy toward supply-side capacity discipline alongside demand support."
+    },
+    "false_signals": "Dominated by commodity base effects. Decompose into the production-materials versus consumer-goods components to read domestic demand."
+  },
+  "gdp_deflator_yoy": {
+    "name": "GDP deflator",
+    "name_zh": "GDP平减指数同比",
+    "block": "context",
+    "group": "Prices & activity",
+    "unit": "% y/y",
+    "freq": "Q",
+    "looser_when": "higher",
+    "core": true,
+    "derived": "nominal_gdp_yoy - real_gdp_yoy",
+    "read": "The economy-wide price level — the broadest and most honest measure of China's deflation, and the correct deflator for the real cost of credit.",
+    "implications": {
+      "growth": "Nominal GDP growth is what services debt. A negative deflator means the debt burden rises even when real growth hits target.",
+      "inflation": "The definitive deflation measure. Consecutive negative quarters mark economy-wide deflation regardless of what headline CPI shows.",
+      "policy": "The most powerful argument for aggressive nominal easing — and the variable the real-lending-rate calculation hinges on."
+    },
+    "false_signals": "Derived from nominal and real GDP, both revised. Quarterly and noisy; use a 4-quarter average for the underlying trend.",
+    "unavailable": "Not built. Deriving it requires nominal and real growth for the same periods, and the December 2024 economic census revised the 2023 nominal base upward — a deflator computed across that break is wrong. Use the CPI- and PPI-deflated real rates instead."
+  },
+  "real_gdp_yoy": {
+    "name": "Real GDP, cumulative YTD",
+    "name_zh": "实际GDP同比",
+    "block": "context",
+    "group": "Prices & activity",
+    "unit": "% y/y",
+    "freq": "Q",
+    "looser_when": "higher",
+    "core": false,
+    "read": "Official real growth, cumulative year-to-date — the form the NBS headlines. Resets each Q1.",
+    "implications": {
+      "growth": "The headline outcome against which policy is judged.",
+      "inflation": "The gap to potential drives price pressure.",
+      "policy": "Risk of missing the annual target is the single most reliable trigger for coordinated stimulus."
+    },
+    "false_signals": "Low volatility relative to underlying activity. Cross-check against nominal GDP, which tells the more honest story in a deflation."
+  },
+  "nominal_gdp_yoy": {
+    "name": "Nominal GDP",
+    "name_zh": "名义GDP同比",
+    "block": "context",
+    "group": "Prices & activity",
+    "unit": "% y/y",
+    "freq": "Q",
+    "looser_when": "higher",
+    "core": true,
+    "read": "Growth in current prices — what incomes, profits, tax revenue and debt service are actually measured in.",
+    "implications": {
+      "growth": "Nominal GDP growth falling below real GDP growth means the economy is in deflation and the debt-to-GDP ratio rises mechanically.",
+      "inflation": "The combined quantity-and-price outcome that monetary policy ultimately influences.",
+      "policy": "The benchmark the PBoC uses for 'credit growth broadly matching nominal GDP growth'. A widening gap between TSF growth and nominal GDP growth signals rising leverage without commensurate income."
+    },
+    "false_signals": "None material, but it receives far less attention than real GDP despite being the more policy-relevant series in a deflation.",
+    "unavailable": "Not built. Only sparse cumulative nominal GDP levels were verified, spanning the 2024 census revision. See nominal GDP cumulative YTD for the levels that were verified."
+  }
+}

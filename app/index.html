@@ -1,0 +1,1391 @@
+<title>China Conditions Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;600&display=swap">
+
+<style>
+/* ============================================================ tokens ==== */
+:root{
+  color-scheme: light;
+  --page:#f4f5f7; --surface:#fdfdfe; --surface-2:#eef0f3; --raised:#ffffff;
+  --ink:#111418; --ink-2:#4d5560; --ink-3:#858e9a;
+  --rule:#e3e6ea; --rule-2:#d2d7dd; --border:rgba(17,20,24,.10);
+  --mon:#2a78d6; --mon-soft:rgba(42,120,214,.12); --mon-line:rgba(42,120,214,.30);
+  --liq:#eb6834; --liq-soft:rgba(235,104,52,.12); --liq-line:rgba(235,104,52,.30);
+  --tight:#c0392f; --tight-soft:rgba(192,57,47,.12);
+  --loose:#1c5cab; --loose-soft:rgba(28,92,171,.12);
+  --flat:#6b7480; --flat-soft:rgba(107,116,128,.12);
+  --shadow:0 1px 2px rgba(17,20,24,.05), 0 8px 24px -12px rgba(17,20,24,.18);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --page:#0c0e11; --surface:#14181d; --surface-2:#1b2027; --raised:#1e242b;
+    --ink:#f2f4f6; --ink-2:#a9b2bd; --ink-3:#79828d;
+    --rule:#242a31; --rule-2:#2f3740; --border:rgba(255,255,255,.10);
+    --mon:#3987e5; --mon-soft:rgba(57,135,229,.16); --mon-line:rgba(57,135,229,.34);
+    --liq:#e2703c; --liq-soft:rgba(226,112,60,.16); --liq-line:rgba(226,112,60,.34);
+    --tight:#e66767; --tight-soft:rgba(230,103,103,.16);
+    --loose:#5598e7; --loose-soft:rgba(85,152,231,.16);
+    --flat:#8d96a1; --flat-soft:rgba(141,150,161,.16);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#0c0e11; --surface:#14181d; --surface-2:#1b2027; --raised:#1e242b;
+  --ink:#f2f4f6; --ink-2:#a9b2bd; --ink-3:#79828d;
+  --rule:#242a31; --rule-2:#2f3740; --border:rgba(255,255,255,.10);
+  --mon:#3987e5; --mon-soft:rgba(57,135,229,.16); --mon-line:rgba(57,135,229,.34);
+  --liq:#e2703c; --liq-soft:rgba(226,112,60,.16); --liq-line:rgba(226,112,60,.34);
+  --tight:#e66767; --tight-soft:rgba(230,103,103,.16);
+  --loose:#5598e7; --loose-soft:rgba(85,152,231,.16);
+  --flat:#8d96a1; --flat-soft:rgba(141,150,161,.16);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+/* ============================================================== base ==== */
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--page); color:var(--ink);
+  font-family:var(--sans); font-size:14px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding-inline:20px; padding-block:0 72px}
+h1,h2,h3,h4{margin:0; text-wrap:balance; font-weight:600}
+p{margin:0}
+a{color:inherit}
+button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+:focus-visible{outline:2px solid var(--mon); outline-offset:2px; border-radius:3px}
+.num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+.eyebrow{
+  font-size:10.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink-3);
+}
+@media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important}}
+
+/* ============================================================ header ==== */
+.masthead{
+  border-bottom:1px solid var(--rule); background:var(--surface);
+  position:sticky; top:0; z-index:40;
+}
+.masthead-in{
+  max-width:1180px; margin:0 auto; padding:14px 20px;
+  display:flex; align-items:flex-start; gap:20px; flex-wrap:wrap;
+}
+.brand{flex:1 1 320px; min-width:0}
+.brand h1{
+  font-family:var(--serif); font-size:20px; letter-spacing:-.01em; line-height:1.2;
+}
+.brand .zh{
+  font-size:12px; color:var(--ink-3); margin-top:2px; letter-spacing:.02em;
+}
+.stamp{
+  display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+  font-size:11.5px; color:var(--ink-2);
+}
+.chip{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 8px; border-radius:999px; border:1px solid var(--border);
+  background:var(--surface-2); font-size:11px; font-weight:500; white-space:nowrap;
+}
+.chip .dot{width:6px; height:6px; border-radius:50%; background:var(--flat); flex:none}
+.chip.ok .dot{background:#0ca30c}
+.chip.warn .dot{background:#fab219}
+.chip.bad .dot{background:var(--tight)}
+.theme-btn{
+  padding:5px 10px; border-radius:7px; border:1px solid var(--border);
+  background:var(--surface-2); font-size:11.5px; font-weight:500;
+}
+
+/* ============================================================== nav ===== */
+.nav{
+  display:flex; gap:2px; overflow-x:auto; border-bottom:1px solid var(--rule);
+  background:var(--surface); position:sticky; top:0; z-index:35;
+  scrollbar-width:none;
+}
+.nav::-webkit-scrollbar{display:none}
+.nav-in{max-width:1180px; margin:0 auto; padding:0 20px; display:flex; gap:2px; width:100%}
+.nav button{
+  padding:11px 13px; font-size:13px; font-weight:500; color:var(--ink-3);
+  border-bottom:2px solid transparent; white-space:nowrap; margin-bottom:-1px;
+}
+.nav button:hover{color:var(--ink)}
+.nav button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--ink)}
+
+/* ============================================================ layout ==== */
+section[role="tabpanel"]{padding-top:26px}
+section[hidden]{display:none !important}
+.lede{
+  font-size:14.5px; color:var(--ink-2); max-width:68ch; line-height:1.65;
+}
+.sec-head{margin:34px 0 14px}
+.sec-head:first-child{margin-top:0}
+.sec-head h2{font-family:var(--serif); font-size:17px; letter-spacing:-.005em}
+.sec-head p{font-size:13px; color:var(--ink-2); margin-top:5px; max-width:70ch}
+
+/* ========================================================= diagnosis ==== */
+.diagnosis{
+  border:1px solid var(--border); border-radius:12px; background:var(--surface);
+  padding:18px 20px; box-shadow:var(--shadow); margin-bottom:20px;
+  border-left:3px solid var(--flat);
+}
+.diagnosis[data-state="impaired"]{border-left-color:var(--liq)}
+.diagnosis[data-state="tight"]{border-left-color:var(--tight)}
+.diagnosis[data-state="loose"]{border-left-color:var(--loose)}
+.diagnosis h2{font-family:var(--serif); font-size:19px; margin:6px 0 8px; line-height:1.3}
+.diagnosis p{font-size:13.5px; color:var(--ink-2); max-width:78ch; line-height:1.6}
+.diagnosis .metrics{
+  display:flex; gap:22px; flex-wrap:wrap; margin-top:14px;
+  padding-top:14px; border-top:1px solid var(--rule);
+}
+.metric .k{font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:600}
+.metric .v{font-family:var(--mono); font-size:21px; font-weight:500; line-height:1.2; margin-top:3px}
+.metric .s{font-size:11.5px; color:var(--ink-3)}
+
+/* ============================================================= cards ==== */
+.pair{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:800px){.pair{grid-template-columns:1fr}}
+.card{
+  border:1px solid var(--border); border-radius:12px; background:var(--surface);
+  box-shadow:var(--shadow); overflow:hidden;
+}
+.card-head{
+  padding:15px 18px 12px; display:flex; align-items:flex-start;
+  justify-content:space-between; gap:14px;
+}
+.card-head h3{font-size:14.5px; display:flex; align-items:center; gap:7px}
+.card-head .sub{font-size:11.5px; color:var(--ink-3); margin-top:3px}
+.swatch{width:9px; height:9px; border-radius:2px; flex:none}
+.swatch.mon{background:var(--mon)} .swatch.liq{background:var(--liq)}
+.reading{text-align:right; flex:none}
+.reading .z{font-family:var(--mono); font-size:24px; font-weight:500; line-height:1.1}
+.card-body{padding:0 18px 16px}
+.card-note{
+  font-size:12.5px; color:var(--ink-2); line-height:1.55;
+  padding:12px 18px 15px; border-top:1px solid var(--rule); background:var(--surface-2);
+}
+
+/* ============================================================= pills ==== */
+.pill{
+  display:inline-flex; align-items:center; gap:5px; padding:2px 8px;
+  border-radius:5px; font-size:11px; font-weight:600; white-space:nowrap;
+  letter-spacing:.01em;
+}
+.pill .gl{font-family:var(--mono); font-size:10px; font-weight:600}
+.pill.loose{background:var(--loose-soft); color:var(--loose)}
+.pill.tight{background:var(--tight-soft); color:var(--tight)}
+.pill.flat{background:var(--flat-soft); color:var(--flat)}
+.pill.none{background:var(--surface-2); color:var(--ink-3); font-weight:500}
+
+/* ============================================================= table ==== */
+.tablewrap{
+  border:1px solid var(--border); border-radius:12px; background:var(--surface);
+  box-shadow:var(--shadow); overflow:hidden;
+}
+.scroller{overflow-x:auto}
+table{width:100%; border-collapse:collapse; min-width:640px}
+thead th{
+  font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:600;
+  color:var(--ink-3); text-align:right; padding:10px 12px; border-bottom:1px solid var(--rule-2);
+  background:var(--surface-2); white-space:nowrap; position:sticky; top:0;
+}
+thead th:first-child{text-align:left}
+tbody tr{border-bottom:1px solid var(--rule); cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr:focus-visible{background:var(--surface-2)}
+tbody tr.nodata{cursor:pointer; opacity:.72}
+td{padding:9px 12px; text-align:right; vertical-align:middle}
+td:first-child{text-align:left}
+.iname{font-size:13px; font-weight:500; line-height:1.3}
+.izh{font-size:11px; color:var(--ink-3); font-family:var(--sans)}
+.grouprow td{
+  background:var(--surface-2); font-size:10.5px; letter-spacing:.12em;
+  text-transform:uppercase; font-weight:600; color:var(--ink-3);
+  padding:7px 12px; border-bottom:1px solid var(--rule-2);
+}
+.grouprow{cursor:default}
+.grouprow:hover{background:var(--surface-2)}
+.val{font-family:var(--mono); font-size:13px; font-variant-numeric:tabular-nums; white-space:nowrap}
+.delta{font-family:var(--mono); font-size:12px; font-variant-numeric:tabular-nums; color:var(--ink-2); white-space:nowrap}
+.spark{display:block}
+.muted{color:var(--ink-3); font-size:11.5px}
+
+/* ============================================================ drawer ==== */
+.scrim{
+  position:fixed; inset:0; background:rgba(10,12,15,.44); z-index:60;
+  opacity:0; pointer-events:none; transition:opacity .18s ease;
+}
+.scrim.open{opacity:1; pointer-events:auto}
+.drawer{
+  position:fixed; top:0; right:0; height:100dvh; width:min(560px,100vw);
+  background:var(--surface); border-left:1px solid var(--border); z-index:61;
+  transform:translateX(100%); transition:transform .22s cubic-bezier(.3,.8,.4,1);
+  display:flex; flex-direction:column;
+}
+.drawer.open{transform:translateX(0)}
+.drawer-head{
+  padding:16px 20px 13px; border-bottom:1px solid var(--rule);
+  display:flex; justify-content:space-between; gap:14px; align-items:flex-start;
+}
+.drawer-head h3{font-family:var(--serif); font-size:17px; line-height:1.25}
+.drawer-head .zh{font-size:12px; color:var(--ink-3); margin-top:3px}
+.closebtn{
+  border:1px solid var(--border); border-radius:7px; width:28px; height:28px;
+  display:grid; place-items:center; flex:none; background:var(--surface-2); font-size:15px;
+  line-height:1; color:var(--ink-2);
+}
+.drawer-body{overflow-y:auto; padding:18px 20px 40px; flex:1}
+.facts{
+  display:flex; gap:18px; flex-wrap:wrap; padding-bottom:16px;
+  border-bottom:1px solid var(--rule); margin-bottom:16px;
+}
+.fact .k{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:600}
+.fact .v{font-family:var(--mono); font-size:17px; font-weight:500; margin-top:2px}
+.block{margin-bottom:18px}
+.block h4{
+  font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--ink-3); margin-bottom:6px;
+}
+.block p{font-size:13px; color:var(--ink-2); line-height:1.6}
+.imp{display:grid; gap:10px}
+.imp .row{
+  display:grid; grid-template-columns:78px 1fr; gap:12px; align-items:start;
+  padding:10px 0; border-top:1px solid var(--rule);
+}
+.imp .row:first-child{border-top:none; padding-top:2px}
+.imp .tag{
+  font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:600;
+  color:var(--ink-3); padding-top:2px;
+}
+.warnbox{
+  border-left:2px solid var(--tight); background:var(--tight-soft);
+  padding:10px 13px; border-radius:0 7px 7px 0;
+}
+.warnbox p{color:var(--ink-2); font-size:12.5px}
+.prov{
+  font-size:11.5px; color:var(--ink-3); line-height:1.5;
+  border-top:1px solid var(--rule); padding-top:13px; margin-top:4px;
+}
+.prov a{color:var(--mon); word-break:break-all}
+
+/* ========================================================== charts ====== */
+.chartbox{position:relative}
+.chartbox svg{display:block; width:100%; height:auto; overflow:visible}
+.tip{
+  position:absolute; pointer-events:none; z-index:5; opacity:0;
+  background:var(--raised); border:1px solid var(--rule-2); border-radius:8px;
+  padding:8px 10px; font-size:11.5px; box-shadow:var(--shadow);
+  white-space:nowrap; transition:opacity .1s ease;
+}
+.tip.on{opacity:1}
+.tip .t-date{font-family:var(--mono); font-size:10.5px; color:var(--ink-3); margin-bottom:3px}
+.tip .t-row{display:flex; align-items:center; gap:6px; font-size:12px}
+.tip .t-row .sw{width:8px; height:8px; border-radius:2px; flex:none}
+.tip .t-row .tv{font-family:var(--mono); font-weight:500; margin-left:auto; padding-left:12px}
+.legend{display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--ink-2); padding:2px 0 8px}
+.legend .it{display:flex; align-items:center; gap:6px}
+.legend .sw{width:10px; height:3px; border-radius:2px}
+.rangebar{display:flex; gap:4px; padding:0 0 10px}
+.rangebar button{
+  font-size:11px; font-weight:500; padding:3px 9px; border-radius:6px;
+  border:1px solid transparent; color:var(--ink-3);
+}
+.rangebar button[aria-pressed="true"]{background:var(--surface-2); border-color:var(--border); color:var(--ink)}
+
+/* ========================================================== matrix ====== */
+.matrix{min-width:900px}
+.matrix td{text-align:left; font-size:12.5px; color:var(--ink-2); line-height:1.5; vertical-align:top}
+.matrix td:first-child{width:200px}
+.matrix th{text-align:left}
+.matrix .iname{color:var(--ink)}
+
+/* ========================================================== method ====== */
+.prose{max-width:72ch}
+.prose h3{font-family:var(--serif); font-size:16px; margin:26px 0 8px}
+.prose h3:first-child{margin-top:0}
+.prose p{font-size:13.5px; color:var(--ink-2); line-height:1.68; margin-bottom:10px}
+.prose ul{margin:0 0 12px; padding-left:20px}
+.prose li{font-size:13.5px; color:var(--ink-2); line-height:1.6; margin-bottom:5px}
+.prose code{font-family:var(--mono); font-size:12px; background:var(--surface-2); padding:1px 5px; border-radius:4px}
+.deftable{width:100%; min-width:0; margin-bottom:14px}
+.deftable td{text-align:left; font-size:13px; padding:10px 0; border-bottom:1px solid var(--rule); vertical-align:top}
+.deftable td:first-child{width:34%; font-weight:600; color:var(--ink); padding-right:16px}
+.gaps{
+  border:1px solid var(--border); border-radius:10px; background:var(--surface-2);
+  padding:14px 16px; margin-bottom:16px;
+}
+.gaps ul{margin:8px 0 0; padding-left:18px}
+.gaps li{font-size:12.5px; color:var(--ink-2); margin-bottom:4px; font-family:var(--mono)}
+.empty{
+  border:1px dashed var(--rule-2); border-radius:10px; padding:26px 20px;
+  text-align:center; color:var(--ink-3); font-size:13px;
+}
+</style>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <div class="brand">
+      <h1>China Conditions Monitor</h1>
+      <div class="zh">中国货币与流动性状况监测 · monetary conditions vs liquidity conditions</div>
+    </div>
+    <div class="stamp">
+      <span class="chip" id="chip-asof"><span class="dot"></span><span>loading</span></span>
+      <span class="chip" id="chip-cov"><span class="dot"></span><span>coverage</span></span>
+      <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
+    </div>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Sections">
+  <div class="nav-in" role="tablist">
+    <button role="tab" id="tab-overview"  aria-controls="panel-overview"  aria-selected="true">Overview</button>
+    <button role="tab" id="tab-monetary"  aria-controls="panel-monetary"  aria-selected="false">Monetary conditions</button>
+    <button role="tab" id="tab-liquidity" aria-controls="panel-liquidity" aria-selected="false">Liquidity conditions</button>
+    <button role="tab" id="tab-matrix"    aria-controls="panel-matrix"    aria-selected="false">Read-across</button>
+    <button role="tab" id="tab-method"    aria-controls="panel-method"    aria-selected="false">Definitions &amp; method</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ================================================== OVERVIEW ======== -->
+  <section role="tabpanel" id="panel-overview" aria-labelledby="tab-overview">
+
+    <div class="diagnosis" id="diagnosis">
+      <div class="eyebrow">Current diagnosis</div>
+      <h2 id="diag-head">Reading the data…</h2>
+      <p id="diag-body"></p>
+      <div class="metrics" id="diag-metrics"></div>
+    </div>
+
+    <div class="pair">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3><span class="swatch mon"></span>Monetary Conditions Index</h3>
+            <div class="sub">The medium-term policy stance reaching the real economy</div>
+          </div>
+          <div class="reading">
+            <div class="z num" id="mci-z">–</div>
+            <div id="mci-pill"></div>
+          </div>
+        </div>
+        <div class="card-body"><div class="chartbox" id="mci-chart"></div></div>
+        <div class="card-note" id="mci-note"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h3><span class="swatch liq"></span>Liquidity Conditions Index</h3>
+            <div class="sub">Short-horizon funding conditions in the banking system</div>
+          </div>
+          <div class="reading">
+            <div class="z num" id="lci-z">–</div>
+            <div id="lci-pill"></div>
+          </div>
+        </div>
+        <div class="card-body"><div class="chartbox" id="lci-chart"></div></div>
+        <div class="card-note" id="lci-note"></div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <h2>The transmission gap</h2>
+      <p>Both indices on one scale, with the gap between them below. When liquidity runs loose while
+         monetary conditions stay tight, the central bank is supplying money the credit system is
+         not passing on — the defining configuration of a balance-sheet recession.</p>
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding-top:14px">
+        <div class="rangebar" id="ov-range" role="group" aria-label="Time range"></div>
+        <div class="legend" id="ov-legend"></div>
+        <div class="chartbox" id="ov-chart"></div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <h2>Headline indicators</h2>
+      <p>The core dashboard. <strong>Loose</strong> and <strong>tight</strong> are measured against each
+         series' own history on the available sample, not against a neutral level. Select any row for the
+         full series, the transmission mechanism and the ways it misleads.</p>
+    </div>
+    <div class="tablewrap"><div class="scroller"><table id="core-table"></table></div></div>
+  </section>
+
+  <!-- ================================================== MONETARY ======== -->
+  <section role="tabpanel" id="panel-monetary" aria-labelledby="tab-monetary" hidden>
+    <p class="lede"><strong>Monetary conditions</strong> describe the stance of policy as it is actually
+      transmitted to households and firms — the price and quantity of credit plus the exchange rate, over
+      a horizon of quarters. They answer: is money cheap and available for the real economy?</p>
+    <div class="sec-head">
+      <h2>Monetary condition indicators</h2>
+      <p>Grouped by transmission channel. The state column signs each series so that positive always
+         means looser.</p>
+    </div>
+    <div class="tablewrap"><div class="scroller"><table id="mon-table"></table></div></div>
+  </section>
+
+  <!-- ================================================= LIQUIDITY ======== -->
+  <section role="tabpanel" id="panel-liquidity" aria-labelledby="tab-liquidity" hidden>
+    <p class="lede"><strong>Liquidity conditions</strong> describe the availability and price of settlement
+      balances and short-term funding inside the financial system, over a horizon of days to weeks. They
+      answer: can banks and non-banks fund themselves, and at what cost relative to the policy rate?</p>
+    <div class="sec-head">
+      <h2>Liquidity condition indicators</h2>
+      <p>Built from spreads wherever possible, so the readings measure conditions relative to the policy
+         rate rather than the level of rates.</p>
+    </div>
+    <div class="tablewrap"><div class="scroller"><table id="liq-table"></table></div></div>
+
+    <div class="sec-head">
+      <h2>Macro context</h2>
+      <p>Prices and activity — not conditions indicators themselves, but the variables that determine
+         whether a given nominal stance is genuinely loose.</p>
+    </div>
+    <div class="tablewrap"><div class="scroller"><table id="ctx-table"></table></div></div>
+  </section>
+
+  <!-- =================================================== MATRIX ========= -->
+  <section role="tabpanel" id="panel-matrix" aria-labelledby="tab-matrix" hidden>
+    <p class="lede">What each indicator implies for growth, inflation and the conduct of policy, alongside
+      the ways it most often misleads. This is the interpretation layer: a reading is only useful once you
+      know what it is a signal <em>of</em>.</p>
+    <div class="sec-head">
+      <h2>Signal read-across</h2>
+      <p>Current state is shown where data exists. The implications hold regardless of the current reading.</p>
+    </div>
+    <div class="tablewrap"><div class="scroller"><table class="matrix" id="matrix-table"></table></div></div>
+  </section>
+
+  <!-- =================================================== METHOD ========= -->
+  <section role="tabpanel" id="panel-method" aria-labelledby="tab-method" hidden>
+    <div class="prose" id="method-prose"></div>
+  </section>
+
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" hidden>
+  <div class="drawer-head">
+    <div>
+      <h3 id="drawer-title"></h3>
+      <div class="zh" id="drawer-zh"></div>
+    </div>
+    <button class="closebtn" id="drawer-close" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<script src="data.js"></script>
+<script>
+(function () {
+"use strict";
+
+/* ============================================================== data ==== */
+const DATA = (window.CMLT_DATA) || {meta:{}, registry:{}, composites:{}, series:{}, composite_build:{}};
+const REG  = DATA.registry || {};
+const SER  = DATA.series || {};
+const COMP = DATA.composites || {};
+const META = DATA.meta || {};
+
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const has = (id) => !!(SER[id] && SER[id].points && SER[id].points.length);
+const pts = (id) => (has(id) ? SER[id].points : []);
+const $   = (s, r) => (r || document).querySelector(s);
+const el  = (t, c, x) => { const n = document.createElement(t); if (c) n.className = c; if (x != null) n.textContent = x; return n; };
+
+/* ============================================================= stats ==== */
+function mean(a){ return a.reduce((s,v)=>s+v,0)/a.length; }
+function sd(a){ const m = mean(a); return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/a.length); }
+function zLast(id){
+  const p = pts(id); if (p.length < 8) return null;
+  const v = p.map(d=>d[1]), s = sd(v);
+  if (!s || !isFinite(s)) return null;
+  return (v[v.length-1] - mean(v)) / s;
+}
+function latest(id){ const p = pts(id); return p.length ? p[p.length-1] : null; }
+function changeOver(id, months){
+  const p = pts(id); if (p.length < months+1) return null;
+  return p[p.length-1][1] - p[p.length-1-months][1];
+}
+
+/* ======================================================== formatting ==== */
+function fmt(v, unit){
+  if (v == null || !isFinite(v)) return "–";
+  switch (unit) {
+    case "bp":       return Math.round(v).toLocaleString("en-US");
+    case "%":
+    case "% y/y":    return v.toFixed(2);
+    case "pp":       return v.toFixed(1);
+    case "RMB bn":   return Math.round(v).toLocaleString("en-US");
+    case "pp of GDP":return v.toFixed(1);
+    case "index":    return v.toFixed(1);
+    case "z":        return (v>=0?"+":"") + v.toFixed(2);
+    default:         return v.toFixed(2);
+  }
+}
+function fmtDelta(v, unit){
+  if (v == null || !isFinite(v)) return "–";
+  const s = fmt(Math.abs(v), unit);
+  return (v > 0 ? "+" : v < 0 ? "−" : "") + s;
+}
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtMonth(m){ const [y,mo] = m.split("-"); return MONTHS[+mo-1] + " " + y; }
+function unitOf(id){ return (REG[id] && REG[id].unit) || (SER[id] && SER[id].unit) || ""; }
+
+/* ============================================================ states ==== */
+const BANDS = [
+  {min: 1.00,  cls:"loose", label:"Loose",        gl:"▲▲"},
+  {min: 0.33,  cls:"loose", label:"Mildly loose", gl:"▲"},
+  {min:-0.33,  cls:"flat",  label:"Neutral",      gl:"─"},
+  {min:-1.00,  cls:"tight", label:"Mildly tight", gl:"▼"},
+  {min:-99,    cls:"tight", label:"Tight",        gl:"▼▼"}
+];
+function signedZ(id){
+  const z = zLast(id); if (z == null) return null;
+  const e = REG[id] || {};
+  return z * (e.looser_when === "lower" ? -1 : 1);
+}
+function stateOf(id){
+  const e = REG[id] || {};
+  const z = zLast(id);
+  if (z == null) return {cls:"none", label:"No data", gl:"", z:null, sz:null};
+  if (e.stateless) return {cls:"none", label:(e.stateless_label || "No reading"), gl:"", z:z, sz:null, why:e.stateless};
+  if (e.block === "context") {
+    const above = z >= 0;
+    return {cls:"none", label:(above?"+":"") + z.toFixed(2) + "σ vs history", gl:"", z:z, sz:null};
+  }
+  const sz = signedZ(id);
+  const band = BANDS.find(b => sz >= b.min) || BANDS[BANDS.length-1];
+  return {cls:band.cls, label:band.label, gl:band.gl, z:z, sz:sz};
+}
+function pillNode(st){
+  const p = el("span", "pill " + st.cls);
+  if (st.gl) { const g = el("span","gl",st.gl); p.appendChild(g); }
+  p.appendChild(el("span", null, st.label));
+  return p;
+}
+
+/* ======================================================= chart engine ==== */
+function lineChart(box, opts){
+  const series = (opts.series || []).filter(s => s.points && s.points.length);
+  box.innerHTML = "";
+  if (!series.length) {
+    box.appendChild(el("div","empty","No data available for this series."));
+    return;
+  }
+  const W = Math.max(280, box.clientWidth || 560);
+  const H = opts.height || 190;
+  const padL = opts.padL != null ? opts.padL : 44, padR = 12, padT = 10, padB = 22;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+
+  const months = [...new Set(series.flatMap(s => s.points.map(d => d[0])))].sort();
+  const xi = new Map(months.map((m,i) => [m,i]));
+  const n = months.length;
+  const X = (i) => padL + (n === 1 ? plotW/2 : (i/(n-1)) * plotW);
+
+  let lo = Infinity, hi = -Infinity;
+  series.forEach(s => s.points.forEach(d => { if (d[1] < lo) lo = d[1]; if (d[1] > hi) hi = d[1]; }));
+  if (opts.includeZero) { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
+  if (lo === hi) { lo -= 1; hi += 1; }
+  const pad = (hi - lo) * 0.10; lo -= pad; hi += pad;
+
+  /* Ticks land on human numbers (1/2/2.5/5 x 10^n), chosen by nearest step to
+     ~5 intervals, and are placed INSIDE the data-driven domain. Snapping the
+     domain itself to the step instead would pad the plot out to round bounds
+     and waste half the vertical space on empty chart. */
+  const rawStep = (hi - lo) / 5;
+  const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+  const candidates = [];
+  [0.1, 1, 10].forEach(scale =>
+    [1, 2, 2.5, 5].forEach(m => candidates.push(m * mag * scale)));
+  const step = candidates.sort(
+    (a, b) => Math.abs(a - rawStep) - Math.abs(b - rawStep))[0];
+  const tickVals = [];
+  for (let k = Math.ceil(lo / step); k * step <= hi + step * 1e-9; k++) {
+    tickVals.push(k === 0 ? 0 : k * step);
+  }
+  const Y = (v) => padT + plotH - ((v - lo) / (hi - lo)) * plotH;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", opts.ariaLabel || "Time series chart");
+  const mk = (t, a) => { const e = document.createElementNS(NS,t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+
+  const inkMuted = css("--ink-3"), rule = css("--rule");
+
+  /* y grid + labels */
+  tickVals.forEach(v => {
+    const y = Y(v);
+    svg.appendChild(mk("line",{x1:padL, x2:W-padR, y1:y, y2:y, stroke:rule, "stroke-width":1}));
+    const lb = mk("text",{x:padL-7, y:y+3.5, "text-anchor":"end", fill:inkMuted,
+                          "font-size":10, "font-family":"var(--mono)"});
+    lb.textContent = fmt(v, opts.unit);
+    svg.appendChild(lb);
+  });
+  /* zero line */
+  if (lo < 0 && hi > 0){
+    svg.appendChild(mk("line",{x1:padL, x2:W-padR, y1:Y(0), y2:Y(0),
+                               stroke:css("--rule-2"), "stroke-width":1.25}));
+  }
+  /* x labels at January of each year */
+  let lastYr = null;
+  months.forEach((m,i) => {
+    const yr = m.slice(0,4);
+    if (yr !== lastYr && (n < 40 || m.slice(5) === "01" || i === 0)) {
+      if (yr === lastYr) return;
+      lastYr = yr;
+      const x = X(i);
+      if (x > padL + 8 && x < W - padR - 8) {
+        const lb = mk("text",{x:x, y:H-6, "text-anchor":"middle", fill:inkMuted,
+                              "font-size":10, "font-family":"var(--mono)"});
+        lb.textContent = yr;
+        svg.appendChild(lb);
+      }
+    }
+  });
+
+  /* series paths */
+  series.forEach(s => {
+    const d = s.points.map((p,k) => (k ? "L" : "M") + X(xi.get(p[0])).toFixed(2) + " " + Y(p[1]).toFixed(2)).join(" ");
+    if (s.fill) {
+      const base = Y(Math.max(lo, Math.min(hi, 0)));
+      const first = X(xi.get(s.points[0][0])), last = X(xi.get(s.points[s.points.length-1][0]));
+      svg.appendChild(mk("path",{d: d + ` L${last.toFixed(2)} ${base.toFixed(2)} L${first.toFixed(2)} ${base.toFixed(2)} Z`,
+                                 fill:s.fill, stroke:"none"}));
+    }
+    svg.appendChild(mk("path",{d:d, fill:"none", stroke:s.color, "stroke-width":s.width || 2,
+                               "stroke-linejoin":"round", "stroke-linecap":"round",
+                               "stroke-dasharray": s.dash || "none"}));
+    /* emphasised endpoint */
+    const lastP = s.points[s.points.length-1];
+    svg.appendChild(mk("circle",{cx:X(xi.get(lastP[0])), cy:Y(lastP[1]), r:3.2,
+                                 fill:s.color, stroke:css("--surface"), "stroke-width":1.5}));
+  });
+
+  /* hover layer */
+  const cross = mk("line",{x1:0,x2:0,y1:padT,y2:padT+plotH, stroke:css("--rule-2"),
+                           "stroke-width":1, opacity:0});
+  svg.appendChild(cross);
+  const dots = series.map(s => {
+    const c = mk("circle",{r:4, fill:s.color, stroke:css("--surface"), "stroke-width":2, opacity:0});
+    svg.appendChild(c); return c;
+  });
+  const hit = mk("rect",{x:padL, y:padT, width:plotW, height:plotH, fill:"transparent"});
+  svg.appendChild(hit);
+  box.appendChild(svg);
+
+  const tip = el("div","tip");
+  box.appendChild(tip);
+
+  function move(ev){
+    const r = svg.getBoundingClientRect();
+    const cx = ((ev.touches ? ev.touches[0].clientX : ev.clientX) - r.left) * (W / r.width);
+    let i = n === 1 ? 0 : Math.round(((cx - padL) / plotW) * (n - 1));
+    i = Math.max(0, Math.min(n - 1, i));
+    const m = months[i], x = X(i);
+    cross.setAttribute("x1", x); cross.setAttribute("x2", x); cross.setAttribute("opacity", 1);
+    let html = `<div class="t-date">${fmtMonth(m)}</div>`;
+    series.forEach((s, k) => {
+      const p = s.points.find(d => d[0] === m);
+      if (p) {
+        dots[k].setAttribute("cx", x); dots[k].setAttribute("cy", Y(p[1])); dots[k].setAttribute("opacity", 1);
+        html += `<div class="t-row"><span class="sw" style="background:${s.color}"></span>`
+             +  `<span>${s.label}</span><span class="tv">${fmt(p[1], s.unit || opts.unit)}${s.suffix||""}</span></div>`;
+      } else { dots[k].setAttribute("opacity", 0); }
+    });
+    tip.innerHTML = html;
+    tip.classList.add("on");
+    const tw = tip.offsetWidth, bw = box.clientWidth;
+    const px = (x / W) * bw;
+    tip.style.left = Math.max(2, Math.min(bw - tw - 2, px - tw/2)) + "px";
+    tip.style.top = "2px";
+  }
+  function leave(){
+    cross.setAttribute("opacity", 0);
+    dots.forEach(d => d.setAttribute("opacity", 0));
+    tip.classList.remove("on");
+  }
+  hit.addEventListener("mousemove", move);
+  hit.addEventListener("mouseleave", leave);
+  hit.addEventListener("touchstart", move, {passive:true});
+  hit.addEventListener("touchmove", move, {passive:true});
+  hit.addEventListener("touchend", leave);
+}
+
+/* =========================================================== sparkline == */
+function sparkline(id, cls){
+  const p = pts(id);
+  const w = 108, h = 26, m = 3;
+  if (p.length < 2) return el("span","muted","—");
+  const v = p.map(d => d[1]);
+  const lo = Math.min(...v), hi = Math.max(...v);
+  const rng = (hi - lo) || 1;
+  const X = (i) => m + (i/(v.length-1)) * (w - 2*m);
+  const Y = (x) => m + (h - 2*m) - ((x - lo)/rng) * (h - 2*m);
+  const d = v.map((x,i) => (i?"L":"M") + X(i).toFixed(1) + " " + Y(x).toFixed(1)).join(" ");
+  const color = cls === "mon" ? css("--mon") : cls === "liq" ? css("--liq") : css("--ink-3");
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS,"svg");
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`); svg.setAttribute("width", w); svg.setAttribute("height", h);
+  svg.setAttribute("class","spark"); svg.setAttribute("aria-hidden","true");
+  const path = document.createElementNS(NS,"path");
+  path.setAttribute("d", d); path.setAttribute("fill","none");
+  path.setAttribute("stroke", color); path.setAttribute("stroke-width","1.5");
+  path.setAttribute("stroke-linejoin","round"); path.setAttribute("stroke-linecap","round");
+  svg.appendChild(path);
+  const dot = document.createElementNS(NS,"circle");
+  dot.setAttribute("cx", X(v.length-1)); dot.setAttribute("cy", Y(v[v.length-1]));
+  dot.setAttribute("r","2.2"); dot.setAttribute("fill", color);
+  svg.appendChild(dot);
+  return svg;
+}
+
+/* ============================================================= tables === */
+const HEADS = ["Indicator","Latest","Δ 3m","Trend","State"];
+function buildTable(table, ids){
+  table.innerHTML = "";
+  const thead = el("thead"), htr = el("tr");
+  HEADS.forEach(h => { const th = el("th", null, h); htr.appendChild(th); });
+  thead.appendChild(htr); table.appendChild(thead);
+
+  const tbody = el("tbody");
+  let group = null;
+  ids.forEach(id => {
+    const e = REG[id]; if (!e) return;
+    if (e.group !== group){
+      group = e.group;
+      const gr = el("tr","grouprow"); const gd = el("td", null, group);
+      gd.colSpan = HEADS.length; gr.appendChild(gd); tbody.appendChild(gr);
+    }
+    const st = stateOf(id);
+    const tr = el("tr", has(id) ? "" : "nodata");
+    tr.tabIndex = 0;
+    tr.dataset.id = id;
+    tr.setAttribute("role","button");
+    tr.setAttribute("aria-label", "Open details for " + e.name);
+
+    const c1 = el("td");
+    c1.appendChild(el("div","iname", e.name));
+    if (e.name_zh) c1.appendChild(el("div","izh", e.name_zh));
+    tr.appendChild(c1);
+
+    const lv = latest(id);
+    const c2 = el("td","val");
+    c2.textContent = lv ? fmt(lv[1], e.unit) : "–";
+    if (lv) { const u = el("span","muted"); u.textContent = " " + (e.unit || ""); c2.appendChild(u); }
+    tr.appendChild(c2);
+
+    const d3 = changeOver(id, 3);
+    const c3 = el("td","delta", fmtDelta(d3, e.unit));
+    tr.appendChild(c3);
+
+    const c4 = el("td");
+    const cls = e.block === "monetary" ? "mon" : e.block === "liquidity" ? "liq" : "ctx";
+    const sp = sparkline(id, cls);
+    c4.appendChild(sp);
+    c4.style.width = "120px";
+    tr.appendChild(c4);
+
+    const c5 = el("td");
+    c5.appendChild(pillNode(st));
+    tr.appendChild(c5);
+
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+}
+
+function ordered(block, coreOnly){
+  /* preserve registry insertion order, grouped by `group` in first-seen order */
+  const ids = Object.keys(REG).filter(id => REG[id].block === block && (!coreOnly || REG[id].core));
+  const seen = [];
+  ids.forEach(id => { const g = REG[id].group; if (!seen.includes(g)) seen.push(g); });
+  return seen.flatMap(g => ids.filter(id => REG[id].group === g));
+}
+
+/* ============================================================= drawer === */
+const drawer = $("#drawer"), scrim = $("#scrim");
+let lastFocus = null;
+
+function openDrawer(id){
+  const e = REG[id]; if (!e) return;
+  lastFocus = document.activeElement;
+  $("#drawer-title").textContent = e.name;
+  $("#drawer-zh").textContent = [e.name_zh, e.unit].filter(Boolean).join(" · ");
+
+  const body = $("#drawer-body");
+  body.innerHTML = "";
+
+  /* facts */
+  const st = stateOf(id);
+  const facts = el("div","facts");
+  const lv = latest(id);
+  const addFact = (k, v) => { const f = el("div","fact"); f.appendChild(el("div","k",k)); f.appendChild(el("div","v",v)); facts.appendChild(f); };
+  addFact("Latest", lv ? fmt(lv[1], e.unit) : "–");
+  addFact("As of", lv ? fmtMonth(lv[0]) : "–");
+  addFact("Δ 3m", fmtDelta(changeOver(id,3), e.unit));
+  addFact("Δ 12m", fmtDelta(changeOver(id,12), e.unit));
+  if (st.z != null) addFact("z-score", fmt(st.z, "z"));
+  body.appendChild(facts);
+
+  if (st.why){
+    const b = el("div","block");
+    b.appendChild(el("h4", null, "No loose/tight reading"));
+    const w = el("div","warnbox"); w.appendChild(el("p", null, st.why));
+    b.appendChild(w); body.appendChild(b);
+  }
+  if (e.block !== "context" && st.cls !== "none"){
+    const sl = el("div","block");
+    const p = pillNode(st);
+    const wrapp = el("div");
+    wrapp.appendChild(p);
+    const note = el("span","muted");
+    note.textContent = "  " + (e.looser_when === "lower" ? "lower = looser" : "higher = looser")
+                     + " · measured against this series' own history";
+    wrapp.appendChild(note);
+    sl.appendChild(wrapp);
+    body.appendChild(sl);
+  }
+
+  /* chart */
+  const cb = el("div","block");
+  cb.appendChild(el("h4", null, "Time series"));
+  const box = el("div","chartbox");
+  cb.appendChild(box);
+  body.appendChild(cb);
+  const color = e.block === "monetary" ? css("--mon") : e.block === "liquidity" ? css("--liq") : css("--ink-2");
+  const fillC = e.block === "monetary" ? css("--mon-soft") : e.block === "liquidity" ? css("--liq-soft") : "none";
+
+  /* content blocks */
+  const addBlock = (h, txt) => {
+    if (!txt) return;
+    const b = el("div","block");
+    b.appendChild(el("h4", null, h));
+    b.appendChild(el("p", null, txt));
+    body.appendChild(b);
+  };
+  if (e.derived){
+    const b = el("div","block");
+    b.appendChild(el("h4", null, "Construction"));
+    const p = el("p"); const code = el("code", null, e.derived); p.appendChild(code);
+    if (e.basis) p.appendChild(document.createTextNode("  (scaled by " + e.basis + ")"));
+    if (e.basis_note){ const n = el("p","muted", e.basis_note); n.style.marginTop = "6px"; b.appendChild(n); }
+    b.appendChild(p); body.appendChild(b);
+  }
+  addBlock("How to read it", e.read);
+
+  if (e.implications){
+    const b = el("div","block");
+    b.appendChild(el("h4", null, "Implications"));
+    const g = el("div","imp");
+    [["Growth","growth"],["Inflation","inflation"],["Policy","policy"]].forEach(([tag,key]) => {
+      if (!e.implications[key]) return;
+      const r = el("div","row");
+      r.appendChild(el("div","tag",tag));
+      r.appendChild(el("div", null, e.implications[key]));
+      g.appendChild(r);
+    });
+    b.appendChild(g); body.appendChild(b);
+  }
+  if (e.false_signals){
+    const b = el("div","block");
+    b.appendChild(el("h4", null, "Where it misleads"));
+    const w = el("div","warnbox"); w.appendChild(el("p", null, e.false_signals));
+    b.appendChild(w); body.appendChild(b);
+  }
+  if (e.thresholds){
+    const b = el("div","block");
+    b.appendChild(el("h4", null, "Reference thresholds (" + (e.unit||"") + ")"));
+    const t = el("p", null, Object.entries(e.thresholds)
+      .map(([k,v]) => k.replace(/_/g," ") + ": " + v).join("  ·  "));
+    b.appendChild(t); body.appendChild(b);
+  }
+
+  /* provenance */
+  const s = SER[id];
+  const pv = el("div","prov");
+  if (s && s.provenance){
+    const p = s.provenance;
+    pv.appendChild(document.createTextNode(
+      "Source: " + (p.source_name || "unknown")
+      + (p.retrieved ? " · retrieved " + p.retrieved : "")
+      + " · confidence: " + (p.confidence || "unstated") + ". "));
+    if (p.source_url && /^https?:/.test(p.source_url)){
+      const a = el("a", null, p.source_url);
+      a.href = p.source_url; a.target = "_blank"; a.rel = "noopener noreferrer";
+      pv.appendChild(a);
+    }
+    if (s.series_notes) pv.appendChild(el("div", null, s.series_notes));
+  } else {
+    pv.textContent = "No observations loaded for this indicator. The framework entry above still applies — "
+                   + "see Definitions & method for how to populate the dataset.";
+  }
+  body.appendChild(pv);
+
+  drawer.hidden = false;
+  requestAnimationFrame(() => {
+    drawer.classList.add("open"); scrim.classList.add("open");
+    lineChart(box, {
+      series: has(id) ? [{id:id, label:e.name, color:color, points:pts(id), fill:fillC}] : [],
+      height: 180, unit: e.unit, includeZero: /bp|pp|% y\/y/.test(e.unit || ""),
+      ariaLabel: e.name + " time series"
+    });
+    $("#drawer-close").focus();
+  });
+}
+function closeDrawer(){
+  drawer.classList.remove("open"); scrim.classList.remove("open");
+  setTimeout(() => { drawer.hidden = true; }, 230);
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+$("#drawer-close").addEventListener("click", closeDrawer);
+scrim.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !drawer.hidden) closeDrawer(); });
+document.addEventListener("click", (e) => {
+  const tr = e.target.closest && e.target.closest("tr[data-id]");
+  if (tr) openDrawer(tr.dataset.id);
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const tr = e.target.closest && e.target.closest("tr[data-id]");
+  if (tr) { e.preventDefault(); openDrawer(tr.dataset.id); }
+});
+
+/* ========================================================== composites == */
+function compNote(key){
+  const b = (DATA.composite_build || {})[key];
+  const spec = COMP[key];
+  if (!spec) return "";
+  if (!b) return spec.description;
+  let s = "Built from " + b.components_used.length + " component"
+        + (b.components_used.length === 1 ? "" : "s") + ": "
+        + b.components_used.map(c => (REG[c] && REG[c].name) || c).join(", ") + ".";
+  if (b.components_missing && b.components_missing.length)
+    s += " Not yet available: " + b.components_missing.map(c => (REG[c] && REG[c].name) || c).join(", ") + ".";
+  if (b.coverage) s += " Sample " + b.coverage + ".";
+  return s;
+}
+function renderComposite(key, chartId, zId, pillId, noteId, color, fill){
+  const p = pts(key);
+  $("#" + noteId).textContent = compNote(key);
+  const zEl = $("#" + zId), pEl = $("#" + pillId);
+  if (!p.length){
+    zEl.textContent = "–";
+    pEl.innerHTML = "";
+    pEl.appendChild(pillNode({cls:"none", label:"Not built", gl:""}));
+    lineChart($("#" + chartId), {series:[], height:150});
+    return;
+  }
+  const v = p[p.length-1][1];
+  zEl.textContent = fmt(v, "z");
+  zEl.style.color = v > 0.33 ? css("--loose") : v < -0.33 ? css("--tight") : css("--ink");
+  const band = BANDS.find(b => v >= b.min) || BANDS[BANDS.length-1];
+  pEl.innerHTML = "";
+  pEl.appendChild(pillNode({cls:band.cls, label:band.label, gl:band.gl}));
+  lineChart($("#" + chartId), {
+    series:[{id:key, label:COMP[key] ? COMP[key].name : key, color:color, points:p, fill:fill}],
+    height:150, unit:"z", includeZero:true, padL:38,
+    ariaLabel:(COMP[key] ? COMP[key].name : key) + ", standardised, positive means looser"
+  });
+}
+
+/* =========================================================== diagnosis == */
+function renderDiagnosis(){
+  const node = $("#diagnosis");
+  const headEl = $("#diag-head"), bodyEl = $("#diag-body"), mEl = $("#diag-metrics");
+  mEl.innerHTML = "";
+  const mci = latest("mci"), lci = latest("lci"), dv = latest("divergence");
+
+  if (!mci || !lci){
+    node.dataset.state = "";
+    headEl.textContent = "The framework is loaded; the data is not";
+    const missing = [];
+    ["mci","lci"].forEach(k => {
+      const b = (DATA.composite_build || {})[k];
+      if (!b) missing.push((COMP[k] ? COMP[k].name : k) + " (no components available)");
+      else if (b.components_missing && b.components_missing.length)
+        missing.push((COMP[k] ? COMP[k].name : k) + " missing " + b.components_missing.join(", "));
+    });
+    bodyEl.textContent = "Every indicator definition, transmission mechanism and read-across below is live — "
+      + "browse them in the tabs above. The composite indices need observations to be populated in "
+      + "data/seed/series.json and the build re-run. " + (missing.length ? missing.join("; ") + "." : "");
+    return;
+  }
+
+  const m = mci[1], l = lci[1], g = dv ? dv[1] : l - m;
+  const word = (v) => v >= 1 ? "clearly loose" : v >= 0.33 ? "mildly loose"
+                    : v > -0.33 ? "close to average" : v > -1 ? "mildly tight" : "clearly tight";
+  let state = "", head = "", body = "";
+
+  if (g > 0.75){
+    state = "impaired";
+    head = "Loose liquidity, tight money — transmission is impaired";
+    body = "Interbank funding is " + word(l) + " while monetary conditions reaching the real economy are "
+         + word(m) + ". The central bank is supplying settlement balances that the credit system is not "
+         + "passing through to borrowers. On this configuration further liquidity injections have little "
+         + "traction: the binding constraint is the demand for credit, not its supply. Watch the "
+         + "narrow-money and real-lending-rate components rather than the money market for evidence of a turn.";
+  } else if (g < -0.75){
+    state = "tight";
+    head = "Credit is flowing despite tight funding";
+    body = "Monetary conditions are " + word(m) + " while interbank liquidity is " + word(l) + ". Credit is "
+         + "being extended faster than money-market conditions would imply, which in China typically means "
+         + "policy-directed lending or heavy government bond issuance is carrying the aggregate. Check the "
+         + "composition of total social financing before reading this as private-sector strength.";
+  } else if (m < -0.5 && l < -0.5){
+    state = "tight";
+    head = "Conditions are tight on both measures";
+    body = "Monetary conditions are " + word(m) + " and liquidity is " + word(l) + ". Tightening is reaching "
+         + "both the money market and the real economy — a genuinely restrictive configuration rather than a "
+         + "transmission problem.";
+  } else if (m > 0.5 && l > 0.5){
+    state = "loose";
+    head = "Conditions are loose on both measures";
+    body = "Monetary conditions are " + word(m) + " and liquidity is " + word(l) + ". Easing is reaching the "
+         + "real economy as well as the money market — the configuration in which monetary policy is "
+         + "actually working.";
+  } else {
+    state = "";
+    head = "Conditions are mixed";
+    body = "Monetary conditions are " + word(m) + " and liquidity is " + word(l) + ". Neither block is far "
+         + "from its historical average, and the gap between them is not wide enough to diagnose a "
+         + "transmission problem.";
+  }
+  node.dataset.state = state;
+  headEl.textContent = head;
+  bodyEl.textContent = body;
+
+  const addM = (k, v, s, color) => {
+    const d = el("div","metric");
+    d.appendChild(el("div","k",k));
+    const vv = el("div","v", v); if (color) vv.style.color = color;
+    d.appendChild(vv);
+    d.appendChild(el("div","s",s));
+    mEl.appendChild(d);
+  };
+  addM("Monetary", fmt(m,"z"), word(m), m > 0.33 ? css("--loose") : m < -0.33 ? css("--tight") : "");
+  addM("Liquidity", fmt(l,"z"), word(l), l > 0.33 ? css("--loose") : l < -0.33 ? css("--tight") : "");
+  addM("Transmission gap", fmt(g,"z"), g > 0.75 ? "impaired" : g < -0.75 ? "inverted" : "within normal range",
+       Math.abs(g) > 0.75 ? css("--liq") : "");
+  addM("As of", fmtMonth(mci[0]), "latest common month", "");
+}
+
+/* ====================================================== overview chart == */
+let ovRange = 0;   /* 0 = all */
+function clipTo(p, months){
+  if (!months || p.length <= months) return p;
+  return p.slice(p.length - months);
+}
+function renderOverview(){
+  const box = $("#ov-chart");
+  const s = [];
+  if (has("mci")) s.push({id:"mci", label:"Monetary", color:css("--mon"), points:clipTo(pts("mci"), ovRange)});
+  if (has("lci")) s.push({id:"lci", label:"Liquidity", color:css("--liq"), points:clipTo(pts("lci"), ovRange)});
+  if (has("divergence")) s.push({id:"divergence", label:"Gap (Liq − Mon)", color:css("--ink-3"),
+                                 points:clipTo(pts("divergence"), ovRange), width:1.5, dash:"3 3"});
+  lineChart(box, {series:s, height:250, unit:"z", includeZero:true, padL:40,
+                  ariaLabel:"Monetary and liquidity conditions indices, standardised"});
+
+  const lg = $("#ov-legend");
+  lg.innerHTML = "";
+  s.forEach(x => {
+    const it = el("div","it");
+    const sw = el("span","sw"); sw.style.background = x.color;
+    if (x.dash) sw.style.opacity = ".7";
+    it.appendChild(sw); it.appendChild(el("span", null, x.label));
+    lg.appendChild(it);
+  });
+  if (s.length){
+    const hint = el("div","it");
+    hint.appendChild(el("span","muted","↑ looser   ↓ tighter   (standard deviations from sample mean)"));
+    lg.appendChild(hint);
+  }
+}
+function renderRange(){
+  const bar = $("#ov-range");
+  bar.innerHTML = "";
+  [["All",0],["10y",120],["5y",60],["3y",36]].forEach(([lab,n]) => {
+    const b = el("button", null, lab);
+    b.type = "button";
+    b.setAttribute("aria-pressed", String(ovRange === n));
+    b.addEventListener("click", () => { ovRange = n; renderRange(); renderOverview(); });
+    bar.appendChild(b);
+  });
+}
+
+/* ============================================================= matrix === */
+function renderMatrix(){
+  const t = $("#matrix-table");
+  t.innerHTML = "";
+  const thead = el("thead"), htr = el("tr");
+  ["Indicator","State","Growth","Inflation","Policy"].forEach(h => htr.appendChild(el("th",null,h)));
+  thead.appendChild(htr); t.appendChild(thead);
+  const tb = el("tbody");
+  ["monetary","liquidity"].forEach(block => {
+    const gr = el("tr","grouprow");
+    const gd = el("td", null, block === "monetary" ? "Monetary conditions" : "Liquidity conditions");
+    gd.colSpan = 5; gr.appendChild(gd); tb.appendChild(gr);
+    ordered(block, true).forEach(id => {
+      const e = REG[id]; if (!e || !e.implications) return;
+      const tr = el("tr"); tr.dataset.id = id; tr.tabIndex = 0; tr.setAttribute("role","button");
+      const c1 = el("td");
+      c1.appendChild(el("div","iname", e.name));
+      if (e.name_zh) c1.appendChild(el("div","izh", e.name_zh));
+      tr.appendChild(c1);
+      const c2 = el("td"); c2.appendChild(pillNode(stateOf(id))); tr.appendChild(c2);
+      tr.appendChild(el("td", null, e.implications.growth || "—"));
+      tr.appendChild(el("td", null, e.implications.inflation || "—"));
+      tr.appendChild(el("td", null, e.implications.policy || "—"));
+      tb.appendChild(tr);
+    });
+  });
+  t.appendChild(tb);
+}
+
+/* ============================================================= method === */
+function renderMethod(){
+  const root = $("#method-prose");
+  root.innerHTML = "";
+  const h = (t) => root.appendChild(el("h3", null, t));
+  const p = (t) => { const n = el("p"); n.innerHTML = t; root.appendChild(n); return n; };
+  const ul = (items) => { const u = el("ul"); items.forEach(i => { const li = el("li"); li.innerHTML = i; u.appendChild(li); }); root.appendChild(u); };
+
+  h("The distinction this tracker is built on");
+  p("<strong>Monetary conditions</strong> describe the stance of policy as it is actually transmitted to "
+    + "households and firms: the price of credit, the quantity of credit, and the exchange rate. The horizon is "
+    + "quarters to years, the object is the real economy, and the question is whether money is cheap and available "
+    + "to people who might spend it.");
+  p("<strong>Liquidity conditions</strong> describe the availability and price of settlement balances and "
+    + "short-term funding inside the financial system. The horizon is days to weeks, the object is banks and "
+    + "non-banks, and the question is whether financial institutions can fund themselves and at what cost "
+    + "relative to the policy rate.");
+  p("The two are routinely conflated, and in China they come apart more than almost anywhere else. A central bank "
+    + "can flood the money market with reserves — driving repo rates to the floor — while credit conditions for a "
+    + "private manufacturer remain punishingly tight, because the banks receiving those reserves cannot find "
+    + "creditworthy borrowers who want to borrow. Loose liquidity and tight money is not a contradiction; it is "
+    + "the signature of impaired transmission, and it is the configuration this tracker is designed to detect.");
+  p("Three China-specific features make the gap wider than in developed markets: a bank-dominated system in which "
+    + "property collateral drives credit supply; capital controls that let domestic and external monetary conditions "
+    + "diverge; and a policy framework that was, until recently, quantity-based rather than price-based.");
+
+  h("How the two indices are built");
+  p("Each component is converted to a z-score over its own available sample, signed so that <strong>positive always "
+    + "means looser</strong>, then combined using the weights below. The indices measure conditions "
+    + "<em>relative to their own history</em>, not against a neutral level — a reading of zero means average for the "
+    + "sample, not neutral policy.");
+  Object.entries(COMP).forEach(([key, spec]) => {
+    if (!spec.components) return;
+    const t = el("table","deftable");
+    const tb = el("tbody");
+    const cap = el("tr"); const cd = el("td", null, spec.name); cd.colSpan = 2;
+    cd.style.fontFamily = "var(--serif)"; cd.style.fontSize = "15px"; cd.style.paddingTop = "14px";
+    cap.appendChild(cd); tb.appendChild(cap);
+    spec.components.forEach(c => {
+      const tr = el("tr");
+      const name = (REG[c.id] && REG[c.id].name) || c.id;
+      const built = has(c.id);
+      const k = el("td");
+      k.appendChild(document.createTextNode(name));
+      const w = el("div","muted");
+      w.textContent = Math.round(c.weight*100) + "% weight · sign " + (c.sign > 0 ? "+" : "−")
+                    + (built ? "" : " · NOT AVAILABLE");
+      k.appendChild(w);
+      tr.appendChild(k);
+      tr.appendChild(el("td", null, c.why));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); root.appendChild(t);
+  });
+  if (COMP.divergence) p("<strong>Transmission gap</strong> = Liquidity index − Monetary index. " + COMP.divergence.description);
+
+  h("Reading the state labels");
+  p("Every indicator is signed by whether a rise means looser or tighter conditions, then banded against its own "
+    + "history. Context indicators — prices and activity — are shown as a plain z-score instead, because "
+    + "'loose' and 'tight' are not meaningful descriptions of an inflation rate.");
+  ul([
+    "<strong>Loose</strong> / <strong>Tight</strong> — more than one standard deviation from the sample mean.",
+    "<strong>Mildly loose</strong> / <strong>Mildly tight</strong> — between a third and one standard deviation.",
+    "<strong>Neutral</strong> — within a third of a standard deviation of the sample mean.",
+    "A z-score needs at least eight observations; series shorter than that show no state."
+  ]);
+
+  h("Data provenance — read this before using any number");
+  const warn = el("div","gaps");
+  const wp = el("p");
+  wp.innerHTML = "<strong>This dataset was assembled under a hard network restriction and is a demonstration seed, "
+    + "not a production feed.</strong> The sandbox that built it blocks every macroeconomic data host — the PBoC, "
+    + "the NBS, ChinaBond, CFETS, FRED, the BIS, the IMF and the World Bank were all unreachable. Every fetched "
+    + "value therefore came from third-party mirrors on GitHub rather than from a primary publisher. Values were "
+    + "spot-checked against the official record and match it where checked, but re-pulling from primary sources is "
+    + "the first task for anyone using this seriously.";
+  wp.style.fontSize = "13px"; wp.style.color = "var(--ink-2)"; wp.style.lineHeight = "1.6";
+  warn.appendChild(wp);
+  root.appendChild(warn);
+  p("Each indicator carries its own source, retrieval date and confidence rating, visible when you open it. "
+    + "Three confidence levels are used: <code>verified</code> (traced to a named official publication, typically "
+    + "the PBoC Monetary Policy Report), <code>partial</code> (from a mirror whose upstream is an official series "
+    + "but which was not confirmed at the publisher), and <code>analyst-supplied</code> (entered from domain "
+    + "knowledge because no machine-readable source was reachable).");
+  p("Two series — the 7-day reverse repo policy rate and the 1-year MLF rate — are "
+    + "<code>analyst-supplied</code>. They were added deliberately: without a policy rate there is no DR007 spread, "
+    + "no real policy rate and no liquidity index at all. They are cross-checked against policy-rate anchors "
+    + "independently extracted from the Monetary Policy Report, and against the reserve requirement series, which "
+    + "corroborates the May 2025 easing package. They are kept in a separate file from the fetched data so the "
+    + "distinction is auditable.");
+
+  h("What is missing, and why it matters");
+  const gapNames = Object.keys(REG).filter(id => !has(id) && REG[id].core);
+  if (gapNames.length){
+    p("These indicators are defined in the framework but carry no data in this build. Their absence degrades the "
+      + "indices in specific, named ways rather than silently:");
+    ul(gapNames.map(id => "<strong>" + REG[id].name + "</strong> — " + (REG[id].unavailable || "no reachable source in this build.")));
+  }
+  const cb = DATA.composite_build || {};
+  const notes = [];
+  Object.entries(cb).forEach(([k, b]) => {
+    if (!COMP[k]) return;
+    if (b.stale_months) notes.push("<strong>" + COMP[k].name + "</strong>: the last " + b.stale_months
+      + " month(s) after " + fmtMonth(b.fresh_until) + " rest entirely on quarterly inputs carried forward. "
+      + "They are not fresh readings — treat " + fmtMonth(b.fresh_until) + " as the last informative month.");
+    if (b.latest_weight_coverage != null && b.latest_weight_coverage < 0.999)
+      notes.push("<strong>" + COMP[k].name + "</strong>: the latest month is computed from "
+        + Math.round(b.latest_weight_coverage*100) + "% of the intended index weight, because components start and "
+        + "end at different dates. Weights are renormalised over whatever is present each month.");
+  });
+  if (notes.length){ p("Two further caveats on the composite readings:"); ul(notes); }
+  if (META.gaps && META.gaps.length){
+    const g = el("div","gaps");
+    g.appendChild(el("div","eyebrow","Omissions recorded by the data-sourcing pass"));
+    const u = el("ul");
+    META.gaps.forEach(x => u.appendChild(el("li", null, x)));
+    g.appendChild(u); root.appendChild(g);
+  }
+
+  h("Refreshing the data");
+  p("The tracker is driven by two files. <code>data/seed/series.json</code> holds fetched observations; "
+    + "<code>data/seed/analyst_supplied.json</code> holds anything entered by hand. Running "
+    + "<code>python3 scripts/build_app_data.py</code> merges them, computes every derived series and composite, "
+    + "and regenerates <code>app/data.js</code>. Nothing in the app fetches at runtime, so it works offline and "
+    + "the numbers on screen always correspond to a build you can inspect.");
+  p("To add an indicator, give it an entry in one of the <code>data/registry_*.json</code> files and add "
+    + "observations under the same key. Derived series are declared in the build script; composites in "
+    + "<code>data/composites.json</code>. The build reports every series it could not construct and why, so "
+    + "missing data fails loudly rather than silently producing a plausible-looking index.");
+}
+
+/* ============================================================== chrome == */
+function renderChips(){
+  const all = Object.values(SER).flatMap(s => s.points.map(p => p[0]));
+  const asof = all.length ? all.sort().slice(-1)[0] : null;
+  const c1 = $("#chip-asof");
+  c1.className = "chip" + (asof ? " ok" : " bad");
+  c1.lastChild.textContent = asof ? "Data to " + fmtMonth(asof) : "No data loaded";
+
+  const total = Object.keys(REG).length;
+  const withData = Object.keys(REG).filter(has).length;
+  const c2 = $("#chip-cov");
+  const ratio = total ? withData/total : 0;
+  c2.className = "chip" + (ratio > 0.8 ? " ok" : ratio > 0.5 ? " warn" : " bad");
+  c2.lastChild.textContent = withData + " of " + total + " indicators populated";
+  c2.title = "Indicators defined in the framework that carry observations in this build";
+}
+
+function initTabs(){
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      tabs.forEach(t => {
+        const on = t === tab;
+        t.setAttribute("aria-selected", String(on));
+        $("#" + t.getAttribute("aria-controls")).hidden = !on;
+      });
+      window.scrollTo({top:0, behavior:"instant"});
+      if (tab.id === "tab-overview") { renderOverview(); renderCards(); }
+    });
+    tab.addEventListener("keydown", (e) => {
+      const i = tabs.indexOf(tab);
+      let j = null;
+      if (e.key === "ArrowRight") j = (i+1) % tabs.length;
+      if (e.key === "ArrowLeft")  j = (i-1+tabs.length) % tabs.length;
+      if (j != null){ e.preventDefault(); tabs[j].focus(); tabs[j].click(); }
+    });
+  });
+}
+
+function initTheme(){
+  const btn = $("#theme-toggle");
+  const apply = (mode) => {
+    if (mode === "system") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", mode);
+    btn.textContent = mode === "system" ? "Theme: auto" : mode === "dark" ? "Theme: dark" : "Theme: light";
+    redraw();
+  };
+  let mode = "system";
+  try { mode = localStorage.getItem("cmlt-theme") || "system"; } catch (e) { /* private mode */ }
+  apply(mode);
+  btn.addEventListener("click", () => {
+    mode = mode === "system" ? "light" : mode === "light" ? "dark" : "system";
+    try { localStorage.setItem("cmlt-theme", mode); } catch (e) { /* ignore */ }
+    apply(mode);
+  });
+}
+
+function renderCards(){
+  renderComposite("mci","mci-chart","mci-z","mci-pill","mci-note", css("--mon"), css("--mon-soft"));
+  renderComposite("lci","lci-chart","lci-z","lci-pill","lci-note", css("--liq"), css("--liq-soft"));
+  /* append the freshness caveat to each card note */
+  const cb = DATA.composite_build || {};
+  [["mci","mci-note"],["lci","lci-note"]].forEach(([k, id]) => {
+    const b = cb[k]; if (!b) return;
+    const bits = [];
+    if (b.stale_months) bits.push("Last " + b.stale_months + " month(s) rest on quarterly inputs carried forward — "
+      + fmtMonth(b.fresh_until) + " is the last fresh reading.");
+    if (b.latest_weight_coverage != null && b.latest_weight_coverage < 0.999)
+      bits.push("Latest month carries " + Math.round(b.latest_weight_coverage*100) + "% of index weight.");
+    if (!bits.length) return;
+    const n = $("#" + id);
+    const warn = el("div");
+    warn.style.marginTop = "7px"; warn.style.color = "var(--liq)"; warn.style.fontWeight = "500";
+    warn.textContent = bits.join(" ");
+    n.appendChild(warn);
+  });
+}
+
+let resizeTimer = null;
+function redraw(){
+  renderCards();
+  renderOverview();
+  if (!drawer.hidden){ const t = $("#drawer-title").textContent;
+    const id = Object.keys(REG).find(k => REG[k].name === t); if (id) openDrawer(id); }
+}
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(redraw, 160);
+});
+
+/* ================================================================ init == */
+renderChips();
+renderDiagnosis();
+renderRange();
+renderCards();
+renderOverview();
+buildTable($("#core-table"), [...ordered("monetary", true), ...ordered("liquidity", true)]);
+buildTable($("#mon-table"), ordered("monetary", false));
+buildTable($("#liq-table"), ordered("liquidity", false));
+buildTable($("#ctx-table"), ordered("context", false));
+renderMatrix();
+renderMethod();
+initTabs();
+initTheme();
+
+})();
+</script>
