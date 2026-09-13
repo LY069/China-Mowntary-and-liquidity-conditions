@@ -65,6 +65,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import shutil
 import sys
 from datetime import date, datetime
@@ -100,18 +101,37 @@ def pick(df, *candidates):
 
 
 def as_month(value) -> str | None:
-    """Normalise whatever akshare returns for a date into 'YYYY-MM'."""
+    """Normalise whatever an endpoint returns for a month into 'YYYY-MM'.
+
+    Every upstream spells this differently and several spell it in ways the
+    obvious formats miss. MOFCOM serves bare 'YYYYMM', which is six characters
+    and so failed both the strptime list and the len>=7 fallback — that alone
+    silently dropped 125 of 136 TSF observations on every refresh. The PBoC
+    balance sheet serves '2026.7'. Add a format here rather than a special case
+    at each call site.
+    """
     s = str(value).strip()
     if " " in s or "T" in s:                      # ISO datetime -> date part
         s = s.replace("T", " ").split(" ", 1)[0]
-    for fmt in ("%Y-%m-%d", "%Y%m%d", "%Y-%m", "%Y年%m月份", "%Y年%m月"):
+    for fmt in ("%Y-%m-%d", "%Y%m%d", "%Y-%m", "%Y年%m月份", "%Y年%m月",
+                "%Y%m", "%Y.%m", "%Y/%m"):
         try:
             return datetime.strptime(s, fmt).strftime("%Y-%m")
         except ValueError:
             continue
-    if len(s) >= 7 and s[4] in "-/年":
-        return s[:4] + "-" + s[5:7].zfill(2)
+    if len(s) >= 7 and s[4] in "-/年.":
+        return s[:4] + "-" + s[5:7].strip("-/.年").zfill(2)
     return None
+
+
+def as_quarter(value) -> str | None:
+    """'2026年第1季度' and '2026年第1-2季度' (cumulative through Q2) -> 'YYYY-Qn'."""
+    s = str(value).strip()
+    m = re.search(r"(\d{4})\D+?(\d)(?:\s*-\s*(\d))?\s*季度", s)
+    if not m:
+        return None
+    year, first, last = m.group(1), int(m.group(2)), m.group(3)
+    return f"{year}-Q{int(last) if last else first}"
 
 
 def as_day(value) -> str | None:
@@ -423,6 +443,210 @@ def fetch_interbank(ak, start):
     return out
 
 
+def fetch_central_bank_balance(ak, start):
+    """PBoC monetary authority balance sheet.
+
+    Two things the tracker wants live here. 政府存款 is the Treasury Single
+    Account — the single largest autonomous drain on bank reserves. And
+    对其他存款性公司债权 (claims on other depository corporations) is the STOCK of
+    all PBoC lending to banks: open market operations, MLF, PSL and outright
+    reverse repo together. Its change is net liquidity injection, which is far
+    more robust than scraping daily operation announcements and summing them.
+    """
+    df = ak.macro_china_central_bank_balance()
+    dcol = pick(df, "统计时间", ("统计",), "月份")
+    prov = {"source_name": "PBoC monetary authority balance sheet via akshare (Sina)",
+            "source_url": "http://www.pbc.gov.cn/diaochatongjisi/116219/116319/index.html",
+            "retrieved": TODAY, "confidence": "partial"}
+    out = {}
+    for sid, names, note in [
+        ("govt_deposits_level", ("政府存款", ("政府", "存款")),
+         "Treasury Single Account balance. Converted from 100mn RMB to RMB bn. "
+         "The month-on-month change is the drain on (or injection into) bank reserves."),
+        ("pboc_claims_odc", ("对其他存款性公司债权", ("其他存款性公司",)),
+         "Stock of PBoC lending to banks — OMO, MLF, PSL and outright reverse repo "
+         "combined. Converted from 100mn RMB to RMB bn. Changes in this stock are net "
+         "liquidity injection."),
+    ]:
+        try:
+            col = pick(df, *names)
+        except KeyError as e:
+            print(f"    skip {sid}: {e}")
+            continue
+        obs = [o for o in monthly(df, dcol, col, 0.1) if o[0] >= start]
+        if obs:
+            out[sid] = (obs, prov, note)
+    return out
+
+
+def fetch_gdp(ak, start):
+    """Nominal GDP growth and the GDP deflator, from one consistent vintage.
+
+    Neither could be built before. The absolute figures are cumulative
+    year-to-date in current prices and the growth column is real, so nominal
+    growth comes from comparing like periods a year apart and the deflator is
+    the difference between the two. Taking both legs from the same publisher in
+    the same request is what avoids the vintage mismatch that made the earlier
+    hand-assembled attempt produce a 2.8pp phantom jump across the 2024 census
+    revision.
+    """
+    df = ak.macro_china_gdp()
+    qcol = pick(df, "季度", ("季度",))
+    lvl = pick(df, "国内生产总值-绝对值", ("国内生产总值", "绝对值"))
+    real = pick(df, "国内生产总值-同比增长", ("国内生产总值", "同比"))
+    levels, reals = {}, {}
+    for _, row in df.iterrows():
+        q = as_quarter(row[qcol])
+        if q is None:
+            continue
+        try:
+            levels[q] = float(row[lvl])
+        except (TypeError, ValueError):
+            pass
+        try:
+            reals[q] = float(row[real])
+        except (TypeError, ValueError):
+            pass
+    prov = {"source_name": "NBS quarterly GDP via akshare (East Money)",
+            "source_url": "https://data.eastmoney.com/cjsj/gdp.html",
+            "retrieved": TODAY, "confidence": "partial"}
+    nominal, deflator = [], []
+    for q, v in sorted(levels.items()):
+        year, qn = q.split("-Q")
+        prior = f"{int(year) - 1}-Q{qn}"
+        if prior not in levels or not levels[prior] or not math.isfinite(v):
+            continue
+        ny = (v / levels[prior] - 1) * 100
+        if q >= start[:4]:
+            nominal.append([q, round(ny, 3)])
+            if q in reals and math.isfinite(reals[q]):
+                deflator.append([q, round(ny - reals[q], 3)])
+    out = {}
+    if nominal:
+        out["nominal_gdp_yoy"] = (nominal, prov,
+            "Cumulative year-to-date nominal growth, computed by comparing like "
+            "year-to-date periods a year apart. Pairs correctly with the cumulative "
+            "real growth rate the same source publishes.")
+    if deflator:
+        out["gdp_deflator_yoy"] = (deflator, prov,
+            "Nominal minus real cumulative growth, both legs from the same publisher "
+            "and the same request, so the series does not straddle data vintages.")
+    return out
+
+
+def fetch_tsf_components(ak, start):
+    """Total social financing excluding government bonds.
+
+    The PBoC does not publish this directly and the component table carries no
+    government-bond line, but every component it DOES break out is non-government
+    credit. Summing them gives private-sector financing — the series that
+    actually maps to demand, and the one headline TSF has been masking while
+    government bond issuance carried it.
+    """
+    df = ak.macro_china_shrzgm()
+    dcol = pick(df, "月份", ("月份",))
+    parts = [c for c in df.columns if str(c).startswith("其中-")]
+    if not parts:
+        print("    skip tsf_ex_govt: no 其中- component columns present")
+        return {}
+    flow = {}
+    for _, row in df.iterrows():
+        m = as_month(row[dcol])
+        if m is None:
+            continue
+        total = 0.0
+        seen = False
+        for c in parts:
+            try:
+                v = float(row[c])
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(v):
+                total += v
+                seen = True
+        if seen:
+            flow[m] = total * 0.1                  # 亿元 -> RMB bn
+    if not flow:
+        return {}
+    prov = {"source_name": "PBoC TSF components via akshare (MOFCOM republication)",
+            "source_url": "https://data.mofcom.gov.cn/gnmy/shrzgm.shtml",
+            "retrieved": TODAY, "confidence": "partial"}
+    note = ("Sum of every non-government component the PBoC breaks out: RMB and FX loans, "
+            "entrusted and trust loans, undiscounted bankers' acceptances, corporate bonds "
+            "and domestic equity financing. It is a construction, not a published series — "
+            "small items outside the published breakdown (ABS, loan write-offs) are excluded. "
+            "Components: " + ", ".join(str(c) for c in parts))
+    months = sorted(flow)
+    out = {"tsf_ex_govt_flow": ([[m, round(flow[m], 2)] for m in months if m >= start],
+                                prov, note)}
+    # year-on-year growth of the trailing 12-month sum
+    roll, yoy = {}, []
+    for i, m in enumerate(months):
+        if i >= 11:
+            roll[m] = sum(flow[x] for x in months[i - 11:i + 1])
+    for m in sorted(roll):
+        prior = f"{int(m[:4]) - 1}{m[4:]}"
+        if prior in roll and roll[prior]:
+            v = (roll[m] / roll[prior] - 1) * 100
+            if m >= start:
+                yoy.append([m, round(v, 3)])
+    if yoy:
+        out["tsf_ex_govt_yoy"] = (yoy, prov,
+            note + " Expressed as the year-on-year change in the trailing 12-month sum.")
+    return out
+
+
+def fetch_govt_bond_issuance(ak, start):
+    """Monthly government bond issuance: treasury plus local government.
+
+    GROSS issuance, not net — redemptions are not in this source, so this
+    overstates the reserve drain. Still the best available read on the supply
+    calendar banks have to absorb.
+    """
+    import pandas as pd
+    frames = []
+    for fn in ("bond_treasure_issue_cninfo", "bond_local_government_issue_cninfo"):
+        f = getattr(ak, fn, None)
+        if f is None:
+            print(f"    skip {fn}: not in akshare")
+            continue
+        for year in range(max(2015, int(start[:4])), date.today().year + 1):
+            try:
+                frames.append(f(start_date=f"{year}0101", end_date=f"{year}1231"))
+            except Exception as e:                 # noqa: BLE001
+                print(f"    {fn} {year}: {e}")
+    if not frames:
+        return {}
+    df = pd.concat(frames, ignore_index=True)
+    try:
+        dcol = pick(df, "发行起始日", ("发行", "日"))
+        vcol = pick(df, "实际发行总量", ("实际发行",), "计划发行总量")
+    except KeyError as e:
+        print(f"    skip govt_bond_issuance: {e}")
+        return {}
+    buckets = {}
+    for _, row in df.iterrows():
+        m = as_month(row[dcol])
+        if m is None:
+            continue
+        try:
+            v = float(row[vcol])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(v):
+            buckets[m] = buckets.get(m, 0.0) + v * 0.1     # 亿元 -> RMB bn
+    obs = [[m, round(v, 2)] for m, v in sorted(buckets.items()) if m >= start]
+    if not obs:
+        return {}
+    return {"govt_bond_issuance": (obs,
+            {"source_name": "Treasury and local government bond issuance via akshare (CNINFO)",
+             "source_url": "https://www.cninfo.com.cn/",
+             "retrieved": TODAY, "confidence": "partial"},
+            "GROSS issuance summed by issue start date — central treasury plus local "
+            "government bonds. Redemptions are not in this source, so it overstates the "
+            "net drain on bank reserves. Converted from 100mn RMB to RMB bn.")}
+
+
 FETCHERS = {
     "money":     (fetch_money_supply, ["m1_yoy", "m2_yoy", "m2_level"]),
     "tsf":       (fetch_tsf,          ["tsf_flow"]),
@@ -432,6 +656,10 @@ FETCHERS = {
     "ncd":       (fetch_ncd,          ["ncd_1y_aaa"]),
     "interbank": (fetch_interbank,    ["shibor_3m", "cnh_hibor_on"]),
     "rrr":       (fetch_rrr,          ["rrr_large", "rrr_small"]),
+    "cbbs":      (fetch_central_bank_balance, ["govt_deposits_level", "pboc_claims_odc"]),
+    "gdp":       (fetch_gdp,          ["nominal_gdp_yoy", "gdp_deflator_yoy"]),
+    "tsfparts":  (fetch_tsf_components, ["tsf_ex_govt_flow", "tsf_ex_govt_yoy"]),
+    "govtbonds": (fetch_govt_bond_issuance, ["govt_bond_issuance"]),
 }
 
 MANUAL_ONLY = {

@@ -191,7 +191,7 @@
     "false_signals": "Purely seasonal in most months. Only the deviation from the seasonal norm carries information."
   },
   "govt_bond_issuance": {
-    "name": "Government bond net issuance",
+    "name": "Government bond gross issuance",
     "name_zh": "政府债券净融资",
     "block": "liquidity",
     "group": "Autonomous factors",
@@ -199,7 +199,7 @@
     "freq": "M",
     "looser_when": "lower",
     "core": false,
-    "read": "Central plus local government bond supply absorbed by the banking system. Heavy supply drains reserves and crowds bank balance sheets.",
+    "read": "Central treasury plus local government bond issuance that the banking system has to absorb. GROSS, not net — redemptions are not in the source, so it overstates the reserve drain.",
     "implications": {
       "growth": "Positive for growth via the fiscal channel, negative for near-term bank liquidity — the two effects run in opposite directions and on different timescales.",
       "inflation": "Supports demand and therefore prices, with a lag.",

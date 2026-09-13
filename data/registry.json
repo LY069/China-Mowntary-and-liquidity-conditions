@@ -338,6 +338,25 @@
     "false_signals": "Different providers (BIS broad vs narrow, IMF, Bruegel) give materially different levels. Be consistent about which series is used.",
     "id": "reer"
   },
+  "tsf_minus_ngdp": {
+    "name": "TSF growth − nominal GDP growth",
+    "name_zh": "社融增速与名义GDP增速之差",
+    "block": "monetary",
+    "group": "Credit & financing",
+    "unit": "pp",
+    "freq": "Q",
+    "looser_when": "higher",
+    "core": true,
+    "derived": "tsf_stock_yoy - nominal_gdp_yoy",
+    "read": "The PBoC's own stated benchmark: credit growth 'broadly matching' nominal GDP growth. The gap is the cleanest measure of whether the economy is releveraging or deleveraging.",
+    "implications": {
+      "growth": "A positive gap means debt is growing faster than the income available to service it. Sustained positive gaps in a deflation are how leverage ratios spiral.",
+      "inflation": "A persistent positive gap with no inflation is evidence that credit is financing balance-sheet repair and asset purchases rather than spending.",
+      "policy": "The ratio the PBoC watches to judge whether the quantity of credit is appropriate."
+    },
+    "false_signals": "Widens mechanically in a deflation even with no change in credit policy, because nominal GDP growth collapses. Decompose before concluding that credit policy has loosened.",
+    "id": "tsf_minus_ngdp"
+  },
   "dr007": {
     "name": "DR007",
     "name_zh": "银行间存款类机构7天质押式回购利率",
@@ -540,7 +559,7 @@
     "id": "fiscal_deposits"
   },
   "govt_bond_issuance": {
-    "name": "Government bond net issuance",
+    "name": "Government bond gross issuance",
     "name_zh": "政府债券净融资",
     "block": "liquidity",
     "group": "Autonomous factors",
@@ -548,7 +567,7 @@
     "freq": "M",
     "looser_when": "lower",
     "core": false,
-    "read": "Central plus local government bond supply absorbed by the banking system. Heavy supply drains reserves and crowds bank balance sheets.",
+    "read": "Central treasury plus local government bond issuance that the banking system has to absorb. GROSS, not net — redemptions are not in the source, so it overstates the reserve drain.",
     "implications": {
       "growth": "Positive for growth via the fiscal channel, negative for near-term bank liquidity — the two effects run in opposite directions and on different timescales.",
       "inflation": "Supports demand and therefore prices, with a lag.",
@@ -738,7 +757,7 @@
       "policy": "The most powerful argument for aggressive nominal easing — and the variable the real-lending-rate calculation hinges on."
     },
     "false_signals": "Derived from nominal and real GDP, both revised. Quarterly and noisy; use a 4-quarter average for the underlying trend.",
-    "unavailable": "Not built. Deriving it requires nominal and real growth for the same periods, and the December 2024 economic census revised the 2023 nominal base upward — a deflator computed across that break is wrong. Use the CPI- and PPI-deflated real rates instead.",
+    "notes": "Built from NBS quarterly GDP: cumulative nominal growth minus cumulative real growth, both legs from the same publisher and the same request, so the series does not straddle data vintages.",
     "id": "gdp_deflator_yoy"
   },
   "real_gdp_yoy": {
@@ -775,7 +794,7 @@
       "policy": "The benchmark the PBoC uses for 'credit growth broadly matching nominal GDP growth'. A widening gap between TSF growth and nominal GDP growth signals rising leverage without commensurate income."
     },
     "false_signals": "None material, but it receives far less attention than real GDP despite being the more policy-relevant series in a deflation.",
-    "unavailable": "Not built. Only sparse cumulative nominal GDP levels were verified, spanning the 2024 census revision. See nominal GDP cumulative YTD for the levels that were verified.",
+    "notes": "Cumulative year-to-date nominal growth, computed by comparing like year-to-date periods a year apart.",
     "id": "nominal_gdp_yoy"
   },
   "ncd_issuance_war": {
@@ -1002,7 +1021,7 @@
       "policy": "The gap between headline TSF and this series is the clearest evidence of whether stimulus is monetary or fiscal in substance."
     },
     "false_signals": "Requires a consistent government bond series to subtract; definitional changes to what counts as government financing break comparability across the 2018 revision.",
-    "unavailable": "Not populated in this build — requires the TSF component breakdown, which was not reachable. This is the single highest-value series to add next.",
+    "derived": "year-on-year change in the trailing 12m sum of tsf_ex_govt_flow",
     "id": "tsf_ex_govt_yoy"
   },
   "corp_mlt_loans_yoy": {
@@ -1160,5 +1179,65 @@
     },
     "false_signals": "Quarter-end MPA assessment widens it mechanically as banks withdraw from lending to non-banks.",
     "id": "r_dr_spread_001"
+  },
+  "govt_deposits_level": {
+    "name": "Government deposits at the PBoC",
+    "name_zh": "政府存款",
+    "block": "liquidity",
+    "group": "Autonomous factors",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "lower",
+    "core": false,
+    "stateless": "Trending level series — read the monthly change, which is what actually drains or adds bank reserves.",
+    "stateless_label": "Level series",
+    "read": "The Treasury Single Account balance on the PBoC's balance sheet. Money sitting here is money withdrawn from the banking system.",
+    "implications": {
+      "growth": "A sustained build-up means fiscal revenue is being raised but not spent — a drag on demand as well as on liquidity.",
+      "inflation": "Indirect, via the fiscal impulse.",
+      "policy": "The PBoC's daily operations are largely designed to offset moves in this account."
+    },
+    "false_signals": "Dominated by the tax calendar. Only the deviation from the seasonal norm carries information.",
+    "id": "govt_deposits_level"
+  },
+  "pboc_claims_odc": {
+    "name": "PBoC claims on banks",
+    "name_zh": "对其他存款性公司债权",
+    "block": "liquidity",
+    "group": "Central bank operations",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "higher",
+    "core": false,
+    "stateless": "Trending level series — the change is the signal, not the level.",
+    "stateless_label": "Level series",
+    "read": "The stock of all PBoC lending to banks: open market operations, MLF, PSL and outright reverse repo combined. Changes in this stock ARE net liquidity injection.",
+    "implications": {
+      "growth": "None directly — this is plumbing, not stance.",
+      "inflation": "None.",
+      "policy": "Far more robust than summing daily operation announcements, because it captures every facility at once and cannot miss one."
+    },
+    "false_signals": "Rising claims can reflect banks rolling maturing facilities rather than new support. Judge the change against what needed offsetting — bond supply, tax drains — not against zero.",
+    "id": "pboc_claims_odc"
+  },
+  "tsf_ex_govt_flow": {
+    "name": "TSF excluding government bonds, flow",
+    "name_zh": "社融(剔除政府债券)增量",
+    "block": "monetary",
+    "group": "Credit & financing",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "higher",
+    "core": false,
+    "stateless": "Strongly seasonal monthly flow — judge it through the year-on-year series rather than the monthly print.",
+    "stateless_label": "Seasonal flow",
+    "read": "The sum of every non-government financing component the PBoC breaks out — the monthly flow of private-sector credit.",
+    "implications": {
+      "growth": "This is the series that maps to private investment; headline TSF has been carried by government bonds while this decelerated.",
+      "inflation": "Private credit is how money becomes spending. Government bonds funding debt swaps create neither.",
+      "policy": "The gap to headline TSF shows whether stimulus is monetary or fiscal in substance."
+    },
+    "false_signals": "A construction, not a published series: small components outside the published breakdown (ABS, loan write-offs) are excluded, so it is slightly below a true TSF-minus-government-bonds.",
+    "id": "tsf_ex_govt_flow"
   }
 }

@@ -54,9 +54,18 @@ class FakeAk:
         })
 
     def macro_china_shrzgm(self):
+        # MOFCOM serves bare 'YYYYMM' — six characters, which is exactly the
+        # format that silently dropped 125 of 136 observations before it was fixed.
         return pd.DataFrame({
-            "月份": ["2024年01月份", "2024年02月份"],
-            "社会融资规模增量": ["64200", "15200"],       # 亿元
+            "月份": ["201501", "201502"],
+            "社会融资规模增量": ["20516", "13609"],        # 亿元
+            "其中-人民币贷款": ["14708", "11437"],
+            "其中-委托贷款外币贷款": ["212", "-146"],
+            "其中-委托贷款": ["832", "1299"],
+            "其中-信托贷款": ["52", "38"],
+            "其中-未贴现银行承兑汇票": ["1946", "-592"],
+            "其中-企业债券": ["1868", "716"],
+            "其中-非金融企业境内股票融资": ["526.0", "542.0"],
         })
 
     def macro_china_lpr(self):
@@ -94,6 +103,20 @@ class FakeAk:
             "报告日": ["2026-01-05"], "利率": [1.88], "涨跌": [0.01],
         })
 
+    def macro_china_central_bank_balance(self):
+        return pd.DataFrame({
+            "统计时间": ["2026.6", "2026.7"],
+            "政府存款": ["50000", "62000"],              # 亿元
+            "对其他存款性公司债权": ["212276.16", "218480.42"],
+        })
+
+    def macro_china_gdp(self):
+        return pd.DataFrame({
+            "季度": ["2025年第1-2季度", "2026年第1-2季度"],
+            "国内生产总值-绝对值": ["660000.0", "695704.0"],
+            "国内生产总值-同比增长": ["5.3", "4.7"],
+        })
+
     def macro_china_reserve_requirement_ratio(self):
         return pd.DataFrame({
             # akshare does NOT date-convert these; East Money serves ISO datetimes
@@ -113,7 +136,8 @@ def main():
 
     print("\nTSF — 亿元 converted, MOFCOM lag noted")
     r = rd.fetch_tsf(ak, "2015-01")
-    check("tsf_flow", r["tsf_flow"][0], [("2024-01", 6420.0), ("2024-02", 1520.0)])
+    check("tsf_flow parses bare YYYYMM", r["tsf_flow"][0],
+          [("2015-01", 2051.6), ("2015-02", 1360.9)])
     check("lag documented", "MOFCOM" in r["tsf_flow"][2], True)
 
     print("\nLPR — TRADE_DATE/LPR1Y/LPR5Y")
@@ -191,10 +215,32 @@ def main():
     check("rrr_large uses 生效时间", r["rrr_large"][0], [("2025-05-15", 9.0)])
     check("rrr_small", r["rrr_small"][0], [("2025-05-15", 6.0)])
 
+    print("\ncentral bank balance sheet — 亿元 converted, both lines extracted")
+    r = rd.fetch_central_bank_balance(ak, "2015-01")
+    check("govt_deposits_level", r["govt_deposits_level"][0],
+          [("2026-06", 5000.0), ("2026-07", 6200.0)])
+    check("pboc_claims_odc", r["pboc_claims_odc"][0],
+          [("2026-06", 21227.616), ("2026-07", 21848.042)])
+
+    print("\nGDP — nominal growth from like-period YTD levels, deflator as the difference")
+    r = rd.fetch_gdp(ak, "2015-01")
+    # 695704/660000 - 1 = 5.410%, real 4.7 -> deflator 0.710
+    check("nominal_gdp_yoy", r["nominal_gdp_yoy"][0], [["2026-Q2", 5.410]])
+    check("gdp_deflator_yoy", r["gdp_deflator_yoy"][0], [["2026-Q2", 0.710]])
+
+    print("\nTSF components — non-government components summed")
+    r = rd.fetch_tsf_components(ak, "2015-01")
+    flow = dict(r["tsf_ex_govt_flow"][0])
+    # 2015-01 components: 14708+212+832+52+1946+1868+526 = 20144 亿元 -> 2014.4 bn
+    check("component sum excludes the headline total", flow.get("2015-01"), 2014.4)
+    check("note names the components", "人民币贷款" in r["tsf_ex_govt_flow"][2], True)
+
     print("\nevery fetcher group is registered")
     registered = {s for _, ids in rd.FETCHERS.values() for s in ids}
-    for sid in ("m1_yoy", "tsf_flow", "lpr_1y", "dr007", "r007", "cgb_1y",
-                "cgb_10y", "ncd_1y_aaa", "shibor_3m", "cnh_hibor_on", "rrr_large"):
+    for sid in ("m1_yoy", "tsf_flow", "lpr_1y", "dr007", "r007", "dr001", "r001", "cgb_1y",
+                "cgb_10y", "ncd_1y_aaa", "shibor_3m", "cnh_hibor_on", "rrr_large",
+                "govt_deposits_level", "pboc_claims_odc", "nominal_gdp_yoy",
+                "gdp_deflator_yoy", "tsf_ex_govt_yoy", "govt_bond_issuance"):
         check(f"{sid} registered", sid in registered, True)
 
     print("\nALL PASSED" if not FAILURES else f"\n{len(FAILURES)} FAILURE(S): {FAILURES}")

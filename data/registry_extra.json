@@ -212,7 +212,7 @@
       "policy": "The gap between headline TSF and this series is the clearest evidence of whether stimulus is monetary or fiscal in substance."
     },
     "false_signals": "Requires a consistent government bond series to subtract; definitional changes to what counts as government financing break comparability across the 2018 revision.",
-    "unavailable": "Not populated in this build — requires the TSF component breakdown, which was not reachable. This is the single highest-value series to add next."
+    "derived": "year-on-year change in the trailing 12m sum of tsf_ex_govt_flow"
   },
   "corp_mlt_loans_yoy": {
     "name": "Corporate medium & long-term loans",
@@ -361,5 +361,62 @@
       "policy": "The earliest warning of non-bank funding stress — it widens before the 7-day equivalent does."
     },
     "false_signals": "Quarter-end MPA assessment widens it mechanically as banks withdraw from lending to non-banks."
+  },
+  "govt_deposits_level": {
+    "name": "Government deposits at the PBoC",
+    "name_zh": "政府存款",
+    "block": "liquidity",
+    "group": "Autonomous factors",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "lower",
+    "core": false,
+    "stateless": "Trending level series — read the monthly change, which is what actually drains or adds bank reserves.",
+    "stateless_label": "Level series",
+    "read": "The Treasury Single Account balance on the PBoC's balance sheet. Money sitting here is money withdrawn from the banking system.",
+    "implications": {
+      "growth": "A sustained build-up means fiscal revenue is being raised but not spent — a drag on demand as well as on liquidity.",
+      "inflation": "Indirect, via the fiscal impulse.",
+      "policy": "The PBoC's daily operations are largely designed to offset moves in this account."
+    },
+    "false_signals": "Dominated by the tax calendar. Only the deviation from the seasonal norm carries information."
+  },
+  "pboc_claims_odc": {
+    "name": "PBoC claims on banks",
+    "name_zh": "对其他存款性公司债权",
+    "block": "liquidity",
+    "group": "Central bank operations",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "higher",
+    "core": false,
+    "stateless": "Trending level series — the change is the signal, not the level.",
+    "stateless_label": "Level series",
+    "read": "The stock of all PBoC lending to banks: open market operations, MLF, PSL and outright reverse repo combined. Changes in this stock ARE net liquidity injection.",
+    "implications": {
+      "growth": "None directly — this is plumbing, not stance.",
+      "inflation": "None.",
+      "policy": "Far more robust than summing daily operation announcements, because it captures every facility at once and cannot miss one."
+    },
+    "false_signals": "Rising claims can reflect banks rolling maturing facilities rather than new support. Judge the change against what needed offsetting — bond supply, tax drains — not against zero."
+  },
+  "tsf_ex_govt_flow": {
+    "name": "TSF excluding government bonds, flow",
+    "name_zh": "社融(剔除政府债券)增量",
+    "block": "monetary",
+    "group": "Credit & financing",
+    "unit": "RMB bn",
+    "freq": "M",
+    "looser_when": "higher",
+    "core": false,
+    "stateless": "Strongly seasonal monthly flow — judge it through the year-on-year series rather than the monthly print.",
+    "stateless_label": "Seasonal flow",
+    "read": "The sum of every non-government financing component the PBoC breaks out — the monthly flow of private-sector credit.",
+    "implications": {
+      "growth": "This is the series that maps to private investment; headline TSF has been carried by government bonds while this decelerated.",
+      "inflation": "Private credit is how money becomes spending. Government bonds funding debt swaps create neither.",
+      "policy": "The gap to headline TSF shows whether stimulus is monetary or fiscal in substance."
+    },
+    "false_signals": "A construction, not a published series: small components outside the published breakdown (ABS, loan write-offs) are excluded, so it is slightly below a true TSF-minus-government-bonds."
   }
 }

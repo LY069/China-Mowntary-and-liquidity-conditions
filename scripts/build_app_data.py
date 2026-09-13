@@ -250,6 +250,31 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
             last_original[target] = min(parents)
         built.append(f"{target}  [{months[0]} .. {months[-1]}, n={len(months)}]")
 
+    def change(target: str, source: str, lag: int = 1, scale: float = 1.0):
+        """Difference a stock over `lag` months to get the flow it implies.
+
+        The PBoC publishes the Treasury Single Account and its lending to banks
+        as balance-sheet stocks. What drains or adds reserves is the change in
+        them, so the flow has to be derived rather than sourced.
+        """
+        if source not in grids:
+            skipped.append(f"{target} (needs {source})")
+            return
+        src = grids[source]
+        out = {}
+        for month in sorted(src):
+            prior = index_to_month(month_index(month) - lag)
+            if prior in src:
+                out[month] = (src[month] - src[prior]) * scale
+        if not out:
+            skipped.append(f"{target} (not enough history in {source})")
+            return
+        grids[target] = out
+        if source in last_original:
+            last_original[target] = last_original[source]
+        span = sorted(out)
+        built.append(f"{target}  [{span[0]} .. {span[-1]}, n={len(out)}, {lag}m change in {source}]")
+
     built: list[str] = []
     skipped: list[str] = []
 
@@ -262,6 +287,11 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
     difference("ncd_omo_spread", "ncd_issuance_war", "omo_7d", scale=100)     # -> bp
     difference("term_spread", "cgb_10y", "cgb_1y", scale=100)                 # -> bp
     difference("cgb10y_omo_spread", "cgb_10y", "omo_7d", scale=100)           # -> bp
+
+    # Stocks the PBoC publishes, differenced into the flows that matter.
+    change("fiscal_deposits", "govt_deposits_level", lag=1)
+    change("net_injection_3m", "pboc_claims_odc", lag=3)
+    difference("tsf_minus_ngdp", "tsf_stock_yoy", "nominal_gdp_yoy")
     difference("real_policy_rate", "omo_7d", "cpi_yoy")
     difference("real_policy_rate_core", "omo_7d", "core_cpi_yoy")
     difference("real_lending_rate", "walr_general", "cpi_yoy")

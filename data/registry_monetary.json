@@ -317,5 +317,23 @@
       "policy": "REER depreciation via domestic deflation is the wrong kind of competitiveness gain — it signals the deflation problem rather than solving it."
     },
     "false_signals": "Different providers (BIS broad vs narrow, IMF, Bruegel) give materially different levels. Be consistent about which series is used."
+  },
+  "tsf_minus_ngdp": {
+    "name": "TSF growth − nominal GDP growth",
+    "name_zh": "社融增速与名义GDP增速之差",
+    "block": "monetary",
+    "group": "Credit & financing",
+    "unit": "pp",
+    "freq": "Q",
+    "looser_when": "higher",
+    "core": true,
+    "derived": "tsf_stock_yoy - nominal_gdp_yoy",
+    "read": "The PBoC's own stated benchmark: credit growth 'broadly matching' nominal GDP growth. The gap is the cleanest measure of whether the economy is releveraging or deleveraging.",
+    "implications": {
+      "growth": "A positive gap means debt is growing faster than the income available to service it. Sustained positive gaps in a deflation are how leverage ratios spiral.",
+      "inflation": "A persistent positive gap with no inflation is evidence that credit is financing balance-sheet repair and asset purchases rather than spending.",
+      "policy": "The ratio the PBoC watches to judge whether the quantity of credit is appropriate."
+    },
+    "false_signals": "Widens mechanically in a deflation even with no change in credit policy, because nominal GDP growth collapses. Decompose before concluding that credit policy has loosened."
   }
 }

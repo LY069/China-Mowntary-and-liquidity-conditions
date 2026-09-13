@@ -102,7 +102,15 @@ def main() -> int:
             failed += 1
             continue
         try:
-            print(describe(fn(**kwargs)))
+            result = fn(**kwargs)
+            print(describe(result))
+            # The curve map is the one probe whose whole value is the full list:
+            # credit_spread_aa needs the exact Chinese label of the AA+ medium-term
+            # note curve, and there is no way to guess it.
+            if name == "curve_map" and result is not None and len(result):
+                print("    --- every curve CFETS publishes ---")
+                for _, r in result.iterrows():
+                    print(f"      {str(r.get('value','')):10} {r.get('cnLabel','')}")
             ok += 1
         except Exception as e:                     # noqa: BLE001
             failed += 1

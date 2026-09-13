@@ -68,7 +68,7 @@
       "policy": "The most powerful argument for aggressive nominal easing — and the variable the real-lending-rate calculation hinges on."
     },
     "false_signals": "Derived from nominal and real GDP, both revised. Quarterly and noisy; use a 4-quarter average for the underlying trend.",
-    "unavailable": "Not built. Deriving it requires nominal and real growth for the same periods, and the December 2024 economic census revised the 2023 nominal base upward — a deflator computed across that break is wrong. Use the CPI- and PPI-deflated real rates instead."
+    "notes": "Built from NBS quarterly GDP: cumulative nominal growth minus cumulative real growth, both legs from the same publisher and the same request, so the series does not straddle data vintages."
   },
   "real_gdp_yoy": {
     "name": "Real GDP, cumulative YTD",
@@ -103,6 +103,6 @@
       "policy": "The benchmark the PBoC uses for 'credit growth broadly matching nominal GDP growth'. A widening gap between TSF growth and nominal GDP growth signals rising leverage without commensurate income."
     },
     "false_signals": "None material, but it receives far less attention than real GDP despite being the more policy-relevant series in a deflation.",
-    "unavailable": "Not built. Only sparse cumulative nominal GDP levels were verified, spanning the 2024 census revision. See nominal GDP cumulative YTD for the levels that were verified."
+    "notes": "Cumulative year-to-date nominal growth, computed by comparing like year-to-date periods a year apart."
   }
 }
