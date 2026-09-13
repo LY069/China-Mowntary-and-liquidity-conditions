@@ -5,8 +5,10 @@ name: CI
 # calling the live endpoints, which is what makes them runnable here at all.
 
 on:
+  # Pushes to a PR branch are covered by the pull_request trigger; listing both
+  # for every branch runs the whole suite twice on every push.
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
