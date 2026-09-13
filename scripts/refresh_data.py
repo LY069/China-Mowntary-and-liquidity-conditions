@@ -64,6 +64,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import shutil
 import sys
 from datetime import date, datetime
@@ -129,9 +130,12 @@ def monthly(df, datecol, valcol, scale=1.0):
         if m is None or v is None:
             continue
         try:
-            out.append([m, round(float(v) * scale, 4)])
+            num = float(v) * scale
         except (TypeError, ValueError):
             continue
+        if not math.isfinite(num):        # upstream sends NaN for missing points
+            continue
+        out.append([m, round(num, 4)])
     return sorted({m: v for m, v in out}.items())
 
 
@@ -143,9 +147,12 @@ def daily(df, datecol, valcol):
         if d is None or v is None:
             continue
         try:
-            out.append([d, round(float(v), 4)])
+            num = float(v)
         except (TypeError, ValueError):
             continue
+        if not math.isfinite(num):        # upstream sends NaN for missing points
+            continue
+        out.append([d, round(num, 4)])
     return sorted({d: v for d, v in out}.items())
 
 
@@ -428,7 +435,17 @@ def main() -> int:
 
     for sid, (obs, prov, note) in fetched.items():
         entry = existing.setdefault(sid, {})
-        entry["observations"] = obs
+        # Union rather than replace. Upstream windows move — MOFCOM's TSF mirror
+        # in particular serves a rolling window — so overwriting wholesale silently
+        # truncates history that was previously fetched. Newer values win on dates
+        # both cover, since those are genuine revisions.
+        prior = {d: v for d, v in entry.get("observations", []) if v is not None}
+        merged = {**prior, **{d: v for d, v in obs}}
+        kept = len(prior) - len(set(prior) & set(d for d, _ in obs))
+        entry["observations"] = [[d, v] for d, v in sorted(merged.items())]
+        if len(merged) > len(obs):
+            print(f"    {sid}: kept {kept} earlier observation(s) upstream no longer returns "
+                  f"({len(obs)} fetched -> {len(merged)} total)")
         entry["provenance"] = prov
         if note:
             entry["notes"] = note

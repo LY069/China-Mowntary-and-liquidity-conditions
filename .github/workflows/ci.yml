@@ -33,6 +33,9 @@ jobs:
       - name: Replay tests — fetchers against recorded akshare shapes
         run: python3 tests/test_refresh_fetchers.py
 
+      - name: Regression tests — bugs a live endpoint run exposed
+        run: python3 tests/test_live_regressions.py
+
       - name: Build the app payload
         run: python3 scripts/build_app_data.py
 

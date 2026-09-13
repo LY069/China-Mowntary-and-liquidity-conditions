@@ -67,7 +67,11 @@ def monthly_map(series: dict) -> dict[str, float]:
     """
     buckets: dict[str, list[float]] = {}
     for key, value in series.get("observations", []):
-        if value is None:
+        # `float("nan")` is not None and survives every range comparison, so a NaN
+        # from upstream slips past a None check and past the sanity gate's bounds,
+        # then detonates inside statistics.pstdev. Reject non-finite values here,
+        # at the only door into the pipeline.
+        if value is None or not math.isfinite(float(value)):
             continue
         month = to_month(key)
         if month is None:
@@ -318,12 +322,12 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
 
     # ------------------------------------------------------------- composites
     def zscores(values: dict[str, float]) -> dict[str, float]:
-        nums = list(values.values())
+        nums = [v for v in values.values() if math.isfinite(v)]
         if len(nums) < 8:
             return {}
         mean = statistics.fmean(nums)
         sd = statistics.pstdev(nums)
-        if sd == 0 or math.isnan(sd):
+        if not math.isfinite(sd) or sd == 0:
             return {}
         return {m: (v - mean) / sd for m, v in values.items()}
 
