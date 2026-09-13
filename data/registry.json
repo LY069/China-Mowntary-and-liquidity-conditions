@@ -168,6 +168,8 @@
       "policy": "Still useful as the reference against which bank marginal funding (NCD rates) is judged."
     },
     "false_signals": "Treating an MLF move as a stance change is now a category error. Watch the 7-day OMO rate instead.",
+    "valid_to": "2025-03",
+    "notes": "Series ENDS March 2025 by construction. From that month's operation the PBoC moved the MLF to multiple-price bidding, so no single announced MLF rate exists thereafter. Forward-filling past this point invents a policy rate, and any spread computed against it is meaningless — which is why ncd_mlf_spread is expected to be unbuildable for recent periods.",
     "id": "mlf_1y"
   },
   "lpr_1y": {

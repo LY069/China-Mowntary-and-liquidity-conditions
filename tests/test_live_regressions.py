@@ -80,6 +80,28 @@ def test_refresh_never_shrinks_a_series():
     check("refresh_data.py filters non-finite values", "math.isfinite(num)" in src)
 
 
+def test_dead_rate_is_not_resurrected():
+    """The MLF stopped having a single announced rate in March 2025. valid_to
+    lived only in analyst_supplied.json, so once a mirror supplied mlf_1y
+    wholesale the terminator was dropped and the rate was forward-filled 18
+    months past its own death, making ncd_mlf_spread build against a rate that
+    does not exist."""
+    print("\na terminated series must stay terminated whoever supplies it")
+    reg = json.loads((ROOT / "data" / "registry_monetary.json").read_text())
+    check("registry carries mlf_1y valid_to", reg["mlf_1y"].get("valid_to") == "2025-03",
+          str(reg["mlf_1y"].get("valid_to")))
+    src = (ROOT / "scripts" / "build_app_data.py").read_text()
+    check("build reads valid_to from the registry first",
+          'valid_to = (registry.get(key) or {}).get("valid_to")' in src)
+    raw = (ROOT / "app" / "data.js").read_text()
+    payload = json.loads(raw[raw.index("{"):raw.rindex(";")])
+    pts = payload["series"].get("mlf_1y", {}).get("points", [])
+    check("built mlf_1y stops at 2025-03", bool(pts) and pts[-1][0] == "2025-03",
+          pts[-1][0] if pts else "absent")
+    check("ncd_mlf_spread is not built against a dead rate",
+          "ncd_mlf_spread" not in payload["series"])
+
+
 def test_workflow_reports_any_failure():
     """The restore and upload steps were keyed to the gate alone, so a crash in
     the rebuild step left no artifact and no restore."""
@@ -93,6 +115,7 @@ def test_workflow_reports_any_failure():
 def main():
     test_nan_does_not_crash_the_build()
     test_refresh_never_shrinks_a_series()
+    test_dead_rate_is_not_resurrected()
     test_workflow_reports_any_failure()
     print("\nALL PASSED" if not FAILURES else f"\n{len(FAILURES)} FAILURE(S): {FAILURES}")
     return 1 if FAILURES else 0

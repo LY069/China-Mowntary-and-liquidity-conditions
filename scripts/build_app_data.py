@@ -219,7 +219,10 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
     for key in STEP:
         if key in grids:
             stop = span_end
-            valid_to = (observed.get(key) or {}).get("valid_to")
+            # The registry is the authority: a supplement that supplies the series
+            # without the terminator must not be able to resurrect a dead rate.
+            valid_to = (registry.get(key) or {}).get("valid_to") \
+                or (observed.get(key) or {}).get("valid_to")
             if valid_to:
                 stop = min(stop, month_index(valid_to))
             grids[key] = step_fill(grids[key], span_start, stop)

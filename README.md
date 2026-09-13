@@ -69,42 +69,48 @@ To add an indicator, give it an entry in a `data/registry_*.json` file and obser
 key, then rebuild. The build reports every series it could not construct and why — missing data fails
 loudly rather than quietly producing a plausible-looking index.
 
-## Data provenance — read before using any number
+## Data provenance
 
-This dataset was assembled inside a sandbox whose egress policy blocked **every** macroeconomic data
-host: the PBoC, NBS, ChinaBond, CFETS, FRED, the BIS, the IMF and the World Bank were all unreachable.
-Fetched values therefore came from **third-party mirrors, not primary publishers**. That is the gap the
-[refresh workflow](#refreshing) exists to close — it pulls from the publishers' own endpoints on a
-runner that can actually reach them.
+**The dataset is now pulled from primary sources.** `.github/workflows/refresh-data.yml` runs on a
+GitHub runner with unrestricted network, fetches from the publishers' own endpoints via akshare and
+CFETS, rebuilds, validates, and commits only if the sanity gate passes. It has run successfully and
+the committed data comes from those endpoints, not from mirrors.
 
-In the meantime the dataset has been **independently audited**: 178 observation-level comparisons
-against PBoC and NBS sources, of which 175 matched. See
-[`research/07-data-validation.md`](research/07-data-validation.md). Every series carries a confidence
-rating, visible in the app:
+47 of 59 defined indicators carry data. DR007, R007, SHIBOR, CNH HIBOR and the CGB curve are daily
+series back to 2015; the reserve requirement ratio goes back to 2007.
+
+Some series still have no machine-readable source and are maintained by hand — the weighted average
+lending rate and the excess reserve ratio appear only in the quarterly PBoC Monetary Policy Report
+PDF. Others come from mirrors that the refresh does not yet replace (the REER, the trade-weighted
+renminbi). Every series carries a confidence rating, visible in the app:
 
 | Rating | Meaning |
 |---|---|
 | `verified` | Checked against the official record and matched. The six Monetary Policy Report series were audited by full census, not spot check — `walr_general`, which carries 30% of the monetary index, matched 33/33. |
-| `partial` | From a mirror whose upstream is an official series, not confirmed at the publisher. |
+| `partial` | Fetched from a publisher endpoint, or from a mirror whose upstream is an official series. |
 | `analyst-supplied` | Entered from domain knowledge because no machine-readable source was reachable. |
 | `suspect` | **Failed the audit.** Shown in the app with the problem stated and no loose/tight reading, so a known data defect cannot masquerade as a signal. |
 
-Two series are flagged `suspect`: `nominal_gdp_level_cum` mixes pre- and post-census GDP vintages
-(computing growth across that seam produces a phantom 2.8pp jump), and `core_cpi_yoy` labels three
+The audit ([`research/07-data-validation.md`](research/07-data-validation.md)) made 178
+observation-level comparisons against PBoC and NBS sources; 175 matched. Two series are flagged
+`suspect`: `nominal_gdp_level_cum` mixes pre- and post-census GDP vintages, and `core_cpi_yoy` labels
 year-to-date averages as single quarters.
 
-The 7-day reverse repo and 1-year MLF rates are `analyst-supplied` — entered by hand because no
-machine-readable source was reachable, and kept in their own file so they stay auditable. They have
-since been corroborated against an independent Wind export: **12/12 overlapping OMO change dates and
-14/14 MLF dates agree exactly, with no disagreements.**
+The 7-day reverse repo rate remains `analyst-supplied` — the PBoC publishes its operations as
+announcements, not as a series. It is corroborated against an independent Wind export: **12/12
+overlapping change dates agree exactly**, as do 14/14 for the MLF.
 
-One audit finding is worth repeating because it looks like an error and is not: `excess_reserve_ratio`
-at 2024-Q3 = 1.8% is **correct**. The 27 September 2024 RRR cut landed three days before the
-quarter-end snapshot. Do not "fix" it.
+Two findings worth keeping in mind:
 
-38 of 59 defined indicators carry data. The rest — including R007, the 1-year AAA NCD rate, DR001 and
-TSF excluding government bonds — are defined, documented, and named in the app along with what their
-absence costs, rather than quietly averaged over.
+- `excess_reserve_ratio` at 2024-Q3 = 1.8% looks anomalous and is **correct** — the 27 September 2024
+  RRR cut landed three days before the quarter-end snapshot. Do not "fix" it.
+- The `mlf_1y` series **ends March 2025 by construction**. The PBoC moved the MLF to multiple-price
+  bidding that month, so no single announced rate exists after it. Forward-filling past that point
+  invents a policy rate, so `ncd_mlf_spread` is deliberately unbuildable for recent periods.
+
+⚠️ When extending the mirror route, verify against a second source: an earlier sourcing pass found a
+repository shipping **synthetic "demo" data** dressed as a real DR007 history — 221 of 230 days wrong
+by up to 58bp.
 
 ### Refreshing
 
