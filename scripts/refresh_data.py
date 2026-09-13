@@ -354,7 +354,11 @@ def _ncd_records(symbol_code, s_, e_, term="1"):
     for rec in ((r.json() or {}).get("records") or []):
         rec = {k: v for k, v in rec.items() if k != "newDateValue"}
         vals = list(rec.values())
-        if len(vals) < 3:
+        # The contract is positional — 日期, 期限, 到期收益率, 即期收益率, 远期收益率 —
+        # so a row with a different number of fields would be read off-by-one and
+        # yield a number from the wrong column. Silently wrong beats loudly wrong
+        # here, so require the exact shape and drop anything else.
+        if len(vals) != 5:
             continue
         day = as_day(vals[0])                      # 日期, 期限, 到期收益率
         if day is None:

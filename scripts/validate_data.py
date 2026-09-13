@@ -161,6 +161,31 @@ def main() -> int:
                  f"likely a units or column error, e.g. {bad[0]}")
     ok(f"range checks applied to {checked} series")
 
+    # A rate that jumps tens of basis points and jumps straight back is almost
+    # never a real move; it is a mis-parsed row or a stray tenor. Flag it rather
+    # than let one bad print distort a z-score or a spread.
+    SPIKE = {"dr007": 1.5, "dr001": 1.5, "r007": 3.0, "r001": 3.0,
+             "cgb_1y": 0.4, "cgb_3y": 0.4, "cgb_10y": 0.4,
+             "ncd_1y_aaa": 0.5, "mtn_aa_3y": 0.5, "shibor_3m": 0.5}
+    # These are WARNINGS, never failures. The guard cannot tell a mis-parsed row
+    # from a real event: the July 2011 SHIBOR spike it flags was the genuine
+    # mid-2011 liquidity squeeze. It exists to put a human eye on the candidate,
+    # not to reject data on its own judgement.
+    spiky = 0
+    for sid, limit in SPIKE.items():
+        pts = series.get(sid, {}).get("points") or []
+        for i in range(1, len(pts) - 1):
+            prev, cur, nxt = pts[i - 1][1], pts[i][1], pts[i + 1][1]
+            if None in (prev, cur, nxt):
+                continue
+            # down-and-back-up (or the reverse) by more than the limit
+            if abs(cur - prev) > limit and abs(cur - nxt) > limit \
+                    and (cur - prev) * (cur - nxt) > 0:
+                warn(f"{sid} at {pts[i][0]} = {cur} sits {abs(cur - prev):.2f} from its "
+                     f"neighbours ({prev}, {nxt}) — likely a mis-parsed row, not a real move")
+                spiky += 1
+    ok(f"spike check applied to {len(SPIKE)} rate series ({spiky} flagged)")
+
     # ------------------------------------------------------------ 3. anchors
     print("\nANCHORS (matters of public record)")
     for sid, when, expect, tol, why in ANCHORS:
