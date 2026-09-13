@@ -418,5 +418,39 @@
       "policy": "The gap to headline TSF shows whether stimulus is monetary or fiscal in substance."
     },
     "false_signals": "A construction, not a published series: small components outside the published breakdown (ABS, loan write-offs) are excluded, so it is slightly below a true TSF-minus-government-bonds."
+  },
+  "cgb_3y": {
+    "name": "3-year CGB yield",
+    "name_zh": "3年期国债收益率",
+    "block": "liquidity",
+    "group": "Bond market",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": false,
+    "read": "The 3-year point of the government curve — the risk-free benchmark for the 3-year credit spread.",
+    "implications": {
+      "growth": "Minimal direct read.",
+      "inflation": "Minimal.",
+      "policy": "Sits between the policy-anchored short end and the growth-expectations long end."
+    },
+    "false_signals": "Distorted by bank demand at quarter-ends."
+  },
+  "mtn_aa_3y": {
+    "name": "3-year AA+ medium-term note yield",
+    "name_zh": "3年期AA+中票收益率",
+    "block": "liquidity",
+    "group": "Bond market",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": false,
+    "read": "The yield on 3-year AA+ medium-term notes — the cost of market funding for a decent but not top-tier corporate borrower.",
+    "implications": {
+      "growth": "Rising yields tighten financing for the marginal private borrower before bank lending rates move.",
+      "inflation": "None directly.",
+      "policy": "Sharp rises, especially in urban investment paper, trigger targeted support rather than broad easing."
+    },
+    "false_signals": "Implicit government support compresses quasi-sovereign spreads, so the level understates true credit risk."
   }
 }

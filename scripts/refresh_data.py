@@ -317,7 +317,8 @@ def fetch_cgb_curve(ak, start):
             "source_url": "https://yield.chinabond.com.cn/",
             "retrieved": TODAY, "confidence": "partial"}
     out = {}
-    for sid, *names in [("cgb_1y", "1年", "1Y"), ("cgb_10y", "10年", "10Y")]:
+    for sid, *names in [("cgb_1y", "1年", "1Y"), ("cgb_3y", "3年", "3Y"),
+                        ("cgb_10y", "10年", "10Y")]:
         # "1年" is a substring of "10年 " in some layouts, so exact match must win;
         # pick() tries exact first, which is why 10y resolves correctly.
         try:
@@ -329,7 +330,7 @@ def fetch_cgb_curve(ak, start):
     return out
 
 
-def _ncd_records(symbol_code, s_, e_):
+def _ncd_records(symbol_code, s_, e_, term="1"):
     """Call the CFETS closing-curve endpoint directly.
 
     akshare's wrapper does `del temp_df["newDateValue"]` and then assigns column
@@ -343,7 +344,7 @@ def _ncd_records(symbol_code, s_, e_):
         params={"lang": "CN", "reference": "1,2,3", "bondType": symbol_code,
                 "startDate": f"{s_[:4]}-{s_[4:6]}-{s_[6:]}",
                 "endDate": f"{e_[:4]}-{e_[4:6]}-{e_[6:]}",
-                "termId": "1", "pageNum": "1", "pageSize": "50"},
+                "termId": term, "pageNum": "1", "pageSize": "50"},
         headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                                "AppleWebKit/537.36 (KHTML, like Gecko) "
                                "Chrome/108.0.0.0 Safari/537.36"},
@@ -647,12 +648,63 @@ def fetch_govt_bond_issuance(ak, start):
             "net drain on bank reserves. Converted from 100mn RMB to RMB bn.")}
 
 
+def fetch_credit_spread(ak, start):
+    """3-year AA+ medium-term note yield, for the spread over CGB.
+
+    The curve code is resolved by matching the published label rather than
+    hard-coded: CFETS publishes 75 curves and renames them, so the fetcher
+    searches the map itself and logs what it matched. If nothing matches it says
+    so and returns nothing, rather than silently fetching the wrong curve.
+    """
+    try:
+        name_code = ak.bond_china_close_return_map()
+    except Exception as e:                         # noqa: BLE001
+        print(f"    skip credit_spread_aa: curve map unavailable ({e})")
+        return {}
+    labels = {str(r["cnLabel"]): str(r["value"]) for _, r in name_code.iterrows()}
+    # Preference order: the plain medium-term note curve at AA+, then AA, then
+    # the enterprise-bond equivalent. Floating-rate spread curves are excluded —
+    # they are point spreads, not yields.
+    code = label = None
+    for want in (("中短期票据", "AA+"), ("中期票据", "AA+"),
+                 ("中短期票据", "AA"), ("企业债", "AA+")):
+        for lbl, val in labels.items():
+            if all(w in lbl for w in want) and "浮动" not in lbl and "点差" not in lbl:
+                code, label = val, lbl
+                break
+        if code:
+            break
+    if not code:
+        print(f"    skip credit_spread_aa: no matching curve among {len(labels)} published. "
+              f"Labels containing 票据: "
+              f"{[l for l in labels if '票据' in l][:8]}")
+        return {}
+    print(f"    credit_spread_aa: matched curve {code} = {label}")
+    obs, failures = [], 0
+    for s_, e_ in _month_spans(start):
+        try:
+            obs.extend(_ncd_records(code, s_, e_, term="3"))
+        except Exception as e:                     # noqa: BLE001
+            failures += 1
+            if failures <= 3:
+                print(f"    mtn {s_[:6]}: {e}")
+    if not obs:
+        return {}
+    merged = sorted({d: v for d, v in obs}.items())
+    return {"mtn_aa_3y": ([[d, v] for d, v in merged],
+            {"source_name": f"CFETS closing yield curve, {label} (ClsYldCurvHis), called directly",
+             "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
+             "retrieved": TODAY, "confidence": "partial"},
+            f"3-year point of the {label} curve, resolved by label match against the published "
+            f"curve map (code {code}). The spread over the 3-year CGB is the credit-risk premium.")}
+
+
 FETCHERS = {
     "money":     (fetch_money_supply, ["m1_yoy", "m2_yoy", "m2_level"]),
     "tsf":       (fetch_tsf,          ["tsf_flow"]),
     "lpr":       (fetch_lpr,          ["lpr_1y", "lpr_5y"]),
     "repo":      (fetch_repo_fixings, ["dr007", "r007", "dr001", "r001"]),
-    "cgb":       (fetch_cgb_curve,    ["cgb_1y", "cgb_10y"]),
+    "cgb":       (fetch_cgb_curve,    ["cgb_1y", "cgb_3y", "cgb_10y"]),
     "ncd":       (fetch_ncd,          ["ncd_1y_aaa"]),
     "interbank": (fetch_interbank,    ["shibor_3m", "cnh_hibor_on"]),
     "rrr":       (fetch_rrr,          ["rrr_large", "rrr_small"]),
@@ -660,6 +712,7 @@ FETCHERS = {
     "gdp":       (fetch_gdp,          ["nominal_gdp_yoy", "gdp_deflator_yoy"]),
     "tsfparts":  (fetch_tsf_components, ["tsf_ex_govt_flow", "tsf_ex_govt_yoy"]),
     "govtbonds": (fetch_govt_bond_issuance, ["govt_bond_issuance"]),
+    "creditspread": (fetch_credit_spread, ["mtn_aa_3y"]),
 }
 
 MANUAL_ONLY = {

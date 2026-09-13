@@ -274,7 +274,8 @@
       "inflation": "None directly.",
       "policy": "Sharp widening, especially in urban investment (城投) bonds, triggers targeted support rather than broad easing."
     },
-    "false_signals": "Implicit government support compresses spreads on quasi-sovereign issuers, so the series understates true credit risk. Spread compression can reflect an asset shortage (资产荒) rather than improving fundamentals."
+    "false_signals": "Implicit government support compresses spreads on quasi-sovereign issuers, so the series understates true credit risk. Spread compression can reflect an asset shortage (资产荒) rather than improving fundamentals.",
+    "derived": "mtn_aa_3y - cgb_3y"
   },
   "cnh_hibor_on": {
     "name": "Overnight CNH HIBOR",

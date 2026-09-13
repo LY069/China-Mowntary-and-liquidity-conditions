@@ -287,6 +287,7 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
     difference("ncd_omo_spread", "ncd_issuance_war", "omo_7d", scale=100)     # -> bp
     difference("term_spread", "cgb_10y", "cgb_1y", scale=100)                 # -> bp
     difference("cgb10y_omo_spread", "cgb_10y", "omo_7d", scale=100)           # -> bp
+    difference("credit_spread_aa", "mtn_aa_3y", "cgb_3y", scale=100)          # -> bp
 
     # Stocks the PBoC publishes, differenced into the flows that matter.
     change("fiscal_deposits", "govt_deposits_level", lag=1)
