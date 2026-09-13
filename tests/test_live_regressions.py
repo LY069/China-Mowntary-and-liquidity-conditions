@@ -102,6 +102,38 @@ def test_dead_rate_is_not_resurrected():
           "ncd_mlf_spread" not in payload["series"])
 
 
+def test_credit_curve_rating_is_matched_exactly():
+    """The first live run selected 中短期票据(AAA+) when asked for AA+, because
+    'AA+' is a substring of 'AAA+'. A higher credit tier understates the spread,
+    and nothing about the output would have looked wrong."""
+    print("\ncredit curve rating must match as a whole token, not a substring")
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import refresh_data as rd
+
+    labels = {"中短期票据(AAA+)": "C1", "中短期票据(AA+)": "C2",
+              "中短期票据(AA)": "C3", "中短期票据(AA+)浮动利率点差": "C4"}
+
+    class FakeMap:
+        def iterrows(self):
+            for i, (k, v) in enumerate(labels.items()):
+                yield i, {"cnLabel": k, "value": v}
+
+    class FakeAk:
+        def bond_china_close_return_map(self): return FakeMap()
+
+    picked = {}
+    real = rd._ncd_records
+    rd._ncd_records = lambda code, s_, e_, term="1": (picked.setdefault("code", code),
+                                                      picked.setdefault("term", term),
+                                                      [])[2]
+    try:
+        rd.fetch_credit_spread(FakeAk(), "2026-08")
+    finally:
+        rd._ncd_records = real
+    check("picks AA+ not AAA+", picked.get("code"), "C2")
+    check("uses the 3-year point", picked.get("term"), "3")
+
+
 def test_workflow_reports_any_failure():
     """The restore and upload steps were keyed to the gate alone, so a crash in
     the rebuild step left no artifact and no restore."""
@@ -116,6 +148,7 @@ def main():
     test_nan_does_not_crash_the_build()
     test_refresh_never_shrinks_a_series()
     test_dead_rate_is_not_resurrected()
+    test_credit_curve_rating_is_matched_exactly()
     test_workflow_reports_any_failure()
     print("\nALL PASSED" if not FAILURES else f"\n{len(FAILURES)} FAILURE(S): {FAILURES}")
     return 1 if FAILURES else 0

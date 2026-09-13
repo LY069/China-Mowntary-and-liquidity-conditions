@@ -1,7 +1,7 @@
 {
  "meta": {
   "generated": "2026-09-13",
-  "note": "Refreshed 2026-09-13 by scripts/refresh_data.py via akshare. Series not listed as refreshed retain their earlier provenance.",
+  "note": "Refreshed 2026-09-13 by scripts/refresh_data.py via akshare. Series not listed as refreshed retain their earlier provenance. mtn_aa_3y was purged on 2026-09-13: the first fetch resolved 中短期票据(AAA+) rather than (AA+) because the rating was matched as a loose substring. Refetched from the correct curve.",
   "gaps": [
    "omo_7d (7-day reverse repo policy rate): OMITTED. No complete verified step series obtainable. Verified anchors only, from PBoC MPR text: 2.55% through 2019-Q1..2019-Q3; 1.50% at 2025-03; 'cut from 1.5% to 1.4%' during 2025-Q4; 1.40% at 2026-03. Forward-filling four anchors across 2019-2026 would inject wrong levels for every intervening cut (2020, 2022, 2023, 2024), so no series is emitted.",
    "mlf_1y (1-year MLF rate): OMITTED. Same reason - the MPR text describes MLF changes qualitatively ('down 20bp', 'down 30bp') without a dated level series, and no machine-readable source was reachable.",
@@ -120754,51 +120754,6 @@
     "confidence": "partial"
    },
    "notes": "ChinaBond closing yield curve, maturity point.",
-   "unit": "%",
-   "freq": "D"
-  },
-  "mtn_aa_3y": {
-   "observations": [
-    [
-     "2026-06-29",
-     2.4256
-    ],
-    [
-     "2026-06-30",
-     2.4153
-    ],
-    [
-     "2026-07-30",
-     2.3926
-    ],
-    [
-     "2026-07-31",
-     2.3879
-    ],
-    [
-     "2026-08-28",
-     2.3526
-    ],
-    [
-     "2026-08-31",
-     2.3548
-    ],
-    [
-     "2026-09-10",
-     2.3389
-    ],
-    [
-     "2026-09-11",
-     2.3516
-    ]
-   ],
-   "provenance": {
-    "source_name": "CFETS closing yield curve, 中短期票据(AAA+) (ClsYldCurvHis), called directly",
-    "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
-    "retrieved": "2026-09-13",
-    "confidence": "partial"
-   },
-   "notes": "3-year point of the 中短期票据(AAA+) curve, resolved by label match against the published curve map (code CYCC82A). The spread over the 3-year CGB is the credit-risk premium.",
    "unit": "%",
    "freq": "D"
   }

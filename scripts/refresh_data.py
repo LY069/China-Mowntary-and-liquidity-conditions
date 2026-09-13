@@ -665,13 +665,21 @@ def fetch_credit_spread(ak, start):
     # Preference order: the plain medium-term note curve at AA+, then AA, then
     # the enterprise-bond equivalent. Floating-rate spread curves are excluded —
     # they are point spreads, not yields.
-    code = label = None
-    for want in (("中短期票据", "AA+"), ("中期票据", "AA+"),
-                 ("中短期票据", "AA"), ("企业债", "AA+")):
+    # The rating must be matched as a WHOLE parenthesised token. Matching "AA+"
+    # as a loose substring silently selects 中短期票据(AAA+) — a higher credit
+    # tier — and understates the spread. That is what the first live run did.
+    def find(instrument: str, rating: str):
+        token = f"({rating})"
         for lbl, val in labels.items():
-            if all(w in lbl for w in want) and "浮动" not in lbl and "点差" not in lbl:
-                code, label = val, lbl
-                break
+            if (instrument in lbl and token in lbl
+                    and "浮动" not in lbl and "点差" not in lbl):
+                return val, lbl
+        return None, None
+
+    code = label = None
+    for instrument, rating in (("中短期票据", "AA+"), ("中期票据", "AA+"),
+                               ("中短期票据", "AA"), ("企业债", "AA+")):
+        code, label = find(instrument, rating)
         if code:
             break
     if not code:
