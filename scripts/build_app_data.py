@@ -256,6 +256,8 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
     difference("m1_m2_gap", "m1_yoy", "m2_yoy")
     difference("dr007_omo_spread", "dr007", "omo_7d", scale=100)              # -> bp
     difference("r_dr_spread", "r007", "dr007", scale=100)                     # -> bp
+    difference("r_dr_spread_001", "r001", "dr001", scale=100)                 # -> bp
+    difference("dr001_omo_spread", "dr001", "omo_7d", scale=100)              # -> bp
     difference("ncd_mlf_spread", "ncd_1y_aaa", "mlf_1y", scale=100)           # -> bp
     difference("ncd_omo_spread", "ncd_issuance_war", "omo_7d", scale=100)     # -> bp
     difference("term_spread", "cgb_10y", "cgb_1y", scale=100)                 # -> bp

@@ -259,7 +259,11 @@ def fetch_repo_fixings(ak, start):
             "source_url": f"{CFETS}/ags/ms/cm-u-bk-currency/FrrHis",
             "retrieved": TODAY, "confidence": "partial"}
     out = {}
-    for sid, col, real in [("dr007", "FDR007", "DR007"), ("r007", "FR007", "R007")]:
+    # FDR001/FR001 arrive in the same response as the 7-day fixings and were
+    # being discarded. The overnight tenor is now the PBoC's declared operating
+    # anchor (Q1 2026 MPR), so DR001 matters more than DR007 going forward.
+    for sid, col, real in [("dr007", "FDR007", "DR007"), ("r007", "FR007", "R007"),
+                           ("dr001", "FDR001", "DR001"), ("r001", "FR001", "R001")]:
         try:
             c = pick(df, col)
         except KeyError as e:
@@ -423,7 +427,7 @@ FETCHERS = {
     "money":     (fetch_money_supply, ["m1_yoy", "m2_yoy", "m2_level"]),
     "tsf":       (fetch_tsf,          ["tsf_flow"]),
     "lpr":       (fetch_lpr,          ["lpr_1y", "lpr_5y"]),
-    "repo":      (fetch_repo_fixings, ["dr007", "r007"]),
+    "repo":      (fetch_repo_fixings, ["dr007", "r007", "dr001", "r001"]),
     "cgb":       (fetch_cgb_curve,    ["cgb_1y", "cgb_10y"]),
     "ncd":       (fetch_ncd,          ["ncd_1y_aaa"]),
     "interbank": (fetch_interbank,    ["shibor_3m", "cnh_hibor_on"]),

@@ -62,6 +62,13 @@ jobs:
           python3 tests/test_refresh_fetchers.py
           python3 tests/test_live_regressions.py
 
+      - name: Probe candidate sources (health check, never fatal)
+        # Reports what each candidate endpoint actually returns. Doubles as an
+        # upstream health check: when a source renames a column or stops
+        # serving a series, this says so before a fetcher silently goes quiet.
+        continue-on-error: true
+        run: python3 scripts/probe_sources.py
+
       - name: Snapshot the current dataset
         run: cp data/seed/series.json /tmp/series.before.json
 

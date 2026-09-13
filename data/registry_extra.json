@@ -326,5 +326,40 @@
     },
     "false_signals": "There is no official adjusted series — it must be constructed from the swap issuance calendar, so the adjustment is an estimate and different desks will get different numbers.",
     "unavailable": "Not populated in this build. Flagged by the literature scan as the single highest-value indicator to construct next: without it, measured stimulus is overstated for years."
+  },
+  "r001": {
+    "name": "R001",
+    "name_zh": "银行间隔夜质押式回购利率(全市场)",
+    "block": "liquidity",
+    "group": "Money market rates",
+    "unit": "%",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": false,
+    "read": "The all-market overnight pledged repo rate, including non-banks. Paired with DR001 it gives the overnight equivalent of the R–DR stratification spread.",
+    "implications": {
+      "growth": "None directly.",
+      "inflation": "None.",
+      "policy": "The overnight R−DR gap is the fastest-moving read on whether liquidity is reaching beyond the large banks, and it moves before the 7-day gap does."
+    },
+    "false_signals": "The most volatile rate on the board. Single-day spikes around tax dates, quarter-ends and Chinese New Year carry no policy information."
+  },
+  "r_dr_spread_001": {
+    "name": "R001 − DR001 spread",
+    "name_zh": "R001与DR001利差",
+    "block": "liquidity",
+    "group": "Money market rates",
+    "unit": "bp",
+    "freq": "D",
+    "looser_when": "lower",
+    "core": false,
+    "derived": "r001 - dr001",
+    "read": "Overnight funding stratification: what non-banks pay over banks for overnight money.",
+    "implications": {
+      "growth": "None directly.",
+      "inflation": "None.",
+      "policy": "The earliest warning of non-bank funding stress — it widens before the 7-day equivalent does."
+    },
+    "false_signals": "Quarter-end MPA assessment widens it mechanically as banks withdraw from lending to non-banks."
   }
 }
