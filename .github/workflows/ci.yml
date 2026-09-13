@@ -1,0 +1,54 @@
+name: CI
+
+# Builds the tracker and runs the sanity gate on every change. Needs no network
+# beyond PyPI: the fetcher tests replay recorded response shapes rather than
+# calling the live endpoints, which is what makes them runnable here at all.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pandas
+        # Only pandas: the fetcher tests fake akshare rather than installing it,
+        # so CI stays fast and does not depend on akshare's fragile build.
+        run: pip install --quiet pandas
+
+      - name: Unit tests — refresh parsing helpers
+        run: python3 tests/test_refresh_helpers.py
+
+      - name: Replay tests — fetchers against recorded akshare shapes
+        run: python3 tests/test_refresh_fetchers.py
+
+      - name: Build the app payload
+        run: python3 scripts/build_app_data.py
+
+      - name: Build the standalone page
+        run: python3 scripts/make_standalone.py
+
+      - name: Sanity gate — structure, plausibility, anchors, coherence
+        run: python3 scripts/validate_data.py
+
+      - name: Check the build is committed
+        # docs/index.html and app/data.js are generated. If a registry or data
+        # change landed without a rebuild, the committed page is stale and the
+        # tracker shows numbers that no longer match the inputs.
+        run: |
+          if ! git diff --quiet -- app/data.js docs/index.html data/registry.json; then
+            echo "::error::Generated files are out of date. Run:"
+            echo "  python3 scripts/build_app_data.py && python3 scripts/make_standalone.py"
+            git diff --stat -- app/data.js docs/index.html data/registry.json
+            exit 1
+          fi
+          echo "generated files are up to date"

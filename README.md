@@ -95,17 +95,53 @@ TSF excluding government bonds. The app names each one and what its absence cost
 
 ### Refreshing
 
+The dataset refreshes itself. `.github/workflows/refresh-data.yml` runs weekly on a
+GitHub runner — which, unlike the sandbox this was built in, has unrestricted network — and pulls
+from the publishers' own endpoints via akshare, rebuilds, validates, and commits only if the sanity
+gate passes. That workflow is what closes the provenance gap: values it commits come from primary
+sources, not mirrors. It can also be run on demand from the Actions tab, with a dry-run option.
+
+To run it locally:
+
 ```bash
+pip install "setuptools<60" wheel
+pip install --no-build-isolation jsonpath     # see note below
 pip install akshare
-python3 scripts/refresh_data.py             # dry run — reports what it would change
+
+python3 scripts/refresh_data.py               # dry run — reports what it would change
 python3 scripts/refresh_data.py --write
 python3 scripts/build_app_data.py && python3 scripts/make_standalone.py
+python3 scripts/validate_data.py              # never skip this
 ```
 
-`refresh_data.py` implements the CFETS, ChinaBond and East Money routes documented in note 05. Its
-endpoint mapping was transcribed from akshare's source, but **it has never been executed against the
-live endpoints**, because the sandbox that wrote it could not reach them — treat the first run as a
-verification exercise. The parsing helpers are unit-tested (`python3 tests/test_refresh_helpers.py`).
+The `jsonpath` dance is not optional. akshare depends on it; it ships sdist-only and its legacy
+`setup.py` calls `install` during `bdist_wheel`, which modern setuptools rejects, so a plain
+`pip install akshare` fails. Building it against `setuptools<60` with build isolation off works.
 
-The weighted average lending rate and the excess reserve ratio have no machine-readable source at all:
-they appear only in the quarterly PBoC Monetary Policy Report PDF and must be entered by hand.
+The weighted average lending rate and the excess reserve ratio have no machine-readable source at
+all: they appear only in the quarterly PBoC Monetary Policy Report PDF and must be entered by hand.
+
+### Guardrails
+
+`scripts/validate_data.py` is the gate between a refresh and a commit. A silent mis-parse is far more
+dangerous than a loud failure — it produces a plausible-looking index built on wrong numbers — so the
+gate checks structure (well-formed, sorted, no future dates), plausibility (a policy rate of 40% means
+the units are wrong, not that the PBoC panicked), anchors (values that are matters of public record and
+cannot legitimately change), and coherence. If it fails, the refresh workflow restores the previous
+dataset and uploads the rejected one for inspection rather than committing it.
+
+Tests:
+
+```bash
+python3 tests/test_refresh_helpers.py     # column resolution, date parsing, unit scaling
+python3 tests/test_refresh_fetchers.py    # every fetcher, against akshare's real response shapes
+```
+
+The fetcher tests replay column names read out of akshare 1.18.94's own source rather than guessed,
+so they verify everything between the API boundary and the output file without touching the network.
+They caught a real bug during development: the CFETS repo endpoint caps a request at one calendar
+month, and the script was asking for a multi-year range. What they cannot verify is that the live
+endpoints still return those columns — only the scheduled workflow does that.
+
+`.github/workflows/ci.yml` runs both test suites, the build, and the gate on every push, and fails if
+the committed `app/data.js` or `docs/index.html` is stale relative to its inputs.

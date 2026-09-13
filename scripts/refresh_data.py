@@ -26,6 +26,28 @@ USAGE
 Then rebuild the app:
     python3 scripts/build_app_data.py && python3 scripts/make_standalone.py
 
+VERIFIED CONTRACTS
+------------------
+akshare 1.18.94 was installed and introspected offline (its endpoints are
+unreachable from here, but its source is not). Every function below exists,
+every signature matches, and the column names are read out of akshare's own
+source rather than guessed:
+
+    macro_china_money_supply()  -> 月份, 货币(M1)-同比增长,
+                                   货币和准货币(M2)-同比增长,
+                                   货币和准货币(M2)-数量(亿元)          [亿元 -> bn]
+    macro_china_shrzgm()        -> 月份, 社会融资规模增量                [亿元 -> bn]
+    macro_china_lpr()           -> TRADE_DATE, LPR1Y, LPR5Y
+    repo_rate_hist(s, e)        -> date, FR001/007/014, FDR001/007/014
+                                   *** start and end MUST be within one month ***
+    bond_china_yield(s, e)      -> 日期, 3月, 6月, 1年, 3年, 5年, 7年, 10年, 30年
+                                   *** window must be under one year ***
+    bond_china_close_return(...)-> 日期, 期限, 到期收益率, 即期收益率, 远期收益率
+    rate_interbank(...)         -> 报告日, 利率   (symbol "Hibor人民币" == CNH)
+    macro_china_reserve_requirement_ratio()
+                                -> 生效时间, 大型金融机构-调整后,
+                                   中小金融机构-调整后
+
 NOTES ON FIDELITY
 -----------------
 * FDR007 is NOT DR007 and FR007 is NOT R007. They are the CFETS repo *fixings*,
@@ -188,9 +210,35 @@ def fetch_lpr(ak, start):
     return out
 
 
+def _month_spans(start: str):
+    """Yield (YYYYMMDD, YYYYMMDD) pairs, one calendar month at a time."""
+    y, m = int(start[:4]), int(start[5:7])
+    today = date.today()
+    while (y, m) <= (today.year, today.month):
+        last = 31
+        while True:
+            try:
+                end = date(y, m, last); break
+            except ValueError:
+                last -= 1
+        yield f"{y}{m:02d}01", end.strftime("%Y%m%d")
+        y, m = (y + 1, 1) if m == 12 else (y, m + 1)
+
+
 def fetch_repo_fixings(ak, start):
-    df = ak.repo_rate_hist(start_date=start.replace("-", "") + "01",
-                           end_date=TODAY.replace("-", ""))
+    # chinamoney's FrrHis endpoint requires start and end inside ONE calendar
+    # month ("开始时间与结束时间需要在一个月内" in akshare's own docstring), so a
+    # single multi-year call silently returns nothing. Walk it month by month.
+    import pandas as pd
+    frames = []
+    for s_, e_ in _month_spans(start):
+        try:
+            frames.append(ak.repo_rate_hist(start_date=s_, end_date=e_))
+        except Exception as e:                        # noqa: BLE001
+            print(f"    repo {s_[:6]}: {e}")
+    if not frames:
+        return {}
+    df = pd.concat(frames, ignore_index=True)
     dcol = pick(df, "date", "日期")
     prov = {"source_name": "CFETS repo fixing history (FrrHis) via akshare",
             "source_url": f"{CFETS}/ags/ms/cm-u-bk-currency/FrrHis",
@@ -256,6 +304,29 @@ def fetch_ncd(ak, start):
                            "ak.bond_china_close_return_map() first to confirm the curve label.")}
 
 
+def fetch_rrr(ak, start):
+    df = ak.macro_china_reserve_requirement_ratio()
+    dcol = pick(df, "生效时间", ("生效",))
+    prov = {"source_name": "PBoC reserve requirement ratio changes via akshare (East Money)",
+            "source_url": "https://data.eastmoney.com/cjsj/ckzbj.html",
+            "retrieved": TODAY, "confidence": "partial"}
+    out = {}
+    for sid, *names in [("rrr_large", "大型金融机构-调整后", ("大型", "调整后")),
+                        ("rrr_small", "中小金融机构-调整后", ("中小", "调整后"))]:
+        try:
+            col = pick(df, *names)
+        except KeyError as e:
+            print(f"    skip {sid}: {e}")
+            continue
+        obs = daily(df, dcol, col)
+        out[sid] = (obs, prov,
+                    "Step series keyed on the EFFECTIVE date (生效时间), not the announcement "
+                    "date. Reconcile against PBoC announcements before relying on it — the "
+                    "seed series was truncated precisely because a mirror had incomplete "
+                    "change dates.")
+    return out
+
+
 def fetch_interbank(ak, start):
     out = {}
     for sid, market, symbol, indicator, name in [
@@ -283,6 +354,7 @@ FETCHERS = {
     "cgb":       (fetch_cgb_curve,    ["cgb_1y", "cgb_10y"]),
     "ncd":       (fetch_ncd,          ["ncd_1y_aaa"]),
     "interbank": (fetch_interbank,    ["shibor_3m", "cnh_hibor_on"]),
+    "rrr":       (fetch_rrr,          ["rrr_large", "rrr_small"]),
 }
 
 MANUAL_ONLY = {

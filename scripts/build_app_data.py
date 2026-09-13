@@ -115,6 +115,45 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
     seed = load_json(seed_path, {"meta": {}, "series": {}})
     observed = dict(seed.get("series", {}))
 
+    # A second round of mirror sourcing lands in its own file. Where it names a
+    # series the primary seed lacks, it is taken wholesale; where both have the
+    # series, the dates are unioned and the primary seed wins any overlap, so a
+    # mirror can only ever EXTEND coverage, never silently restate it. The
+    # combined provenance names both sources and what each contributed.
+    extra = load_json(seed_path.parent / "mirrors_round2.json", {"meta": {}, "series": {}})
+    extended, adopted = [], []
+    for key, series in extra.get("series", {}).items():
+        new_obs = [o for o in series.get("observations", []) if o[1] is not None]
+        if not new_obs:
+            continue
+        if key not in observed:
+            observed[key] = series
+            adopted.append(f"{key} ({len(new_obs)} obs)")
+            continue
+        have = {o[0]: o[1] for o in observed[key].get("observations", [])}
+        added = {d: v for d, v in new_obs if d not in have}
+        if not added:
+            continue
+        merged = sorted({**added, **have}.items())
+        observed[key] = dict(observed[key])
+        observed[key]["observations"] = [[d, v] for d, v in merged]
+        base_prov = dict(observed[key].get("provenance") or {})
+        mirror_prov = series.get("provenance") or {}
+        base_prov["source_name"] = (
+            f"{base_prov.get('source_name', 'primary seed')} "
+            f"(+{len(added)} obs from {mirror_prov.get('source_name', 'second-round mirror')})")
+        base_prov["confidence"] = "partial"
+        observed[key]["provenance"] = base_prov
+        observed[key]["notes"] = ((observed[key].get("notes") or "") +
+            f" Extended with {len(added)} observation(s) through {max(added)} from a "
+            f"second-round mirror ({mirror_prov.get('source_url', 'source unrecorded')}); "
+            f"where the two overlapped the original values were kept.").strip()
+        extended.append(f"{key} (+{len(added)} obs, now through {merged[-1][0]})")
+    if adopted:
+        print(f"mirror series adopted: {', '.join(adopted)}")
+    if extended:
+        print(f"mirror series extended: {', '.join(extended)}")
+
     # Analyst-supplied series live in their own file so provenance stays auditable.
     # They fill gaps the sourcing pass could not close; they never overwrite fetched data.
     supplied = load_json(seed_path.parent / "analyst_supplied.json", {"meta": {}, "series": {}})
