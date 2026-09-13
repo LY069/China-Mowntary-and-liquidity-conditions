@@ -192,10 +192,17 @@ def main():
 
     import requests as _rq
     saved = _rq.get
+    # The real record carries five fields in order — 日期, 期限, 到期收益率,
+    # 即期收益率, 远期收益率 — optionally preceded by newDateValue. The parser
+    # reads them positionally, so it now requires exactly that shape.
     for label, rec in [
         ("old schema (newDateValue present)",
-         {"newDateValue": "x", "d": "2026-03-02", "term": "1", "ytm": "1.88"}),
+         {"newDateValue": "x", "d": "2026-03-02", "term": "1",
+          "ytm": "1.88", "spot": "1.88", "fwd": "1.89"}),
         ("new schema (newDateValue absent)",
+         {"d": "2026-03-02", "term": "1", "ytm": "1.88",
+          "spot": "1.88", "fwd": "1.89"}),
+        ("malformed row is dropped, not read off-by-one",
          {"d": "2026-03-02", "term": "1", "ytm": "1.88"}),
     ]:
         _rq.get = lambda *a, **k: FakeResp({"records": [rec]})
@@ -203,7 +210,7 @@ def main():
             got = rd._ncd_records("CYCC999", "20260301", "20260331")
         finally:
             _rq.get = saved
-        check(label, got, [["2026-03-02", 1.88]])
+        check(label, got, [] if "malformed" in label else [["2026-03-02", 1.88]])
 
     print("\ninterbank — SHIBOR and CNH HIBOR")
     r = rd.fetch_interbank(ak, "2026-01")
