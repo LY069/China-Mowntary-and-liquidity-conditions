@@ -336,6 +336,7 @@ td:first-child{text-align:left}
     <div class="stamp">
       <span class="chip" id="chip-asof"><span class="dot"></span><span>loading</span></span>
       <span class="chip" id="chip-cov"><span class="dot"></span><span>coverage</span></span>
+      <span class="chip" id="chip-quality"><span class="dot"></span><span>quality</span></span>
       <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch colour theme">Theme</button>
     </div>
   </div>
@@ -557,6 +558,10 @@ function stateOf(id){
   const z = zLast(id);
   if (z == null) return {cls:"none", label:"No data", gl:"", z:null, sz:null};
   if (e.stateless) return {cls:"none", label:(e.stateless_label || "No reading"), gl:"", z:z, sz:null, why:e.stateless};
+  const conf = (SER[id] && SER[id].provenance && SER[id].provenance.confidence) || null;
+  if (conf === "suspect") return {cls:"none", label:"Suspect data", gl:"", z:z, sz:null,
+    why:"This series failed the independent validation pass. A loose/tight reading would dress up a "
+      + "known data problem as a signal. See the note below and research/07-data-validation.md."};
   if (e.block === "context") {
     const above = z >= 0;
     return {cls:"none", label:(above?"+":"") + z.toFixed(2) + "σ vs history", gl:"", z:z, sz:null};
@@ -837,6 +842,15 @@ function openDrawer(id){
   if (st.z != null) addFact("z-score", fmt(st.z, "z"));
   body.appendChild(facts);
 
+  const conf = (SER[id] && SER[id].provenance && SER[id].provenance.confidence) || null;
+  if (conf === "suspect"){
+    const b = el("div","block");
+    b.appendChild(el("h4", null, "Known problem with this series"));
+    const w = el("div","warnbox");
+    w.appendChild(el("p", null, (SER[id].series_notes || "")
+      + " Flagged suspect by the independent validation pass — see research/07-data-validation.md."));
+    b.appendChild(w); body.appendChild(b);
+  }
   if (st.why){
     const b = el("div","block");
     b.appendChild(el("h4", null, "No loose/tight reading"));
@@ -1297,6 +1311,20 @@ function renderChips(){
   c2.className = "chip" + (ratio > 0.8 ? " ok" : ratio > 0.5 ? " warn" : " bad");
   c2.lastChild.textContent = withData + " of " + total + " indicators populated";
   c2.title = "Indicators defined in the framework that carry observations in this build";
+
+  const suspect = Object.keys(SER).filter(k =>
+    SER[k].provenance && SER[k].provenance.confidence === "suspect");
+  const c3 = $("#chip-quality");
+  if (suspect.length){
+    c3.className = "chip warn";
+    c3.lastChild.textContent = suspect.length + " series flagged suspect";
+    c3.title = "Failed the independent validation pass: "
+             + suspect.map(k => (REG[k] && REG[k].name) || k).join(", ");
+  } else {
+    c3.className = "chip ok";
+    c3.lastChild.textContent = "No series flagged suspect";
+    c3.title = "Every populated series passed the independent validation pass";
+  }
 }
 
 function initTabs(){

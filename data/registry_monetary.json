@@ -278,7 +278,9 @@
       "inflation": "Imported inflation via commodities, but the pass-through to Chinese CPI is modest.",
       "policy": "FX stability is a hard constraint. A weakening currency and a wide US-China rate differential limit how far the PBoC can cut without triggering outflows."
     },
-    "false_signals": "Bilateral USD/CNY conflates dollar strength with renminbi weakness. Judge the renminbi against the CFETS basket, not the dollar."
+    "false_signals": "Bilateral USD/CNY conflates dollar strength with renminbi weakness. Judge the renminbi against the CFETS basket, not the dollar.",
+    "history_from": "2005-07",
+    "notes": "Trimmed to July 2005, the start of the managed float. Earlier history exists in the source but is not comparable: the rate was pegged at 8.28 for the decade before that, and was a dual-track administered rate before the 1994 unification. Including it would make the z-score measure a regime change rather than currency conditions."
   },
   "cfets": {
     "name": "CFETS RMB index",

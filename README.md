@@ -12,7 +12,7 @@ them apart is the point of this repository.
 
 ## The tracker
 
-An interactive dashboard covering 59 indicators, with a Monetary Conditions Index, a Liquidity
+An interactive dashboard covering 59 indicators (38 populated), with a Monetary Conditions Index, a Liquidity
 Conditions Index and the transmission gap between them.
 
 ```bash
@@ -45,6 +45,7 @@ Two design decisions worth knowing:
 | [04 · Recent research](research/04-recent-research.md) | The 2024–26 PBoC framework overhaul, new measurement methods, 23 new indicators to build |
 | [05 · Data sources](research/05-data-sources.md) | Endpoint-level sourcing manual and production pull strategy |
 | [06 · Implications](research/06-implications.md) | Transmission, lead/lags, thresholds, the PBoC reaction function, read-across matrix, scenario map |
+| [07 · Data validation](research/07-data-validation.md) | Independent audit: 178 comparisons against PBoC/NBS, discrepancies, confidence ratings |
 
 ## Repository layout
 
@@ -72,26 +73,38 @@ loudly rather than quietly producing a plausible-looking index.
 
 This dataset was assembled inside a sandbox whose egress policy blocked **every** macroeconomic data
 host: the PBoC, NBS, ChinaBond, CFETS, FRED, the BIS, the IMF and the World Bank were all unreachable.
-Every fetched value therefore came from **third-party mirrors on GitHub, not from a primary
-publisher**. Values were spot-checked against the official record and match where checked — LPR, RRR,
-M1, M2, CPI, PPI, TSF and nominal GDP levels all verify exactly — but **re-pulling from primary sources
-is task one** for anyone using this seriously.
+Fetched values therefore came from **third-party mirrors, not primary publishers**. That is the gap the
+[refresh workflow](#refreshing) exists to close — it pulls from the publishers' own endpoints on a
+runner that can actually reach them.
 
-Each series carries a confidence rating, visible in the app:
+In the meantime the dataset has been **independently audited**: 178 observation-level comparisons
+against PBoC and NBS sources, of which 175 matched. See
+[`research/07-data-validation.md`](research/07-data-validation.md). Every series carries a confidence
+rating, visible in the app:
 
 | Rating | Meaning |
 |---|---|
-| `verified` | Traced to a named official publication, typically the PBoC Monetary Policy Report |
-| `partial` | From a mirror whose upstream is an official series, not confirmed at the publisher |
-| `analyst-supplied` | Entered from domain knowledge because no machine-readable source was reachable |
+| `verified` | Checked against the official record and matched. The six Monetary Policy Report series were audited by full census, not spot check — `walr_general`, which carries 30% of the monetary index, matched 33/33. |
+| `partial` | From a mirror whose upstream is an official series, not confirmed at the publisher. |
+| `analyst-supplied` | Entered from domain knowledge because no machine-readable source was reachable. |
+| `suspect` | **Failed the audit.** Shown in the app with the problem stated and no loose/tight reading, so a known data defect cannot masquerade as a signal. |
 
-Two series are `analyst-supplied`: the 7-day reverse repo rate and the 1-year MLF rate. They were added
-deliberately — without a policy rate there is no DR007 spread, no real policy rate and no liquidity
-index at all — and they are cross-checked against Monetary Policy Report anchors and against the RRR
-series, which independently corroborates the May 2025 easing package.
+Two series are flagged `suspect`: `nominal_gdp_level_cum` mixes pre- and post-census GDP vintages
+(computing growth across that seam produces a phantom 2.8pp jump), and `core_cpi_yoy` labels three
+year-to-date averages as single quarters.
 
-About 25 defined indicators carry no data, including R007, the 1-year AAA NCD rate, DR001, the REER and
-TSF excluding government bonds. The app names each one and what its absence costs.
+The 7-day reverse repo and 1-year MLF rates are `analyst-supplied` — entered by hand because no
+machine-readable source was reachable, and kept in their own file so they stay auditable. They have
+since been corroborated against an independent Wind export: **12/12 overlapping OMO change dates and
+14/14 MLF dates agree exactly, with no disagreements.**
+
+One audit finding is worth repeating because it looks like an error and is not: `excess_reserve_ratio`
+at 2024-Q3 = 1.8% is **correct**. The 27 September 2024 RRR cut landed three days before the
+quarter-end snapshot. Do not "fix" it.
+
+38 of 59 defined indicators carry data. The rest — including R007, the 1-year AAA NCD rate, DR001 and
+TSF excluding government bonds — are defined, documented, and named in the app along with what their
+absence costs, rather than quietly averaged over.
 
 ### Refreshing
 

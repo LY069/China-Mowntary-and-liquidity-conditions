@@ -1,23 +1,23 @@
 {
   "ncd_issuance_war": {
-    "name": "NCD weighted average issuance rate",
-    "name_zh": "同业存单加权平均发行利率",
+    "name": "3-month NCD issuance rate",
+    "name_zh": "3个月同业存单发行利率",
     "block": "liquidity",
     "group": "Bank funding",
     "unit": "%",
     "freq": "Q",
     "looser_when": "lower",
     "core": true,
-    "read": "The average rate banks actually paid to issue negotiable certificates of deposit, across all tenors, from the PBoC Monetary Policy Report. A direct read on the marginal cost of wholesale bank funding.",
+    "read": "The rate banks pay to issue 3-month negotiable certificates of deposit, from the PBoC Monetary Policy Report. A direct read on the marginal cost of short-term wholesale bank funding.",
     "implications": {
       "growth": "Indirect. Bank funding costs set the floor under lending rates, so a sustained rise limits how far loan pricing can fall.",
       "inflation": "None directly.",
       "policy": "Rising NCD costs compress net interest margins, which are the binding constraint on further LPR cuts. The PBoC watches this as a transmission limit."
     },
-    "false_signals": "All-tenor weighted average, so its level sits below the 1-year AAA benchmark most strategists quote and the two are not interchangeable. The mix of tenors issued shifts with quarter-end regulatory ratios, moving the average without any change in underlying funding pressure."
+    "false_signals": "This is the 3-month point, not the 1-year AAA benchmark most strategists quote, and not an all-tenor average — the two sit at different levels and are not interchangeable. Quarter-end regulatory ratios distort issuance and pricing."
   },
   "ncd_omo_spread": {
-    "name": "NCD issuance rate − policy rate",
+    "name": "3m NCD − policy rate spread",
     "name_zh": "同业存单发行利率与政策利率利差",
     "block": "liquidity",
     "group": "Bank funding",
@@ -26,13 +26,13 @@
     "looser_when": "lower",
     "core": true,
     "derived": "ncd_issuance_war - omo_7d",
-    "read": "What banks pay for wholesale funding relative to what the central bank charges. The workable substitute for the conventional 1-year NCD versus MLF spread now that the MLF no longer has a single announced rate.",
+    "read": "What banks pay for 3-month wholesale funding relative to the central bank's policy rate. The workable substitute for the conventional 1-year NCD versus MLF spread, now that the MLF has no single announced rate.",
     "implications": {
       "growth": "Indirect, via the cost and availability of bank credit.",
       "inflation": "None directly.",
       "policy": "A wide positive spread means market funding is dearer than central bank funding, so banks lean on PBoC facilities and pressure builds for injections. A narrow or negative spread signals genuinely ample liquidity."
     },
-    "false_signals": "Mixes an all-tenor average against an overnight-horizon policy rate, so the level carries a structural term premium and should be read as a change from its own history rather than against zero."
+    "false_signals": "Compares a 3-month funding rate against a 7-day policy rate, so the level carries a structural term premium — read it as a change from its own history, not against zero."
   },
   "m2_level": {
     "name": "M2 stock",

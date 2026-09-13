@@ -115,57 +115,56 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
     seed = load_json(seed_path, {"meta": {}, "series": {}})
     observed = dict(seed.get("series", {}))
 
-    # A second round of mirror sourcing lands in its own file. Where it names a
-    # series the primary seed lacks, it is taken wholesale; where both have the
-    # series, the dates are unioned and the primary seed wins any overlap, so a
-    # mirror can only ever EXTEND coverage, never silently restate it. The
-    # combined provenance names both sources and what each contributed.
-    extra = load_json(seed_path.parent / "mirrors_round2.json", {"meta": {}, "series": {}})
-    extended, adopted = [], []
-    for key, series in extra.get("series", {}).items():
-        new_obs = [o for o in series.get("observations", []) if o[1] is not None]
-        if not new_obs:
-            continue
-        if key not in observed:
-            observed[key] = series
-            adopted.append(f"{key} ({len(new_obs)} obs)")
-            continue
-        have = {o[0]: o[1] for o in observed[key].get("observations", [])}
-        added = {d: v for d, v in new_obs if d not in have}
-        if not added:
-            continue
-        merged = sorted({**added, **have}.items())
-        observed[key] = dict(observed[key])
-        observed[key]["observations"] = [[d, v] for d, v in merged]
-        base_prov = dict(observed[key].get("provenance") or {})
-        mirror_prov = series.get("provenance") or {}
-        base_prov["source_name"] = (
-            f"{base_prov.get('source_name', 'primary seed')} "
-            f"(+{len(added)} obs from {mirror_prov.get('source_name', 'second-round mirror')})")
-        base_prov["confidence"] = "partial"
-        observed[key]["provenance"] = base_prov
-        observed[key]["notes"] = ((observed[key].get("notes") or "") +
-            f" Extended with {len(added)} observation(s) through {max(added)} from a "
-            f"second-round mirror ({mirror_prov.get('source_url', 'source unrecorded')}); "
-            f"where the two overlapped the original values were kept.").strip()
-        extended.append(f"{key} (+{len(added)} obs, now through {merged[-1][0]})")
-    if adopted:
-        print(f"mirror series adopted: {', '.join(adopted)}")
-    if extended:
-        print(f"mirror series extended: {', '.join(extended)}")
+    # Two supplementary files sit alongside the fetched seed: a second round of
+    # mirror sourcing, and values entered by hand. Both merge on EXTEND-ONLY
+    # terms — they may add dates a series lacks, but never restate one it already
+    # has — so a supplement can only widen coverage, and the primary seed stays
+    # the authority wherever they overlap. Keeping the hand-entered values in
+    # their own file is what makes them auditable rather than indistinguishable
+    # from fetched data; the merged provenance records what each contributed.
+    def merge_supplement(doc: dict, label: str) -> None:
+        adopted, extended = [], []
+        for key, series in (doc or {}).get("series", {}).items():
+            fresh = [o for o in series.get("observations", []) if o[1] is not None]
+            if not fresh:
+                continue
+            if key not in observed:
+                observed[key] = series
+                adopted.append(f"{key} ({len(fresh)} obs)")
+                continue
+            have = {o[0]: o[1] for o in observed[key].get("observations", [])}
+            added = {d: v for d, v in fresh if d not in have}
+            if not added:
+                continue
+            merged = sorted({**added, **have}.items())
+            entry = dict(observed[key])
+            entry["observations"] = [[d, v] for d, v in merged]
+            prov = dict(entry.get("provenance") or {})
+            sup = series.get("provenance") or {}
+            prov["source_name"] = (f"{prov.get('source_name', 'primary seed')} "
+                                   f"(+{len(added)} obs from {sup.get('source_name', label)})")
+            # A series is only as trustworthy as its weakest contributor.
+            if sup.get("confidence") == "analyst-supplied":
+                prov["confidence"] = "analyst-supplied"
+            elif prov.get("confidence") == "verified":
+                prov["confidence"] = "partial"
+            entry["provenance"] = prov
+            entry["notes"] = ((entry.get("notes") or "") +
+                f" Extended with {len(added)} observation(s) through {max(added)} from "
+                f"{label} ({sup.get('source_url', 'source unrecorded')}); where the two "
+                f"overlapped the original values were kept.").strip()
+            observed[key] = entry
+            extended.append(f"{key} (+{len(added)}, now through {merged[-1][0]})")
+        if adopted:
+            print(f"{label}: adopted {', '.join(adopted)}")
+        if extended:
+            print(f"{label}: extended {', '.join(extended)}")
 
-    # Analyst-supplied series live in their own file so provenance stays auditable.
-    # They fill gaps the sourcing pass could not close; they never overwrite fetched data.
-    supplied = load_json(seed_path.parent / "analyst_supplied.json", {"meta": {}, "series": {}})
-    supplied_ids = []
-    for key, series in supplied.get("series", {}).items():
-        if key in observed:
-            print(f"  note: analyst series {key} NOT applied — fetched data already present")
-            continue
-        observed[key] = series
-        supplied_ids.append(key)
-    if supplied_ids:
-        print(f"analyst-supplied series merged: {', '.join(supplied_ids)}")
+    merge_supplement(load_json(seed_path.parent / "mirrors_round2.json", {}),
+                     "second-round mirror")
+    merge_supplement(load_json(seed_path.parent / "analyst_supplied.json", {}),
+                     "analyst-supplied")
+
 
     # Seed files name a few series differently from the registry.
     ALIASES = {"new_rmb_loans": "new_loans", "real_gdp_yoy_cum": "real_gdp_yoy"}
@@ -193,8 +192,26 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
         span_start = month_index(min(all_months))
         span_end = month_index(max(all_months))
 
-    # step-function series need forward filling before they can be differenced
+    # Policy rates and the RRR only print on change dates; between them the rate
+    # genuinely IS the last value, so forward-filling them is correct rather than
+    # stale, and they are excluded from the staleness accounting below.
     STEP = {"omo_7d", "mlf_1y", "lpr_1y", "lpr_5y", "rrr_large", "rrr_small"}
+
+    # Some series carry history from a policy regime that is not comparable with
+    # the present one (see usdcny). Trim those before anything is computed from
+    # them, so the z-score describes conditions rather than a regime change.
+    for key, entry in registry.items():
+        floor = entry.get("history_from")
+        if floor and key in grids:
+            before = len(grids[key])
+            grids[key] = {m_: v for m_, v in grids[key].items() if m_ >= floor}
+            dropped = before - len(grids[key])
+            if dropped:
+                print(f"  trimmed {key}: dropped {dropped} observation(s) before {floor}")
+                if key in last_original and grids[key]:
+                    last_original[key] = max(grids[key])
+
+    # step-function series need forward filling before they can be differenced
     for key in STEP:
         if key in grids:
             stop = span_end
@@ -220,7 +237,8 @@ def build(seed_path: Path | None = None, app_dir: Path | None = None,
             skipped.append(f"{target} (no overlapping months)")
             return
         grids[target] = {m: (grids[left][m] - grids[right][m]) * scale for m in months}
-        parents = [last_original[p] for p in (left, right) if p in last_original]
+        parents = [last_original[p] for p in (left, right)
+                   if p in last_original and p not in STEP]
         if parents:
             last_original[target] = min(parents)
         built.append(f"{target}  [{months[0]} .. {months[-1]}, n={len(months)}]")

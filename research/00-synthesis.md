@@ -182,17 +182,24 @@ matrix and full method documentation. See the [repository README](../README.md) 
 ## A warning about the data
 
 The dataset was assembled inside a sandbox whose egress policy blocked **every** macroeconomic data
-host — the PBoC, NBS, ChinaBond, CFETS, FRED, the BIS, the IMF and the World Bank were all
-unreachable. Every fetched value therefore came from third-party mirrors on GitHub rather than from a
-primary publisher. Values were spot-checked against the official record and match where checked (LPR,
-RRR, M1, M2, CPI, PPI, TSF and GDP levels all verify exactly), but **re-pulling from primary sources is
-the first task for anyone using this in production**.
+host, so fetched values came from third-party mirrors rather than primary publishers. A scheduled
+GitHub Actions workflow now closes that gap by pulling from the publishers' own endpoints on a runner
+with unrestricted network; until it has run, treat the committed values as mirror-sourced.
 
-Two series — the 7-day reverse repo rate and the 1-year MLF rate — are supplied from the lead
-economist's own knowledge rather than fetched, and are flagged `analyst-supplied` throughout. They were
-added deliberately: without a policy rate there is no DR007 spread, no real policy rate, and no
-liquidity index at all.
+They are not, however, unchecked. An independent audit made 178 observation-level comparisons against
+PBoC and NBS sources; 175 matched ([`07-data-validation.md`](07-data-validation.md)). The six Monetary
+Policy Report series were audited by full census — `walr_general`, which carries 30% of the monetary
+index, matched 33/33. Two series failed and are flagged `suspect` in the app, shown with the problem
+stated and no loose/tight reading: `nominal_gdp_level_cum` mixes pre- and post-census GDP vintages, and
+`core_cpi_yoy` mislabels year-to-date averages as single quarters.
 
-Several headline indicators remain unpopulated, including R007, the 1-year AAA NCD rate, the REER, the
-CFETS basket and TSF excluding government bonds. The app names each one and what its absence costs,
-rather than quietly averaging over the hole.
+The two policy-rate series entered by hand have since been corroborated against an independent Wind
+export: 12/12 overlapping OMO change dates and 14/14 MLF dates agree exactly.
+
+A caution that generalises beyond this project: the second sourcing pass found a repository shipping
+**synthetic "demo" data** dressed as a real DR007 history — 221 of 230 days wrong by up to 58 basis
+points. It was caught by diffing against an independent source before anything was merged. Mirror data
+is worth having; it is not worth trusting without a second opinion.
+
+38 of 59 defined indicators carry data. The remainder are defined and documented, and the app names
+each one and what its absence costs rather than averaging over the hole.

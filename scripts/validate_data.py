@@ -43,7 +43,7 @@ BOUNDS = {
     "cgb_1y": (0.2, 6.0), "cgb_10y": (0.5, 7.0),
     "rrr_large": (4.0, 22.0), "rrr_small": (4.0, 20.0),
     "walr_general": (2.0, 10.0), "excess_reserve_ratio": (0.2, 8.0),
-    "real_gdp_yoy": (-10, 20), "usdcny": (5.0, 9.0),
+    "real_gdp_yoy": (-10, 20), "usdcny": (5.5, 8.5),   # managed-float era only
     "shibor_3m": (0.5, 10.0), "cnh_hibor_on": (0.0, 70.0),
 }
 
@@ -125,7 +125,7 @@ def main() -> int:
             prov = s.get("provenance") or {}
             if not prov.get("source_url"):
                 warn(f"{fname}:{sid} has no source_url")
-            if prov.get("confidence") not in ("verified", "partial", "analyst-supplied"):
+            if prov.get("confidence") not in ("verified", "partial", "analyst-supplied", "suspect"):
                 warn(f"{fname}:{sid} confidence is {prov.get('confidence')!r}")
 
     # ------------------------------------------------------- 2. plausibility
