@@ -1,0 +1,129 @@
+name: Refresh data
+
+# THE POINT OF THIS WORKFLOW
+#
+# The sandbox this project was built in blocks every macroeconomic data host,
+# so the committed dataset came from third-party GitHub mirrors rather than
+# primary publishers, and scripts/refresh_data.py was never executed against a
+# live endpoint. GitHub's runners have unrestricted network. Running the
+# refresh here is what actually closes both gaps: it pulls from the real
+# sources and exercises the real fetch path, on a schedule, with logs.
+#
+# Nothing is committed unless the sanity gate passes. A broken upstream column
+# fails the job loudly and uploads the rejected data for inspection, rather
+# than quietly committing a plausible-looking but wrong dataset.
+
+on:
+  schedule:
+    - cron: "0 2 * * 6"        # Saturdays 02:00 UTC, after the week's releases
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch and validate, but do not commit"
+        type: boolean
+        default: false
+      since:
+        description: "Earliest month to pull (YYYY-MM)"
+        type: string
+        default: "2015-01"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install akshare
+        # akshare depends on `jsonpath`, which ships sdist-only and whose
+        # legacy setup.py calls install during bdist_wheel — modern setuptools
+        # rejects that and the install dies. Building it against setuptools<60
+        # with build isolation off is the fix. Verified working.
+        run: |
+          python -m pip install --quiet --upgrade pip
+          pip install --quiet "setuptools<60" wheel
+          pip install --quiet --no-build-isolation jsonpath
+          pip install --quiet akshare
+          python -c "import akshare; print('akshare', akshare.__version__)"
+
+      - name: Offline tests must pass before touching live data
+        run: |
+          python3 tests/test_refresh_helpers.py
+          python3 tests/test_refresh_fetchers.py
+
+      - name: Snapshot the current dataset
+        run: cp data/seed/series.json /tmp/series.before.json
+
+      - name: Dry run — report what the endpoints return
+        run: python3 scripts/refresh_data.py --start "${{ inputs.since || '2015-01' }}"
+
+      - name: Fetch and write
+        if: ${{ !inputs.dry_run }}
+        run: python3 scripts/refresh_data.py --start "${{ inputs.since || '2015-01' }}" --write
+
+      - name: Rebuild
+        if: ${{ !inputs.dry_run }}
+        run: |
+          python3 scripts/build_app_data.py
+          python3 scripts/make_standalone.py
+
+      - name: Sanity gate
+        if: ${{ !inputs.dry_run }}
+        id: gate
+        run: python3 scripts/validate_data.py
+
+      - name: Upload rejected data if the gate failed
+        if: ${{ failure() && steps.gate.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: rejected-dataset
+          path: |
+            data/seed/series.json
+            app/data.js
+          retention-days: 14
+
+      - name: Restore the previous dataset if the gate failed
+        if: ${{ failure() && steps.gate.outcome == 'failure' }}
+        run: |
+          cp /tmp/series.before.json data/seed/series.json
+          echo "::error::Refresh rejected by the sanity gate. The previous dataset is intact."
+          echo "Download the 'rejected-dataset' artifact to see what the endpoints returned."
+
+      - name: Summarise what changed
+        if: ${{ !inputs.dry_run }}
+        run: |
+          {
+            echo "## Data refresh"
+            echo ""
+            echo '```'
+            python3 scripts/summarise_refresh.py /tmp/series.before.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit
+        if: ${{ !inputs.dry_run }}
+        run: |
+          if git diff --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/seed/series.json data/registry.json app/data.js docs/index.html
+          git commit -m "Refresh dataset from primary sources
+
+          Fetched by .github/workflows/refresh-data.yml on a runner with
+          unrestricted network access, so these values come from the
+          publishers' own endpoints rather than third-party mirrors.
+          Passed scripts/validate_data.py before being committed."
+          git push
