@@ -877,8 +877,12 @@ def fetch_cfets_index(ak, start):
     # heuristic like "the first field that looks like an index level" is
     # exactly how a plausible-but-wrong number gets in; if the schema moves,
     # this says so and returns nothing.
-    VALUE_KEYS = ("cfetsIdx", "cfets", "cfetsValue", "rmbIdx", "idxValue",
-                  "value", "cfetsIndex")
+    # Confirmed against the live response, whose record is:
+    #   {"showDate","showDateEn","cfetsIndexRateStr","cfetsIndexRate",
+    #    "bisIndexRateStr","bisIndexRate","sdrIndexRateStr","sdrIndexRate"}
+    # The same record also carries the BIS-basket and SDR-basket indices, which
+    # are separate indicators and deliberately not folded in here.
+    VALUE_KEYS = ("cfetsIndexRate", "cfetsIndexRateStr", "cfetsIdx", "cfetsIndex")
     DATE_KEYS = ("showDate", "date", "showDateCN")
     sample = records[0]
     vkey = next((k for k in VALUE_KEYS if k in sample), None)
