@@ -60,6 +60,14 @@ jobs:
         run: |
           python3 tests/test_refresh_helpers.py
           python3 tests/test_refresh_fetchers.py
+          python3 tests/test_live_regressions.py
+
+      - name: Probe candidate sources (health check, never fatal)
+        # Reports what each candidate endpoint actually returns. Doubles as an
+        # upstream health check: when a source renames a column or stops
+        # serving a series, this says so before a fetcher silently goes quiet.
+        continue-on-error: true
+        run: python3 scripts/probe_sources.py
 
       - name: Snapshot the current dataset
         run: cp data/seed/series.json /tmp/series.before.json
@@ -82,8 +90,10 @@ jobs:
         id: gate
         run: python3 scripts/validate_data.py
 
-      - name: Upload rejected data if the gate failed
-        if: ${{ failure() && steps.gate.outcome == 'failure' }}
+      - name: Upload rejected data on any failure
+        # Keyed to the gate alone, this missed a crash in the rebuild step and
+        # left no diagnostic at all. Any failure after the write is worth capturing.
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: rejected-dataset
@@ -92,11 +102,11 @@ jobs:
             app/data.js
           retention-days: 14
 
-      - name: Restore the previous dataset if the gate failed
-        if: ${{ failure() && steps.gate.outcome == 'failure' }}
+      - name: Restore the previous dataset on any failure
+        if: ${{ failure() }}
         run: |
           cp /tmp/series.before.json data/seed/series.json
-          echo "::error::Refresh rejected by the sanity gate. The previous dataset is intact."
+          echo "::error::Refresh failed. The previous dataset has been restored and is intact."
           echo "Download the 'rejected-dataset' artifact to see what the endpoints returned."
 
       - name: Summarise what changed

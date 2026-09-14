@@ -1,0 +1,72 @@
+{
+  "meta": {
+    "generated": "2026-09-13",
+    "note": "Policy-rate step series supplied by the lead economist from domain knowledge, NOT fetched from a publisher in this session. Held in a separate file from the fetched data so provenance stays auditable: everything here carries confidence 'analyst-supplied'. These two series were omitted by the data-sourcing pass because no complete machine-readable step series was reachable, but without a policy rate the DR007 spread, the real policy rate and the whole liquidity index cannot be computed — so they are supplied here deliberately and flagged. VERIFY AGAINST THE PBoC BEFORE ANY PRODUCTION USE.",
+    "cross_checks": [
+      "PBoC Monetary Policy Report anchors independently extracted by the data pass agree with this series at every point it could read: 2.55% across 2019-Q1..2019-Q3, 1.50% at 2025-03, and 1.40% at 2026-03.",
+      "The 1.50% -> 1.40% cut is dated here to 8 May 2025. The fetched RRR series independently records a large-bank RRR cut to 9.00% effective 15 May 2025, corroborating a May 2025 easing package rather than a later one."
+    ]
+  },
+  "series": {
+    "omo_7d": {
+      "name": "7-day reverse repo rate (policy rate)",
+      "name_zh": "7天期逆回购利率",
+      "unit": "%",
+      "freq": "D",
+      "notes": "Step series: only change dates are recorded; the build pipeline forward-fills onto the monthly grid. Series begins 2015-10-26; the January-September 2015 easing sequence is omitted because the intermediate levels could not be stated with confidence. Since the June 2024 framework reform this is the PBoC's single primary policy rate.",
+      "provenance": {
+        "source_name": "Lead economist domain knowledge, cross-checked against PBoC Monetary Policy Report anchors",
+        "source_url": "http://www.pbc.gov.cn/zhengcehuobisi/125207/125213/125440/index.html",
+        "retrieved": "2026-09-13",
+        "confidence": "analyst-supplied"
+      },
+      "observations": [
+        ["2015-10-26", 2.25],
+        ["2017-02-03", 2.35],
+        ["2017-03-16", 2.45],
+        ["2017-12-14", 2.50],
+        ["2018-03-22", 2.55],
+        ["2019-11-18", 2.50],
+        ["2020-02-03", 2.40],
+        ["2020-03-30", 2.20],
+        ["2022-01-17", 2.10],
+        ["2022-08-15", 2.00],
+        ["2023-06-13", 1.90],
+        ["2023-08-15", 1.80],
+        ["2024-07-22", 1.70],
+        ["2024-09-27", 1.50],
+        ["2025-05-08", 1.40]
+      ]
+    },
+    "mlf_1y": {
+      "name": "1-year MLF rate",
+      "name_zh": "1年期中期借贷便利利率",
+      "unit": "%",
+      "freq": "D",
+      "valid_to": "2025-03",
+      "notes": "Step series. DELIBERATELY ENDS MARCH 2025: from the March 2025 operation the PBoC moved the MLF to multi-price (variable-rate) bidding, so no single announced MLF rate exists thereafter. That termination is itself the signal — it is the operational moment the MLF stopped being a policy rate and became a pure liquidity tool. Do not forward-fill 2.00% past this point.",
+      "provenance": {
+        "source_name": "Lead economist domain knowledge, cross-checked against PBoC Monetary Policy Report anchors",
+        "source_url": "http://www.pbc.gov.cn/zhengcehuobisi/125207/125213/125440/index.html",
+        "retrieved": "2026-09-13",
+        "confidence": "analyst-supplied"
+      },
+      "observations": [
+        ["2016-02-19", 3.00],
+        ["2017-01-24", 3.10],
+        ["2017-03-16", 3.20],
+        ["2017-12-14", 3.25],
+        ["2018-04-17", 3.30],
+        ["2019-11-05", 3.25],
+        ["2020-02-17", 3.15],
+        ["2020-04-15", 2.95],
+        ["2022-01-17", 2.85],
+        ["2022-08-15", 2.75],
+        ["2023-06-15", 2.65],
+        ["2023-08-15", 2.50],
+        ["2024-07-25", 2.30],
+        ["2024-09-25", 2.00]
+      ]
+    }
+  }
+}
