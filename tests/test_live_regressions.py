@@ -130,8 +130,10 @@ def test_credit_curve_rating_is_matched_exactly():
         rd.fetch_credit_spread(FakeAk(), "2026-08")
     finally:
         rd._ncd_records = real
-    check("picks AA+ not AAA+", picked.get("code"), "C2")
-    check("uses the 3-year point", picked.get("term"), "3")
+    check("picks AA+ not AAA+", picked.get("code") == "C2",
+          f'expected curve code C2, got {picked.get("code")!r}')
+    check("uses the 3-year point", picked.get("term") == "3",
+          f'expected termId 3, got {picked.get("term")!r}')
 
 
 def test_workflow_reports_any_failure():
@@ -144,12 +146,57 @@ def test_workflow_reports_any_failure():
     check("neither is still gate-only", "steps.gate.outcome == 'failure'" not in wf)
 
 
+def test_spike_check_runs_at_daily_resolution():
+    """The spike guard used to compare monthly means, which both invented
+    defects and hid them.
+
+    Invented: a genuine multi-week move makes the trough month look like a
+    spike against its neighbours. That flagged cgb_1y 2015-06, which reproduces
+    value-for-value from ChinaBond (21/21) and whose daily path is smooth, and
+    shibor_3m 2011-07, which was the real mid-2011 squeeze.
+
+    Hid: averaging thirty days dilutes one bad row below the threshold. A
+    mis-parsed row reading the wrong tenor sat in mtn_aa_3y at four batch
+    boundaries and the monthly check never saw it.
+    """
+    print("\nspike check must look between adjacent days, not months")
+    src = (ROOT / "scripts" / "validate_data.py").read_text(encoding="utf-8")
+    check("reads the daily seed", "daily_seed" in src)
+    check("prefers daily over built", 'pts, res = src, "daily"' in src)
+
+    # The property that matters: one row out of line is caught; a smooth ramp
+    # of the same total size is not.
+    limit = 0.4
+    def flags(vals):
+        n = 0
+        for i in range(1, len(vals) - 1):
+            p_, c_, x_ = vals[i - 1], vals[i], vals[i + 1]
+            if abs(c_ - p_) > limit and abs(c_ - x_) > limit \
+                    and (c_ - p_) * (c_ - x_) > 0:
+                n += 1
+        return n
+
+    # one mis-parsed row in an otherwise flat series
+    bad = [2.40, 2.41, 2.39, 1.75, 2.40, 2.41]
+    check("catches a single bad row", flags(bad) == 1,
+          f"expected 1 flag, got {flags(bad)}")
+
+    # the real June-2015 cgb_1y path: a smooth six-week excursion of similar
+    # depth, which must NOT be flagged
+    real = [2.3822, 2.2462, 2.0338, 1.8707, 1.9369, 1.9387, 1.9947, 1.9651,
+            1.9356, 1.8813, 1.8763, 1.8576, 1.7786, 1.7097, 1.7103, 1.6870,
+            1.6482, 1.6407, 1.6890, 1.7044, 1.7494]
+    check("does not flag the real 2015 move", flags(real) == 0,
+          f"expected 0 flags, got {flags(real)}")
+
+
 def main():
     test_nan_does_not_crash_the_build()
     test_refresh_never_shrinks_a_series()
     test_dead_rate_is_not_resurrected()
     test_credit_curve_rating_is_matched_exactly()
     test_workflow_reports_any_failure()
+    test_spike_check_runs_at_daily_resolution()
     print("\nALL PASSED" if not FAILURES else f"\n{len(FAILURES)} FAILURE(S): {FAILURES}")
     return 1 if FAILURES else 0
 

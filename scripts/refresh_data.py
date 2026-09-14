@@ -331,44 +331,73 @@ def fetch_cgb_curve(ak, start):
 
 
 def _ncd_records(symbol_code, s_, e_, term="1"):
-    """Call the CFETS closing-curve endpoint directly.
+    """Call the CFETS closing-curve endpoint directly, for ONE tenor.
 
-    akshare's wrapper does `del temp_df["newDateValue"]` and then assigns column
-    names positionally. Upstream stopped returning that key, so the wrapper now
-    raises KeyError and the NCD series vanished from the refresh entirely. This
-    issues the same request but tolerates the key being present or absent.
+    Two things about this endpoint bite.
+
+    First, akshare's wrapper does `del temp_df["newDateValue"]` and then assigns
+    column names positionally. Upstream stopped returning that key, so the
+    wrapper raises KeyError and the series vanishes from the refresh entirely.
+    This issues the same request but tolerates the key being present or absent.
+
+    Second — and this one shipped wrong numbers — `termId` does NOT filter the
+    response. CFETS returns the WHOLE curve for every date in the window, about
+    nineteen tenors a day, ordered newest-first. Reading a yield out of each
+    record without checking its tenor therefore collects whichever tenors happen
+    to land in the page: the stored "3-year AA+ note yield" was in fact the
+    15-year point on some dates and the 5-year on others. Nothing about the
+    output looked wrong, because every value was a real yield off a real curve.
+
+    So the tenor is matched against the response, not requested and assumed, and
+    pageSize is raised past one month of full curves (19 tenors x ~22 trading
+    days) so the window is not silently truncated.
     """
     import requests
+    want = float(term)
     r = requests.get(
         "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
         params={"lang": "CN", "reference": "1,2,3", "bondType": symbol_code,
                 "startDate": f"{s_[:4]}-{s_[4:6]}-{s_[6:]}",
                 "endDate": f"{e_[:4]}-{e_[4:6]}-{e_[6:]}",
-                "termId": term, "pageNum": "1", "pageSize": "50"},
+                "termId": term, "pageNum": "1", "pageSize": "1000"},
         headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                                "AppleWebKit/537.36 (KHTML, like Gecko) "
                                "Chrome/108.0.0.0 Safari/537.36"},
         timeout=30)
     r.raise_for_status()
-    out = []
-    for rec in ((r.json() or {}).get("records") or []):
-        rec = {k: v for k, v in rec.items() if k != "newDateValue"}
-        vals = list(rec.values())
-        # The contract is positional — 日期, 期限, 到期收益率, 即期收益率, 远期收益率 —
-        # so a row with a different number of fields would be read off-by-one and
-        # yield a number from the wrong column. Silently wrong beats loudly wrong
-        # here, so require the exact shape and drop anything else.
-        if len(vals) != 5:
-            continue
-        day = as_day(vals[0])                      # 日期, 期限, 到期收益率
+    records = (r.json() or {}).get("records") or []
+    out, seen_terms, matched = [], set(), 0
+    for rec in records:
+        # Read by NAME. The positional read that was here before depended on
+        # dict ordering surviving an upstream schema change, which is exactly
+        # the assumption that broke.
+        day = as_day(rec.get("newDateValueCN") or rec.get("newDateValue"))
         if day is None:
             continue
         try:
-            num = float(vals[2])
+            got = float(rec.get("yearTermStr"))
         except (TypeError, ValueError):
             continue
+        seen_terms.add(got)
+        if abs(got - want) > 1e-6:
+            continue
+        matched += 1
+        try:
+            num = float(rec.get("maturityYieldStr"))
+        except (TypeError, ValueError):
+            continue                                # "---" on illiquid points
         if math.isfinite(num):
             out.append([day, round(num, 4)])
+    if records and not out:
+        # The window had data but produced nothing. Silence here is how the
+        # wrong-tenor values got in, so distinguish the two reasons: the tenor
+        # was absent, or it was there and every yield was unquotable.
+        if matched:
+            print(f"    curve {symbol_code}: {matched} record(s) at term {want} in "
+                  f"{s_[:6]}, but no quotable yield on any of them")
+        else:
+            print(f"    curve {symbol_code}: {len(records)} records in {s_[:6]} but none "
+                  f"at term {want}; tenors present: {sorted(seen_terms)[:12]}")
     return out
 
 
@@ -711,6 +740,182 @@ def fetch_credit_spread(ak, start):
             f"curve map (code {code}). The spread over the 3-year CGB is the credit-risk premium.")}
 
 
+def fetch_loan_direction(ak, start):
+    """Corporate medium-and-long-term loans, from the quarterly 贷款投向 report.
+
+    There is no API. The numbers sit in running prose, and the report states
+    SIX different 中长期贷款余额 figures in one article — all loans, industry,
+    heavy and light industry, services, property, infrastructure. Reading the
+    first number that follows the phrase picks up whichever section comes
+    first, which is not the corporate one.
+
+    What disambiguates them is the section. Section 一 is 企事业单位贷款, and
+    inside it the maturity split appears under 分期限看. Verified verbatim
+    against 2025 Q3:
+
+        一、企事业单位贷款增长较为平稳 ... 本外币企事业单位贷款余额184.3万亿元,
+        同比增长8.2% ... 分期限看, 短期贷款及票据融资余额62.77万亿元 ...
+        中长期贷款余额117.89万亿元, 同比增长7.8% ...
+
+    So the parser anchors on the section heading and takes the 中长期 figure
+    from inside it, and cross-checks that short-term plus medium-and-long-term
+    does not exceed the corporate total it is supposed to decompose.
+    """
+    import requests
+    hdr = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                         "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"}
+
+    def text_of(url):
+        r = requests.get(url, headers=hdr, timeout=40)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding or "utf-8"
+        t = re.sub(r"<[^>]+>", "", r.text)
+        return re.sub(r"[ \t\r\n\u3000]+", "", t)
+
+    # Enumerate the 新闻发布 column. Paginated as index.html, index_1.html, ...
+    base = "https://www.pbc.gov.cn/goutongjiaoliu/113456/113469"
+    seen, articles = set(), []
+    for page in range(0, 12):
+        url = f"{base}/index.html" if page == 0 else f"{base}/index_{page}.html"
+        try:
+            r = requests.get(url, headers=hdr, timeout=40)
+            if r.status_code != 200:
+                break
+            r.encoding = r.apparent_encoding or "utf-8"
+        except Exception as e:                        # noqa: BLE001
+            print(f"    loan_direction: list page {page} failed ({e})")
+            break
+        for href in re.findall(r'href="(/goutongjiaoliu/113456/113469/[^"]+/index\.html)"', r.text):
+            if href not in seen:
+                seen.add(href)
+                articles.append("https://www.pbc.gov.cn" + href)
+    print(f"    loan_direction: {len(articles)} candidate articles")
+
+    obs_bal, obs_yoy, hits = [], [], 0
+    for url in articles:
+        try:
+            t = text_of(url)
+        except Exception:                             # noqa: BLE001
+            continue
+        if "贷款投向统计报告" not in t:
+            continue
+        hits += 1
+        # Section 一 runs to the 二、 heading.
+        sec = re.search(r"一、企[事业]*单位贷款.{0,900}?(?=二、)", t)
+        if not sec:
+            continue
+        body = sec.group(0)
+        q = re.search(r"(20\d\d)年([一二三四])季度末|(20\d\d)年末", body)
+        mlt = re.search(r"中长期贷款余额([\d.]+)万亿元[，,]同比增长([\d.]+)%", body)
+        if not (q and mlt):
+            continue
+        if q.group(3):                                # 「2023年末」 = Q4
+            period = f"{q.group(3)}-Q4"
+        else:
+            period = f"{q.group(1)}-Q{'一二三四'.index(q.group(2)) + 1}"
+        level, yoy = float(mlt.group(1)), float(mlt.group(2))
+        # Cross-check: the maturity split must decompose the corporate total.
+        tot = re.search(r"企[事业]*单位贷款余额([\d.]+)万亿元", body)
+        sht = re.search(r"短期贷款及票据融资余额([\d.]+)万亿元", body)
+        if tot and sht and level + float(sht.group(1)) > float(tot.group(1)) * 1.02:
+            print(f"    loan_direction {period}: {level}+{sht.group(1)} exceeds the "
+                  f"corporate total {tot.group(1)} — section parse is wrong, dropped")
+            continue
+        obs_bal.append([period, round(level, 3)])
+        obs_yoy.append([period, round(yoy, 2)])
+
+    print(f"    loan_direction: {hits} 贷款投向 reports, {len(obs_yoy)} parsed")
+    if not obs_yoy:
+        return {}
+    prov = {"source_name": "PBoC 金融机构贷款投向统计报告 (quarterly)",
+            "source_url": f"{base}/index.html",
+            "retrieved": TODAY, "confidence": "partial"}
+    note = ("Read from section 一 (企事业单位贷款) of the quarterly loan-direction report, "
+            "under 分期限看. The report states six different 中长期贷款余额 figures — this "
+            "is the corporate one, not the all-loans one. 本外币 (local and foreign "
+            "currency). Cross-checked so that short-term plus medium-and-long-term does "
+            "not exceed the corporate total.")
+    return {
+        "corp_mlt_loans_yoy": (sorted(obs_yoy), prov, note),
+        "corp_mlt_loans_level": (sorted(obs_bal), prov, note + " Balance in RMB trn."),
+    }
+
+
+def fetch_cfets_index(ak, start):
+    """The CFETS trade-weighted renminbi index.
+
+    akshare's route for this is broken upstream. CFETS serves it as JSON at
+    cm-u-bk-fx/RmbIdxHis — found by probing, since the endpoint appears nowhere
+    in the page source or in any public code search.
+
+    ONE IMPORTANT LIMIT, established by probing rather than assumed: the
+    endpoint ignores date parameters. Nine spellings of startDate/endDate/
+    pageSize and six sibling route names all returned the same rolling
+    ~one-year window of ~54 weekly records. So this backfills one year and
+    extends forward from there as the weekly refresh accumulates; it cannot
+    reach 2015. The extend-only merge in build_app_data.py is what makes that
+    accumulation safe.
+    """
+    import requests
+    url = "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-fx/RmbIdxHis"
+    try:
+        r = requests.get(url, headers={
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                          "(KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+            "Referer": "https://www.chinamoney.com.cn/chinese/bkrmbidx/"},
+            timeout=40)
+        r.raise_for_status()
+        records = (r.json() or {}).get("records") or []
+    except Exception as e:                            # noqa: BLE001
+        print(f"    skip cfets: {e}")
+        return {}
+    if not records:
+        print("    skip cfets: endpoint returned no records")
+        return {}
+
+    # The value key is taken from a known set rather than guessed at runtime. A
+    # heuristic like "the first field that looks like an index level" is
+    # exactly how a plausible-but-wrong number gets in; if the schema moves,
+    # this says so and returns nothing.
+    VALUE_KEYS = ("cfetsIdx", "cfets", "cfetsValue", "rmbIdx", "idxValue",
+                  "value", "cfetsIndex")
+    DATE_KEYS = ("showDate", "date", "showDateCN")
+    sample = records[0]
+    vkey = next((k for k in VALUE_KEYS if k in sample), None)
+    dkey = next((k for k in DATE_KEYS if k in sample), None)
+    if not (vkey and dkey):
+        print(f"    skip cfets: unrecognised record schema. Keys: {list(sample)}")
+        return {}
+
+    obs = {}
+    for rec in records:
+        d = as_day(rec.get(dkey))
+        if d is None:
+            continue
+        try:
+            v = float(str(rec.get(vkey)).replace(",", ""))
+        except (TypeError, ValueError):
+            continue
+        # The index is based at 2014-12-31 = 100 and has traded roughly 90-110.
+        # Anything far outside that is a different field, not a shock.
+        if math.isfinite(v) and 50.0 < v < 200.0:
+            obs[d] = round(v, 4)
+    if not obs:
+        print(f"    skip cfets: no plausible values from key {vkey!r}")
+        return {}
+    print(f"    cfets: {len(obs)} weekly observations, {min(obs)} .. {max(obs)}")
+    return {"cfets": ([[d, v] for d, v in sorted(obs.items())],
+            {"source_name": "CFETS RMB exchange-rate index (中国外汇交易中心)",
+             "source_url": "https://www.chinamoney.com.cn/chinese/bkrmbidx/",
+             "retrieved": TODAY, "confidence": "partial"},
+            "CFETS trade-weighted renminbi index, 2014-12-31 = 100, published weekly "
+            "on the first trading day for the previous Friday. The endpoint serves only "
+            "a rolling one-year window, so history accumulates forward from first fetch "
+            "rather than reaching back. Basket weights are reset by announcement "
+            "periodically — most recently effective 2026-01-01 — so the level is "
+            "continuous but the composition is not.")}
+
+
 FETCHERS = {
     "money":     (fetch_money_supply, ["m1_yoy", "m2_yoy", "m2_level"]),
     "tsf":       (fetch_tsf,          ["tsf_flow"]),
@@ -725,6 +930,9 @@ FETCHERS = {
     "tsfparts":  (fetch_tsf_components, ["tsf_ex_govt_flow", "tsf_ex_govt_yoy"]),
     "govtbonds": (fetch_govt_bond_issuance, ["govt_bond_issuance"]),
     "creditspread": (fetch_credit_spread, ["mtn_aa_3y"]),
+    "loandirection": (fetch_loan_direction,
+                      ["corp_mlt_loans_yoy", "corp_mlt_loans_level"]),
+    "cfets":     (fetch_cfets_index,  ["cfets"]),
 }
 
 MANUAL_ONLY = {

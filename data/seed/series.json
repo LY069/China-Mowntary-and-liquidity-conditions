@@ -85058,67 +85058,6 @@
    "unit": "%",
    "freq": "D"
   },
-  "ncd_1y_aaa": {
-   "observations": [
-    [
-     "2026-06-26",
-     1.485
-    ],
-    [
-     "2026-06-29",
-     1.47
-    ],
-    [
-     "2026-06-30",
-     1.4668
-    ],
-    [
-     "2026-07-29",
-     1.4822
-    ],
-    [
-     "2026-07-30",
-     1.4852
-    ],
-    [
-     "2026-07-31",
-     1.4836
-    ],
-    [
-     "2026-08-27",
-     1.4874
-    ],
-    [
-     "2026-08-28",
-     1.4854
-    ],
-    [
-     "2026-08-31",
-     1.4856
-    ],
-    [
-     "2026-09-09",
-     1.4863
-    ],
-    [
-     "2026-09-10",
-     1.489
-    ],
-    [
-     "2026-09-11",
-     1.4894
-    ]
-   ],
-   "provenance": {
-    "source_name": "CFETS closing yield curve, AAA NCD (ClsYldCurvHis), called directly",
-    "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
-    "retrieved": "2026-09-13",
-    "confidence": "partial"
-   },
-   "notes": "1-year point of the AAA negotiable CD curve. Fetched by calling CFETS directly rather than through akshare, whose wrapper breaks on the current response schema.",
-   "unit": "%",
-   "freq": "D"
-  },
   "dr001": {
    "observations": [
     [
@@ -120754,67 +120693,6 @@
     "confidence": "partial"
    },
    "notes": "ChinaBond closing yield curve, maturity point.",
-   "unit": "%",
-   "freq": "D"
-  },
-  "mtn_aa_3y": {
-   "observations": [
-    [
-     "2026-06-26",
-     1.8716
-    ],
-    [
-     "2026-06-29",
-     2.5156
-    ],
-    [
-     "2026-06-30",
-     2.5067
-    ],
-    [
-     "2026-07-29",
-     1.8607
-    ],
-    [
-     "2026-07-30",
-     2.4268
-    ],
-    [
-     "2026-07-31",
-     2.4248
-    ],
-    [
-     "2026-08-27",
-     1.8192
-    ],
-    [
-     "2026-08-28",
-     2.3912
-    ],
-    [
-     "2026-08-31",
-     2.3951
-    ],
-    [
-     "2026-09-09",
-     1.7848
-    ],
-    [
-     "2026-09-10",
-     2.3748
-    ],
-    [
-     "2026-09-11",
-     2.3795
-    ]
-   ],
-   "provenance": {
-    "source_name": "CFETS closing yield curve, 中短期票据(AA+) (ClsYldCurvHis), called directly",
-    "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
-    "retrieved": "2026-09-13",
-    "confidence": "partial"
-   },
-   "notes": "3-year point of the 中短期票据(AA+) curve, resolved by label match against the published curve map (code CYCC82D). The spread over the 3-year CGB is the credit-risk premium.",
    "unit": "%",
    "freq": "D"
   }
