@@ -30,6 +30,9 @@ FAILURES = []
 
 
 def check(label, got, want):
+    """Compare got against want. NOTE: tests/test_live_regressions.py spells
+    this differently — check(label, ok, detail) — so a call written for one
+    file is silently wrong in the other."""
     ok = got == want
     print(f"  {'PASS' if ok else 'FAIL'}  {label}")
     if not ok:
@@ -192,25 +195,79 @@ def main():
 
     import requests as _rq
     saved = _rq.get
-    # The real record carries five fields in order — 日期, 期限, 到期收益率,
-    # 即期收益率, 远期收益率 — optionally preceded by newDateValue. The parser
-    # reads them positionally, so it now requires exactly that shape.
-    for label, rec in [
-        ("old schema (newDateValue present)",
-         {"newDateValue": "x", "d": "2026-03-02", "term": "1",
-          "ytm": "1.88", "spot": "1.88", "fwd": "1.89"}),
-        ("new schema (newDateValue absent)",
-         {"d": "2026-03-02", "term": "1", "ytm": "1.88",
-          "spot": "1.88", "fwd": "1.89"}),
-        ("malformed row is dropped, not read off-by-one",
-         {"d": "2026-03-02", "term": "1", "ytm": "1.88"}),
+    # The real record, read verbatim off the live endpoint:
+    #   {"newDateValueCN":"2026-09-10","yearTermStr":"3.0",
+    #    "maturityYieldStr":"1.6950","currentYieldStr":"1.6965",
+    #    "futureYieldStr":"1.9377"}
+    # Fields are read by NAME now. They used to be read positionally, which
+    # depended on dict ordering surviving an upstream schema change.
+    def rec(day, term, ytm, *, legacy_key=False, fwd="1.89"):
+        k = "newDateValue" if legacy_key else "newDateValueCN"
+        return {k: day, "yearTermStr": term, "maturityYieldStr": ytm,
+                "currentYieldStr": ytm, "futureYieldStr": fwd}
+
+    for label, payload, want in [
+        ("current schema (newDateValueCN)",
+         [rec("2026-03-02", "1.0", "1.88")], [["2026-03-02", 1.88]]),
+        ("legacy key (newDateValue) still parses",
+         [rec("2026-03-02", "1.0", "1.88", legacy_key=True)], [["2026-03-02", 1.88]]),
+        ("a yield of '---' on an illiquid point is dropped",
+         [rec("2026-03-02", "1.0", "---")], []),
+        # THE BUG THIS TEST EXISTS FOR: termId does not filter the response.
+        # CFETS returns the whole curve for every date, so a parser that reads
+        # a yield out of every record collects whichever tenors land in the
+        # page. That shipped the 15-year point as the 3-year one.
+        ("whole curve returned — only the asked-for tenor is taken",
+         [rec("2026-03-02", "0.25", "1.20"),
+          rec("2026-03-02", "1.0", "1.88"),
+          rec("2026-03-02", "5.0", "2.55"),
+          rec("2026-03-02", "15.0", "3.10")],
+         [["2026-03-02", 1.88]]),
+        ("no record at the asked-for tenor yields nothing, not a wrong number",
+         [rec("2026-03-02", "5.0", "2.55"), rec("2026-03-02", "15.0", "3.10")], []),
     ]:
-        _rq.get = lambda *a, **k: FakeResp({"records": [rec]})
+        _rq.get = lambda *a, **k: FakeResp({"records": payload})
         try:
-            got = rd._ncd_records("CYCC999", "20260301", "20260331")
+            got = rd._ncd_records("CYCC999", "20260301", "20260331", term="1")
         finally:
             _rq.get = saved
-        check(label, got, [] if "malformed" in label else [["2026-03-02", 1.88]])
+        check(label, got, want)
+
+    # Pagination. pageSize is capped at 50 by the server, and the response
+    # carries the whole curve, so fifty records is two or three DAYS. Without
+    # paging, a month-long window is truncated silently — which is exactly how
+    # this series ended up with twelve observations.
+    pages = {}
+
+    def paged(*a, **k):
+        n = int(k["params"]["pageNum"])
+        pages[n] = pages.get(n, 0) + 1
+        if n == 1:
+            return FakeResp({"records": [rec(f"2026-03-{d:02d}", "1.0", "1.80")
+                                         for d in range(1, 26)]
+                                        + [rec(f"2026-03-{d:02d}", "5.0", "2.50")
+                                           for d in range(1, 26)]})   # exactly 50
+        if n == 2:
+            return FakeResp({"records": [rec("2026-03-26", "1.0", "1.85")]})
+        return FakeResp({"records": []})
+
+    _rq.get = paged
+    try:
+        got = rd._ncd_records("CYCC999", "20260301", "20260331", term="1")
+    finally:
+        _rq.get = saved
+    check("a full page triggers the next one", sorted(pages), [1, 2])
+    check("page 2's observation survives", ["2026-03-26", 1.85] in got, True)
+    check("both pages' 1y points are kept, 5y dropped", len(got), 26)
+
+    # And the tenor actually asked for is honoured, not hard-coded to 1.
+    _rq.get = lambda *a, **k: FakeResp({"records": [
+        rec("2026-03-02", "1.0", "1.88"), rec("2026-03-02", "3.0", "2.11")]})
+    try:
+        got3 = rd._ncd_records("CYCC999", "20260301", "20260331", term="3")
+    finally:
+        _rq.get = saved
+    check("term='3' selects the 3-year point", got3, [["2026-03-02", 2.11]])
 
     print("\ninterbank — SHIBOR and CNH HIBOR")
     r = rd.fetch_interbank(ak, "2026-01")

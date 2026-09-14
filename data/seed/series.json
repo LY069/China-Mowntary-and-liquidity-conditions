@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-09-13",
-  "note": "Refreshed 2026-09-13 by scripts/refresh_data.py via akshare. Series not listed as refreshed retain their earlier provenance.",
+  "generated": "2026-09-14",
+  "note": "Refreshed 2026-09-14 by scripts/refresh_data.py via akshare. Series not listed as refreshed retain their earlier provenance.",
   "gaps": [
    "omo_7d (7-day reverse repo policy rate): OMITTED. No complete verified step series obtainable. Verified anchors only, from PBoC MPR text: 2.55% through 2019-Q1..2019-Q3; 1.50% at 2025-03; 'cut from 1.5% to 1.4%' during 2025-Q4; 1.40% at 2026-03. Forward-filling four anchors across 2019-2026 would inject wrong levels for every intervening cut (2020, 2022, 2023, 2024), so no series is emitted.",
    "mlf_1y (1-year MLF rate): OMITTED. Same reason - the MPR text describes MLF changes qualitatively ('down 20bp', 'down 30bp') without a dated level series, and no machine-readable source was reachable.",
@@ -33,7 +33,7 @@
    "provenance": {
     "source_name": "PBoC money & credit statistics via akshare (East Money mirror)",
     "source_url": "https://data.eastmoney.com/cjsj/hbgyl.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "M1 was redefined in January 2025; pre- and post-2025 values are different aggregates.",
@@ -605,7 +605,7 @@
    "provenance": {
     "source_name": "PBoC money & credit statistics via akshare (East Money mirror)",
     "source_url": "https://data.eastmoney.com/cjsj/hbgyl.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Cross-checked: 2025-04..2025-12 values match an independent mirror (lightfor econ-m2-sf.json) exactly, and 2026-06 (8.0) matches the PBoC English indicator card dated 2026-07-16. Matched PBoC money & credit releases (note 07).",
@@ -1177,7 +1177,7 @@
    "provenance": {
     "source_name": "PBoC money & credit statistics via akshare (East Money mirror)",
     "source_url": "https://data.eastmoney.com/cjsj/hbgyl.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Converted from 100mn RMB to RMB bn.",
@@ -2317,7 +2317,7 @@
    "provenance": {
     "source_name": "PBoC TSF increment via akshare (MOFCOM republication)",
     "source_url": "https://data.mofcom.gov.cn/gnmy/shrzgm.shtml",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "MOFCOM republishes the PBoC headline two to three months late. Converted from 100mn RMB to RMB bn.",
@@ -4289,7 +4289,7 @@
    "provenance": {
     "source_name": "NIFC loan prime rate fixing via akshare",
     "source_url": "https://www.chinamoney.com.cn/english/bmklpr/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Monthly fixing, published on the 20th.",
@@ -4865,7 +4865,7 @@
    "provenance": {
     "source_name": "NIFC loan prime rate fixing via akshare",
     "source_url": "https://www.chinamoney.com.cn/english/bmklpr/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Monthly fixing, published on the 20th.",
@@ -5589,7 +5589,7 @@
    "provenance": {
     "source_name": "CFETS repo fixing history (FrrHis) via akshare",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/FrrHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "PROXY: this is the CFETS FDR007 fixing, not DR007 itself. The two track closely but are distinct series. Replace with the true weighted rate from CFETS pledged-repo data before relying on the level.",
@@ -15345,6 +15345,10 @@
     [
      "2026-09-11",
      1.42
+    ],
+    [
+     "2026-09-14",
+     1.41
     ]
    ]
   },
@@ -15357,7 +15361,7 @@
    "provenance": {
     "source_name": "ChinaBond government bond yield curve via akshare",
     "source_url": "https://yield.chinabond.com.cn/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "ChinaBond closing yield curve, maturity point.",
@@ -27165,7 +27169,7 @@
    "provenance": {
     "source_name": "PBoC reserve requirement ratio changes via akshare (East Money)",
     "source_url": "https://data.eastmoney.com/cjsj/ckzbj.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Step series keyed on the EFFECTIVE date (生效时间), not the announcement date. akshare leaves that column as an ISO datetime string. Reconcile against PBoC announcements before relying on it.",
@@ -27413,7 +27417,7 @@
    "provenance": {
     "source_name": "PBoC reserve requirement ratio changes via akshare (East Money)",
     "source_url": "https://data.eastmoney.com/cjsj/ckzbj.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Step series keyed on the EFFECTIVE date (生效时间), not the announcement date. akshare leaves that column as an ISO datetime string. Reconcile against PBoC announcements before relying on it.",
@@ -40169,12 +40173,16 @@
     [
      "2026-09-11",
      1.42
+    ],
+    [
+     "2026-09-14",
+     1.42
     ]
    ],
    "provenance": {
     "source_name": "CFETS repo fixing history (FrrHis) via akshare",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/FrrHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "PROXY: this is the CFETS FR007 fixing, not R007 itself. The two track closely but are distinct series. Replace with the true weighted rate from CFETS pledged-repo data before relying on the level.",
@@ -51883,7 +51891,7 @@
    "provenance": {
     "source_name": "ChinaBond government bond yield curve via akshare",
     "source_url": "https://yield.chinabond.com.cn/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "ChinaBond closing yield curve, maturity point.",
@@ -71807,12 +71815,16 @@
     [
      "2026-09-11",
      1.43
+    ],
+    [
+     "2026-09-14",
+     1.43
     ]
    ],
    "provenance": {
     "source_name": "SHIBOR 3M via akshare (East Money)",
     "source_url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "unit": "%",
@@ -85052,70 +85064,9 @@
    "provenance": {
     "source_name": "CNH HIBOR overnight via akshare (East Money)",
     "source_url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
-   "unit": "%",
-   "freq": "D"
-  },
-  "ncd_1y_aaa": {
-   "observations": [
-    [
-     "2026-06-26",
-     1.485
-    ],
-    [
-     "2026-06-29",
-     1.47
-    ],
-    [
-     "2026-06-30",
-     1.4668
-    ],
-    [
-     "2026-07-29",
-     1.4822
-    ],
-    [
-     "2026-07-30",
-     1.4852
-    ],
-    [
-     "2026-07-31",
-     1.4836
-    ],
-    [
-     "2026-08-27",
-     1.4874
-    ],
-    [
-     "2026-08-28",
-     1.4854
-    ],
-    [
-     "2026-08-31",
-     1.4856
-    ],
-    [
-     "2026-09-09",
-     1.4863
-    ],
-    [
-     "2026-09-10",
-     1.489
-    ],
-    [
-     "2026-09-11",
-     1.4894
-    ]
-   ],
-   "provenance": {
-    "source_name": "CFETS closing yield curve, AAA NCD (ClsYldCurvHis), called directly",
-    "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
-    "retrieved": "2026-09-13",
-    "confidence": "partial"
-   },
-   "notes": "1-year point of the AAA negotiable CD curve. Fetched by calling CFETS directly rather than through akshare, whose wrapper breaks on the current response schema.",
    "unit": "%",
    "freq": "D"
   },
@@ -94392,12 +94343,16 @@
     [
      "2026-09-11",
      1.42
+    ],
+    [
+     "2026-09-14",
+     1.41
     ]
    ],
    "provenance": {
     "source_name": "CFETS repo fixing history (FrrHis) via akshare",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/FrrHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "PROXY: this is the CFETS FDR001 fixing, not DR001 itself. The two track closely but are distinct series. Replace with the true weighted rate from CFETS pledged-repo data before relying on the level.",
@@ -106073,12 +106028,16 @@
     [
      "2026-09-11",
      1.42
+    ],
+    [
+     "2026-09-14",
+     1.42
     ]
    ],
    "provenance": {
     "source_name": "CFETS repo fixing history (FrrHis) via akshare",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/FrrHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "PROXY: this is the CFETS FR001 fixing, not R001 itself. The two track closely but are distinct series. Replace with the true weighted rate from CFETS pledged-repo data before relying on the level.",
@@ -106647,7 +106606,7 @@
    "provenance": {
     "source_name": "PBoC monetary authority balance sheet via akshare (Sina)",
     "source_url": "http://www.pbc.gov.cn/diaochatongjisi/116219/116319/index.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Treasury Single Account balance. Converted from 100mn RMB to RMB bn. The month-on-month change is the drain on (or injection into) bank reserves.",
@@ -107216,7 +107175,7 @@
    "provenance": {
     "source_name": "PBoC monetary authority balance sheet via akshare (Sina)",
     "source_url": "http://www.pbc.gov.cn/diaochatongjisi/116219/116319/index.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Stock of PBoC lending to banks — OMO, MLF, PSL and outright reverse repo combined. Converted from 100mn RMB to RMB bn. Changes in this stock are net liquidity injection.",
@@ -107413,7 +107372,7 @@
    "provenance": {
     "source_name": "NBS quarterly GDP via akshare (East Money)",
     "source_url": "https://data.eastmoney.com/cjsj/gdp.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Cumulative year-to-date nominal growth, computed by comparing like year-to-date periods a year apart. Pairs correctly with the cumulative real growth rate the same source publishes.",
@@ -107610,7 +107569,7 @@
    "provenance": {
     "source_name": "NBS quarterly GDP via akshare (East Money)",
     "source_url": "https://data.eastmoney.com/cjsj/gdp.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Nominal minus real cumulative growth, both legs from the same publisher and the same request, so the series does not straddle data vintages.",
@@ -108079,7 +108038,7 @@
    "provenance": {
     "source_name": "PBoC TSF components via akshare (MOFCOM republication)",
     "source_url": "https://data.mofcom.gov.cn/gnmy/shrzgm.shtml",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Sum of every non-government component the PBoC breaks out: RMB and FX loans, entrusted and trust loans, undiscounted bankers' acceptances, corporate bonds and domestic equity financing. It is a construction, not a published series — small items outside the published breakdown (ABS, loan write-offs) are excluded. Components: 其中-人民币贷款, 其中-委托贷款外币贷款, 其中-委托贷款, 其中-信托贷款, 其中-未贴现银行承兑汇票, 其中-企业债券, 其中-非金融企业境内股票融资",
@@ -108464,7 +108423,7 @@
    "provenance": {
     "source_name": "PBoC TSF components via akshare (MOFCOM republication)",
     "source_url": "https://data.mofcom.gov.cn/gnmy/shrzgm.shtml",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "Sum of every non-government component the PBoC breaks out: RMB and FX loans, entrusted and trust loans, undiscounted bankers' acceptances, corporate bonds and domestic equity financing. It is a construction, not a published series — small items outside the published breakdown (ABS, loan write-offs) are excluded. Components: 其中-人民币贷款, 其中-委托贷款外币贷款, 其中-委托贷款, 其中-信托贷款, 其中-未贴现银行承兑汇票, 其中-企业债券, 其中-非金融企业境内股票融资 Expressed as the year-on-year change in the trailing 12-month sum.",
@@ -109041,7 +109000,7 @@
    "provenance": {
     "source_name": "Treasury and local government bond issuance via akshare (CNINFO)",
     "source_url": "https://www.cninfo.com.cn/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "GROSS issuance summed by issue start date — central treasury plus local government bonds. Redemptions are not in this source, so it overstates the net drain on bank reserves. Converted from 100mn RMB to RMB bn.",
@@ -120750,71 +120709,857 @@
    "provenance": {
     "source_name": "ChinaBond government bond yield curve via akshare",
     "source_url": "https://yield.chinabond.com.cn/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "ChinaBond closing yield curve, maturity point.",
    "unit": "%",
    "freq": "D"
   },
-  "mtn_aa_3y": {
+  "ncd_1y_aaa": {
    "observations": [
     [
+     "2026-06-01",
+     1.4325
+    ],
+    [
+     "2026-06-02",
+     1.434
+    ],
+    [
+     "2026-06-03",
+     1.435
+    ],
+    [
+     "2026-06-04",
+     1.4375
+    ],
+    [
+     "2026-06-05",
+     1.445
+    ],
+    [
+     "2026-06-08",
+     1.455
+    ],
+    [
+     "2026-06-09",
+     1.4617
+    ],
+    [
+     "2026-06-10",
+     1.465
+    ],
+    [
+     "2026-06-11",
+     1.4825
+    ],
+    [
+     "2026-06-12",
+     1.495
+    ],
+    [
+     "2026-06-15",
+     1.5
+    ],
+    [
+     "2026-06-16",
+     1.5
+    ],
+    [
+     "2026-06-17",
+     1.4765
+    ],
+    [
+     "2026-06-18",
+     1.4775
+    ],
+    [
+     "2026-06-22",
+     1.49
+    ],
+    [
+     "2026-06-23",
+     1.4975
+    ],
+    [
+     "2026-06-24",
+     1.49
+    ],
+    [
+     "2026-06-25",
+     1.485
+    ],
+    [
      "2026-06-26",
-     1.8716
+     1.485
     ],
     [
      "2026-06-29",
-     2.5156
+     1.47
     ],
     [
      "2026-06-30",
-     2.5067
+     1.4668
+    ],
+    [
+     "2026-07-01",
+     1.4812
+    ],
+    [
+     "2026-07-02",
+     1.47
+    ],
+    [
+     "2026-07-03",
+     1.465
+    ],
+    [
+     "2026-07-06",
+     1.4675
+    ],
+    [
+     "2026-07-07",
+     1.465
+    ],
+    [
+     "2026-07-08",
+     1.4673
+    ],
+    [
+     "2026-07-09",
+     1.4688
+    ],
+    [
+     "2026-07-10",
+     1.4648
+    ],
+    [
+     "2026-07-13",
+     1.4724
+    ],
+    [
+     "2026-07-14",
+     1.4705
+    ],
+    [
+     "2026-07-15",
+     1.4654
+    ],
+    [
+     "2026-07-16",
+     1.4687
+    ],
+    [
+     "2026-07-17",
+     1.4692
+    ],
+    [
+     "2026-07-20",
+     1.476
+    ],
+    [
+     "2026-07-21",
+     1.4759
+    ],
+    [
+     "2026-07-22",
+     1.4744
+    ],
+    [
+     "2026-07-23",
+     1.4758
+    ],
+    [
+     "2026-07-24",
+     1.4792
+    ],
+    [
+     "2026-07-27",
+     1.4807
+    ],
+    [
+     "2026-07-28",
+     1.4845
     ],
     [
      "2026-07-29",
-     1.8607
+     1.4835
     ],
     [
      "2026-07-30",
-     2.4268
+     1.4852
     ],
     [
      "2026-07-31",
-     2.4248
+     1.4836
+    ],
+    [
+     "2026-08-03",
+     1.4812
+    ],
+    [
+     "2026-08-04",
+     1.4845
+    ],
+    [
+     "2026-08-05",
+     1.4831
+    ],
+    [
+     "2026-08-06",
+     1.4836
+    ],
+    [
+     "2026-08-07",
+     1.4828
+    ],
+    [
+     "2026-08-10",
+     1.4825
+    ],
+    [
+     "2026-08-11",
+     1.4855
+    ],
+    [
+     "2026-08-12",
+     1.4848
+    ],
+    [
+     "2026-08-13",
+     1.486
+    ],
+    [
+     "2026-08-14",
+     1.4828
+    ],
+    [
+     "2026-08-17",
+     1.4832
+    ],
+    [
+     "2026-08-18",
+     1.4796
+    ],
+    [
+     "2026-08-19",
+     1.4777
+    ],
+    [
+     "2026-08-20",
+     1.4791
+    ],
+    [
+     "2026-08-21",
+     1.4809
+    ],
+    [
+     "2026-08-24",
+     1.4847
+    ],
+    [
+     "2026-08-25",
+     1.4865
+    ],
+    [
+     "2026-08-26",
+     1.4855
     ],
     [
      "2026-08-27",
-     1.8192
+     1.4903
     ],
     [
      "2026-08-28",
-     2.3912
+     1.4854
     ],
     [
      "2026-08-31",
-     2.3951
+     1.4856
+    ],
+    [
+     "2026-09-01",
+     1.4868
+    ],
+    [
+     "2026-09-02",
+     1.4825
+    ],
+    [
+     "2026-09-03",
+     1.4828
+    ],
+    [
+     "2026-09-04",
+     1.4847
+    ],
+    [
+     "2026-09-07",
+     1.4829
+    ],
+    [
+     "2026-09-08",
+     1.4858
     ],
     [
      "2026-09-09",
-     1.7848
+     1.4874
     ],
     [
      "2026-09-10",
-     2.3748
+     1.489
     ],
     [
      "2026-09-11",
-     2.3795
+     1.4894
+    ]
+   ],
+   "provenance": {
+    "source_name": "CFETS closing yield curve, AAA NCD (ClsYldCurvHis), called directly",
+    "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
+    "retrieved": "2026-09-14",
+    "confidence": "partial"
+   },
+   "notes": "1-year point of the AAA negotiable CD curve. Fetched by calling CFETS directly rather than through akshare, whose wrapper breaks on the current response schema.",
+   "unit": "%",
+   "freq": "D"
+  },
+  "mtn_aa_3y": {
+   "observations": [
+    [
+     "2026-06-01",
+     1.6815
+    ],
+    [
+     "2026-06-02",
+     1.6781
+    ],
+    [
+     "2026-06-03",
+     1.6736
+    ],
+    [
+     "2026-06-04",
+     1.6627
+    ],
+    [
+     "2026-06-05",
+     1.6602
+    ],
+    [
+     "2026-06-08",
+     1.6789
+    ],
+    [
+     "2026-06-09",
+     1.6865
+    ],
+    [
+     "2026-06-10",
+     1.6972
+    ],
+    [
+     "2026-06-11",
+     1.7241
+    ],
+    [
+     "2026-06-12",
+     1.7226
+    ],
+    [
+     "2026-06-15",
+     1.7307
+    ],
+    [
+     "2026-06-16",
+     1.7214
+    ],
+    [
+     "2026-06-17",
+     1.7305
+    ],
+    [
+     "2026-06-18",
+     1.7102
+    ],
+    [
+     "2026-06-22",
+     1.7133
+    ],
+    [
+     "2026-06-23",
+     1.7211
+    ],
+    [
+     "2026-06-24",
+     1.7162
+    ],
+    [
+     "2026-06-25",
+     1.6933
+    ],
+    [
+     "2026-06-26",
+     1.6942
+    ],
+    [
+     "2026-06-29",
+     1.6839
+    ],
+    [
+     "2026-06-30",
+     1.6767
+    ],
+    [
+     "2026-07-01",
+     1.7004
+    ],
+    [
+     "2026-07-02",
+     1.7018
+    ],
+    [
+     "2026-07-03",
+     1.7049
+    ],
+    [
+     "2026-07-06",
+     1.7007
+    ],
+    [
+     "2026-07-07",
+     1.6963
+    ],
+    [
+     "2026-07-08",
+     1.7035
+    ],
+    [
+     "2026-07-09",
+     1.7057
+    ],
+    [
+     "2026-07-10",
+     1.7043
+    ],
+    [
+     "2026-07-13",
+     1.72
+    ],
+    [
+     "2026-07-14",
+     1.7241
+    ],
+    [
+     "2026-07-15",
+     1.7196
+    ],
+    [
+     "2026-07-16",
+     1.7202
+    ],
+    [
+     "2026-07-17",
+     1.7204
+    ],
+    [
+     "2026-07-20",
+     1.719
+    ],
+    [
+     "2026-07-21",
+     1.7116
+    ],
+    [
+     "2026-07-22",
+     1.7107
+    ],
+    [
+     "2026-07-23",
+     1.7174
+    ],
+    [
+     "2026-07-24",
+     1.7298
+    ],
+    [
+     "2026-07-27",
+     1.7276
+    ],
+    [
+     "2026-07-28",
+     1.7477
+    ],
+    [
+     "2026-07-29",
+     1.7487
+    ],
+    [
+     "2026-07-30",
+     1.7435
+    ],
+    [
+     "2026-07-31",
+     1.7401
+    ],
+    [
+     "2026-08-03",
+     1.7415
+    ],
+    [
+     "2026-08-04",
+     1.7315
+    ],
+    [
+     "2026-08-05",
+     1.7294
+    ],
+    [
+     "2026-08-06",
+     1.7416
+    ],
+    [
+     "2026-08-07",
+     1.7216
+    ],
+    [
+     "2026-08-10",
+     1.7244
+    ],
+    [
+     "2026-08-11",
+     1.715
+    ],
+    [
+     "2026-08-12",
+     1.7016
+    ],
+    [
+     "2026-08-13",
+     1.6979
+    ],
+    [
+     "2026-08-14",
+     1.6973
+    ],
+    [
+     "2026-08-17",
+     1.6884
+    ],
+    [
+     "2026-08-18",
+     1.6884
+    ],
+    [
+     "2026-08-19",
+     1.6884
+    ],
+    [
+     "2026-08-20",
+     1.6884
+    ],
+    [
+     "2026-08-21",
+     1.7038
+    ],
+    [
+     "2026-08-24",
+     1.7118
+    ],
+    [
+     "2026-08-25",
+     1.7133
+    ],
+    [
+     "2026-08-26",
+     1.7046
+    ],
+    [
+     "2026-08-27",
+     1.7131
+    ],
+    [
+     "2026-08-28",
+     1.7085
+    ],
+    [
+     "2026-08-31",
+     1.7079
+    ],
+    [
+     "2026-09-01",
+     1.7132
+    ],
+    [
+     "2026-09-02",
+     1.7053
+    ],
+    [
+     "2026-09-03",
+     1.6938
+    ],
+    [
+     "2026-09-04",
+     1.7025
+    ],
+    [
+     "2026-09-07",
+     1.7032
+    ],
+    [
+     "2026-09-08",
+     1.6932
+    ],
+    [
+     "2026-09-09",
+     1.6943
+    ],
+    [
+     "2026-09-10",
+     1.695
+    ],
+    [
+     "2026-09-11",
+     1.6975
     ]
    ],
    "provenance": {
     "source_name": "CFETS closing yield curve, 中短期票据(AA+) (ClsYldCurvHis), called directly",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-14",
     "confidence": "partial"
    },
    "notes": "3-year point of the 中短期票据(AA+) curve, resolved by label match against the published curve map (code CYCC82D). The spread over the 3-year CGB is the credit-risk premium.",
+   "unit": "%",
+   "freq": "D"
+  },
+  "cfets": {
+   "observations": [
+    [
+     "2025-09-19",
+     96.36
+    ],
+    [
+     "2025-09-26",
+     96.97
+    ],
+    [
+     "2025-09-30",
+     96.77
+    ],
+    [
+     "2025-10-10",
+     97.32
+    ],
+    [
+     "2025-10-17",
+     97.08
+    ],
+    [
+     "2025-10-24",
+     97.55
+    ],
+    [
+     "2025-10-31",
+     97.61
+    ],
+    [
+     "2025-11-07",
+     97.96
+    ],
+    [
+     "2025-11-14",
+     97.83
+    ],
+    [
+     "2025-11-21",
+     98.22
+    ],
+    [
+     "2025-11-28",
+     97.92
+    ],
+    [
+     "2025-12-05",
+     97.65
+    ],
+    [
+     "2025-12-12",
+     97.71
+    ],
+    [
+     "2025-12-19",
+     97.88
+    ],
+    [
+     "2025-12-26",
+     97.64
+    ],
+    [
+     "2025-12-31",
+     97.99
+    ],
+    [
+     "2026-01-09",
+     98.54
+    ],
+    [
+     "2026-01-16",
+     98.79
+    ],
+    [
+     "2026-01-23",
+     98.24
+    ],
+    [
+     "2026-01-30",
+     96.99
+    ],
+    [
+     "2026-02-06",
+     98.34
+    ],
+    [
+     "2026-02-13",
+     97.81
+    ],
+    [
+     "2026-02-27",
+     98.58
+    ],
+    [
+     "2026-03-06",
+     99.65
+    ],
+    [
+     "2026-03-13",
+     100.15
+    ],
+    [
+     "2026-03-20",
+     100.58
+    ],
+    [
+     "2026-03-27",
+     100.6
+    ],
+    [
+     "2026-03-31",
+     100.87
+    ],
+    [
+     "2026-04-03",
+     100.84
+    ],
+    [
+     "2026-04-10",
+     100.25
+    ],
+    [
+     "2026-04-17",
+     99.88
+    ],
+    [
+     "2026-04-24",
+     100.08
+    ],
+    [
+     "2026-04-30",
+     100.17
+    ],
+    [
+     "2026-05-08",
+     99.7
+    ],
+    [
+     "2026-05-15",
+     100.28
+    ],
+    [
+     "2026-05-22",
+     100.47
+    ],
+    [
+     "2026-05-29",
+     100.66
+    ],
+    [
+     "2026-06-05",
+     101.33
+    ],
+    [
+     "2026-06-12",
+     101.49
+    ],
+    [
+     "2026-06-18",
+     101.77
+    ],
+    [
+     "2026-06-26",
+     102.57
+    ],
+    [
+     "2026-06-30",
+     102.59
+    ],
+    [
+     "2026-07-03",
+     102.65
+    ],
+    [
+     "2026-07-10",
+     102.35
+    ],
+    [
+     "2026-07-17",
+     102.42
+    ],
+    [
+     "2026-07-24",
+     102.75
+    ],
+    [
+     "2026-07-31",
+     102.19
+    ],
+    [
+     "2026-08-07",
+     102.03
+    ],
+    [
+     "2026-08-14",
+     102.12
+    ],
+    [
+     "2026-08-21",
+     101.54
+    ],
+    [
+     "2026-08-28",
+     101.72
+    ],
+    [
+     "2026-08-31",
+     101.87
+    ],
+    [
+     "2026-09-04",
+     101.64
+    ],
+    [
+     "2026-09-11",
+     101.49
+    ]
+   ],
+   "provenance": {
+    "source_name": "CFETS RMB exchange-rate index (中国外汇交易中心)",
+    "source_url": "https://www.chinamoney.com.cn/chinese/bkrmbidx/",
+    "retrieved": "2026-09-14",
+    "confidence": "partial"
+   },
+   "notes": "CFETS trade-weighted renminbi index, 2014-12-31 = 100, published weekly on the first trading day for the previous Friday. The endpoint serves only a rolling one-year window, so history accumulates forward from first fetch rather than reaching back. Basket weights are reset by announcement periodically — most recently effective 2026-01-01 — so the level is continuous but the composition is not.",
    "unit": "%",
    "freq": "D"
   }

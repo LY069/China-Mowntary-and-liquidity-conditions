@@ -167,13 +167,26 @@ def main() -> int:
     SPIKE = {"dr007": 1.5, "dr001": 1.5, "r007": 3.0, "r001": 3.0,
              "cgb_1y": 0.4, "cgb_3y": 0.4, "cgb_10y": 0.4,
              "ncd_1y_aaa": 0.5, "mtn_aa_3y": 0.5, "shibor_3m": 0.5}
-    # These are WARNINGS, never failures. The guard cannot tell a mis-parsed row
-    # from a real event: the July 2011 SHIBOR spike it flags was the genuine
-    # mid-2011 liquidity squeeze. It exists to put a human eye on the candidate,
-    # not to reject data on its own judgement.
+    # Run this at the resolution the defect lives at. A mis-parsed row is ONE
+    # observation reading the wrong column or the wrong tenor, so it shows up
+    # between adjacent trading days. Monthly means cannot see it — and worse,
+    # they invent it: a genuine multi-week move makes the trough month look
+    # like a spike against its neighbours. Both values this check used to flag
+    # were that artefact. cgb_1y 2015-06 reproduces value-for-value from
+    # ChinaBond (21/21) and its daily path is smooth, and the July 2011 SHIBOR
+    # print was the real mid-2011 squeeze. Checking daily clears both without
+    # weakening the guard, because a single bad row is exactly what survives.
+    #
+    # Still WARNINGS, never failures: the check cannot prove intent, only point
+    # a human at a candidate.
+    daily_seed = (seeds.get("series.json") or {}).get("series", {})
     spiky = 0
     for sid, limit in SPIKE.items():
-        pts = series.get(sid, {}).get("points") or []
+        src = (daily_seed.get(sid) or {}).get("observations")
+        if src:
+            pts, res = src, "daily"
+        else:
+            pts, res = (series.get(sid, {}).get("points") or []), "built"
         for i in range(1, len(pts) - 1):
             prev, cur, nxt = pts[i - 1][1], pts[i][1], pts[i + 1][1]
             if None in (prev, cur, nxt):
@@ -182,7 +195,8 @@ def main() -> int:
             if abs(cur - prev) > limit and abs(cur - nxt) > limit \
                     and (cur - prev) * (cur - nxt) > 0:
                 warn(f"{sid} at {pts[i][0]} = {cur} sits {abs(cur - prev):.2f} from its "
-                     f"neighbours ({prev}, {nxt}) — likely a mis-parsed row, not a real move")
+                     f"{res} neighbours ({prev}, {nxt}) — one row out of line, "
+                     f"which is what a wrong column or a stray tenor looks like")
                 spiky += 1
     ok(f"spike check applied to {len(SPIKE)} rate series ({spiky} flagged)")
 
