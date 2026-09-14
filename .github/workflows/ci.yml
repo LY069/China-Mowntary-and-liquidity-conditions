@@ -22,10 +22,13 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install pandas
-        # Only pandas: the fetcher tests fake akshare rather than installing it,
-        # so CI stays fast and does not depend on akshare's fragile build.
-        run: pip install --quiet pandas
+      - name: Install test dependencies
+        # pandas and requests only. The fetcher tests fake akshare rather than
+        # installing it, so CI stays fast and does not depend on akshare's
+        # fragile build — but requests is imported directly by the CFETS fetcher
+        # and patched by its test, so it has to be present. A local venv with
+        # akshare installed pulls requests in transitively and hides that.
+        run: pip install --quiet pandas requests
 
       - name: Unit tests — refresh parsing helpers
         run: python3 tests/test_refresh_helpers.py
