@@ -1,0 +1,50 @@
+name: Probe gaps
+
+# Reconnaissance for the indicators that are still unsourced, and for the 2015
+# CGB print the sanity gate flags. Every host involved is egress-blocked in the
+# development sandbox, so the only way to learn what these endpoints return is
+# to ask them from somewhere with real network.
+#
+# Triggered by pushes that touch the probe itself, so iterating on the probe is
+# the same action as running it. Nothing here writes to the repository.
+
+on:
+  push:
+    branches: ["claude/**"]
+    paths:
+      - "scripts/probe_gaps.py"
+      - ".github/workflows/probe-gaps.yml"
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Space-separated probe names (cfets pboc_pdf loan_direction cgb)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install probe dependencies
+        # akshare for the ChinaBond comparison; pdfplumber for the PBoC credit
+        # tables. The jsonpath dance is akshare's sdist-only dependency, which
+        # modern setuptools refuses to build — see refresh-data.yml.
+        run: |
+          python -m pip install --quiet --upgrade pip
+          pip install --quiet "setuptools<60" wheel
+          pip install --quiet --no-build-isolation jsonpath
+          pip install --quiet akshare pdfplumber requests
+          python -c "import akshare, pdfplumber; print('akshare', akshare.__version__)"
+
+      - name: Probe
+        run: |
+          python3 scripts/probe_gaps.py ${{ inputs.only && format('--only {0}', inputs.only) || '' }}
