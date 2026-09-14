@@ -110,28 +110,60 @@ def probe_cfets():
             for h in sorted(hits):
                 print("      ", h)
 
-    # Candidate machine-readable routes, by analogy with the LPR/FDR CSVs that
-    # research/08 confirmed exist for other series on this host.
-    print("\n[2] Candidate machine-readable routes")
-    candidates = [
-        # the known-good analogue, to prove the pattern works from this runner
-        ("https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/LprChrtCSV"
-         "?startDate=2024-01-01", "KNOWN-GOOD analogue (LPR CSV)"),
-        ("https://www.chinamoney.com.cn/r/cms/www/chinamoney/data/fx/"
-         "rmb-index.csv", "guess: fx/rmb-index.csv"),
-        ("https://www.chinamoney.com.cn/ags/ms/cm-u-bk-fx/RmbIdxHis"
-         "?startDate=2024-01-01&endDate=2026-09-01", "guess: RmbIdxHis"),
-        ("https://www.chinamoney.com.cn/ags/ms/cm-u-bk-ccpr/RmbFxIdx",
-         "guess: RmbFxIdx"),
-    ]
-    for url, why in candidates:
-        body = get(url, referer=page_url, label=f"{why}\n        {url}")
-        if body:
-            print("        first 300 chars:", repr(body[:300]))
+    # RmbIdxHis answered 200 but echoed back a default one-year window
+    # (startDate 2025-09-15) rather than the range asked for, so the open
+    # question is not "does a route exist" but "how do I ask it for history".
+    print("\n[2] cm-u-bk-fx/RmbIdxHis — full shape, and how to widen the window")
+    base = "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-fx/RmbIdxHis"
+    body = get(base, referer=page_url, label="bare call")
+    if body:
+        try:
+            j = json.loads(body)
+            recs = j.get("records") or []
+            print(f"        data block: {json.dumps(j.get('data'), ensure_ascii=False)}")
+            print(f"        records: {len(recs)}")
+            if recs:
+                print(f"        record keys: {list(recs[0])}")
+                print(f"        first: {json.dumps(recs[0], ensure_ascii=False)}")
+                print(f"        last:  {json.dumps(recs[-1], ensure_ascii=False)}")
+        except Exception:
+            traceback.print_exc()
 
-    # The documented fallback: the weekly article list.
-    print("\n[3] Documented fallback — the weekly index article list")
-    get("https://www.chinamoney.com.cn/chinese/bmkidxrud/", label="bmkidxrud list")
+    # Parameter names CFETS uses elsewhere on this host, tried one at a time so
+    # a widened window can be attributed to the parameter that widened it.
+    print("\n[3] Parameter probes — which one moves startDate off the default?")
+    variants = [
+        "?lang=cn",
+        "?startDate=2015-01-01&endDate=2026-09-14",
+        "?lang=cn&startDate=2015-01-01&endDate=2026-09-14",
+        "?t=1&startDate=2015-01-01&endDate=2026-09-14",
+        "?beginDate=2015-01-01&endDate=2026-09-14",
+        "?startDate=2015-01-01&endDate=2026-09-14&pageSize=5000",
+        "?pageSize=5000&pageNo=1",
+        "?startDate=2015-01-01&endDate=2026-09-14&type=1",
+        "?dateInterval=5Y",
+    ]
+    for v in variants:
+        body = get(base + v, referer=page_url, label=f"params {v}")
+        if not body:
+            continue
+        try:
+            j = json.loads(body)
+            recs = j.get("records") or []
+            dat = j.get("data") or {}
+            first = recs[0].get("showDate") if recs else None
+            last = recs[-1].get("showDate") if recs else None
+            print(f"        -> {len(recs)} records, window {dat.get('startDate')}"
+                  f" .. {dat.get('endDate')}, newest {first} oldest {last}")
+        except Exception as exc:
+            print(f"        -> unparseable: {exc}")
+
+    # Sibling routes under the same service, in case history lives elsewhere.
+    print("\n[4] Sibling routes under cm-u-bk-fx")
+    for name in ("RmbIdx", "RmbIdxHisCSV", "RmbIdxChrtCSV", "CfetsRmbIdx",
+                 "RmbIdxList", "RmbIdxHisNew"):
+        get(f"https://www.chinamoney.com.cn/ags/ms/cm-u-bk-fx/{name}",
+            referer=page_url, label=f"sibling {name}")
 
 
 # --------------------------------------------------------------------------
@@ -170,7 +202,41 @@ def probe_pboc_pdf():
         except Exception:
             traceback.print_exc()
 
-    print("\n[3] The per-year node, for crawling the PDF slug")
+    print("\n[2b] Which of the year node's PDFs is the credit-balance table?")
+    node = ("https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2026ntjsj/"
+            "jrjgxdsztj/index.html")
+    html = get(node, label="2026 node")
+    if html:
+        pdfs = sorted(set(re.findall(r"[^\"']*attachDir[^\"']*\.pdf", html)))
+        for rel in pdfs:
+            url = rel if rel.startswith("http") else "https://www.pbc.gov.cn" + rel
+            blob = get(url, binary=True, label=f"  {rel[-30:]}")
+            if not blob:
+                continue
+            try:
+                import pdfplumber, io
+                with pdfplumber.open(io.BytesIO(blob)) as pdf:
+                    txt = (pdf.pages[0].extract_text() or "").splitlines()
+                # First line is the table title; the header row carries the
+                # months, which is what says how much history one PDF covers.
+                title = txt[0] if txt else "?"
+                hdr = next((l for l in txt[:8] if "项目" in l), "")
+                print(f"        TITLE: {title}")
+                print(f"        HDR  : {hdr[:160]}")
+            except Exception as exc:
+                print(f"        parse failed: {exc}")
+
+    print("\n[3] Older years — how is the per-year node addressed?")
+    hub = get("https://www.pbc.gov.cn/diaochatongjisi/116219/116319/index.html",
+              label="statistics hub")
+    if hub:
+        links = sorted(set(re.findall(
+            r'href="(/diaochatongjisi/116219/116319/[^"]*index\.html)"', hub)))
+        print(f"        per-year style links: {len(links)}")
+        for l in links[:30]:
+            print("          ", l)
+
+    print("\n[3b] The originally-probed year node")
     for url in [
         "https://www.pbc.gov.cn/diaochatongjisi/116219/116319/2026ntjsj/"
         "jrjgxdsztj/index.html",
@@ -199,7 +265,11 @@ def probe_loan_direction():
     ]
     # The number lives in running prose, so the test is whether the sentence
     # template survives extraction — not whether a table parses.
-    pat = re.compile(r"中长期贷款余额[^。]{0,80}")
+    # The report states six different 中长期贷款余额 figures — all loans,
+    # industry, light industry, services, property, infrastructure — and the
+    # number alone cannot say which is which. What disambiguates them is the
+    # clause BEFORE the phrase, so capture that too.
+    pat = re.compile(r"[^。；]{0,120}中长期贷款余额[^。]{0,90}")
     for label, url in targets:
         print(f"\n[{label}]")
         html = get(url)
@@ -208,9 +278,13 @@ def probe_loan_direction():
         text = re.sub(r"<[^>]+>", "", html)
         text = re.sub(r"\s+", "", text)
         hits = pat.findall(text)
-        print(f"        中长期贷款余额 sentences found: {len(hits)}")
-        for h in hits[:6]:
-            print("          ", h)
+        print(f"        中长期贷款余额 mentions with leading context: {len(hits)}")
+        for i, h in enumerate(hits):
+            print(f"          [{i}] {h}")
+        # The corporate cut is named 企事业单位 (or 企业事业单位). Show every
+        # sentence that mentions it, whether or not it also says 中长期.
+        for m in re.finditer(r"[^。；]{0,60}企[事业]*单位[^。]{0,160}", text):
+            print(f"          (企事业单位) {m.group(0)}")
 
     print("\n[list] The 新闻发布 column, for enumerating past quarters")
     html = get("https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/index.html")
