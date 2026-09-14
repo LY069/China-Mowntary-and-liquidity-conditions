@@ -957,3 +957,48 @@ third caused by **trusting a request to constrain a response** rather than
 verifying the reply (the others: a rating matched by substring, and a date
 format assumed rather than read). `mtn_aa_3y` and `ncd_1y_aaa` were purged and
 refetched against a tenor-verified parser.
+
+### 3.6 `corp_mlt_loans_yoy` — parser verified, but the reports cannot be listed
+
+§3.2 established that the figure is unambiguous *once you have the article*.
+Getting the articles is the problem. Four routes, all against live servers:
+
+| Route | Result |
+|---|---|
+| PBoC 新闻发布 column `113456/113469` | 15 articles listed, **all JavaScript shells** rendering only site chrome |
+| … `index_1.html`, `index_2.html`, `index1.html`, `index_1.htm` | **404** |
+| … `index.html?page=2` | 200 — and returns **the same 15 links** |
+| gov.cn search API, `q=贷款投向` | `{"code":1001,"msg":"抱歉，没有找到相关结果","data":[]}` |
+| gov.cn monthly archives `/lianbo/bumen/YYYYMM/` | **403** |
+| Walking the reports' numeric article IDs | `5877760` → 200, confirmed *2025年三季度金融机构贷款投向统计报告*. `5877759`, `5877761`, `5877700` → **404**. And `5221508`, the 2023 annual report recorded in §2.6, **now 404s** — the URL has rotted since that note was written. |
+
+So the IDs are sparse, unpredictable and impermanent. The parser is kept in
+`scripts/refresh_data.py` but **deliberately not registered in `FETCHERS`** —
+it has no URL list to run against, and leaving it registered would crawl twelve
+list pages every refresh to return nothing. Wire it to any list of report URLs
+and it works.
+
+### 3.7 The CFETS curve endpoint serves days, not years
+
+Three properties, each established by varying one thing at a time:
+
+| Test | Result |
+|---|---|
+| Fixed recent window, `pageSize` 50 / 100 / 200 / 500 / 1000 | **200 at 50; 403 at every larger value.** 50 is a hard cap. |
+| Fixed `pageSize=50`, windows in 2026-03, 2025-03, 2024-03, 2022-03, 2020-03, 2018-03, 2015-03 | **200 with ZERO records, every one.** |
+| Ten rapid identical calls, no pause | **All 200.** Not rate limited. |
+
+Two consequences. First, the 403 that appeared in the refresh dry run was the
+page size, not the request rate — raising it to cover a month in one call does
+not widen the window, it gets the request rejected. Second, and worse: because
+the response carries the whole curve (~19 tenors a day), **fifty records is two
+or three days**, so a month-long window was being truncated to its last few
+days *with no error*. That is why `mtn_aa_3y` and `ncd_1y_aaa` never held more
+than twelve observations, and it compounded the wrong-tenor bug in §3.5 — the
+few days that survived were also the wrong tenor.
+
+The fetcher now pages with `pageNum` until a short page arrives, and a
+regression test asserts that a full page triggers the next request. But the
+zero-record result for every pre-2026-08 window is not fixable: **this endpoint
+serves only recent weeks.** Both series accumulate forward from first fetch and
+cannot be backfilled, exactly like `cfets` in §3.1.

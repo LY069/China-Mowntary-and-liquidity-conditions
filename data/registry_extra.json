@@ -229,7 +229,8 @@
    "inflation": "Capex-driven credit is what eventually tightens capacity and lifts producer prices.",
    "policy": "Sustained weakness here, alongside strong headline loans, tells the PBoC that banks are meeting quotas with short-dated paper rather than financing investment."
   },
-  "false_signals": "Can be inflated by policy-directed lending to infrastructure and state-owned enterprises. Cross-check against private-sector fixed asset investment. Quarterly and released three to four weeks after quarter end, so it confirms a turn rather than calling one."
+  "false_signals": "Can be inflated by policy-directed lending to infrastructure and state-owned enterprises. Cross-check against private-sector fixed asset investment. Quarterly and released three to four weeks after quarter end, so it confirms a turn rather than calling one.",
+  "unavailable": "Reports cannot be enumerated. The parser is written and verified against 2025 Q3 and 2025 Q1 (scripts/refresh_data.py:fetch_loan_direction), and the figure is unambiguous once you have the article — but there is no way to LIST the articles. PBoC's column serves JavaScript shells with no working pagination, gov.cn's search returns no results for 贷款投向 and its monthly archives answer 403, and the reports' numeric article IDs are sparse and rot (the 2023 annual report's URL is already dead). Quarterly, so even a solved crawl would give ~44 points since 2015."
  },
  "household_time_deposit_share": {
   "name": "Household time-deposit share",
@@ -468,6 +469,7 @@
    "policy": "Useful only to audit the year-on-year figure against the source."
   },
   "false_signals": "Can be inflated by policy-directed lending to infrastructure and state-owned enterprises. Cross-check against private-sector fixed asset investment. Quarterly and released three to four weeks after quarter end, so it confirms a turn rather than calling one.",
-  "stateless": true
+  "stateless": true,
+  "unavailable": "Reports cannot be enumerated. The parser is written and verified against 2025 Q3 and 2025 Q1 (scripts/refresh_data.py:fetch_loan_direction), and the figure is unambiguous once you have the article — but there is no way to LIST the articles. PBoC's column serves JavaScript shells with no working pagination, gov.cn's search returns no results for 贷款投向 and its monthly archives answer 403, and the reports' numeric article IDs are sparse and rot (the 2023 annual report's URL is already dead). Quarterly, so even a solved crawl would give ~44 points since 2015."
  }
 }

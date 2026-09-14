@@ -759,6 +759,27 @@ def fetch_credit_spread(ak, start):
 def fetch_loan_direction(ak, start):
     """Corporate medium-and-long-term loans, from the quarterly 贷款投向 report.
 
+    NOT REGISTERED IN `FETCHERS`, and deliberately so. The parser below is
+    verified — it reads 2025 Q3 and 2025 Q1 correctly — but the reports cannot
+    be ENUMERATED, so it has no list of URLs to run against. Four routes were
+    tried against live servers:
+
+      - PBoC's own 新闻发布 column lists fifteen articles that are JavaScript
+        shells rendering only site chrome; index_1.html and friends 404, and
+        index.html?page=2 returns the same fifteen.
+      - gov.cn's search API answers 贷款投向 with
+        {"code":1001,"msg":"抱歉，没有找到相关结果"}.
+      - gov.cn's monthly archive directories answer 403.
+      - The reports' own short numeric article IDs are sparse and unstable:
+        5877760 resolves and is indeed 2025年三季度金融机构贷款投向统计报告, but
+        5877759, 5877761 and 5877700 all 404 — and 5221508, the 2023 annual
+        report recorded in research/08, has since rotted.
+
+    Kept rather than deleted because the hard part is the disambiguation, not
+    the plumbing: the article states SIX different 中长期贷款余额 figures and
+    only one is the corporate cut. Wire this up to any list of report URLs and
+    it works.
+
     There is no API. The numbers sit in running prose, and the report states
     SIX different 中长期贷款余额 figures in one article — all loans, industry,
     heavy and light industry, services, property, infrastructure. Reading the
@@ -950,8 +971,6 @@ FETCHERS = {
     "tsfparts":  (fetch_tsf_components, ["tsf_ex_govt_flow", "tsf_ex_govt_yoy"]),
     "govtbonds": (fetch_govt_bond_issuance, ["govt_bond_issuance"]),
     "creditspread": (fetch_credit_spread, ["mtn_aa_3y"]),
-    "loandirection": (fetch_loan_direction,
-                      ["corp_mlt_loans_yoy", "corp_mlt_loans_level"]),
     "cfets":     (fetch_cfets_index,  ["cfets"]),
 }
 
