@@ -30,6 +30,9 @@ FAILURES = []
 
 
 def check(label, got, want):
+    """Compare got against want. NOTE: tests/test_live_regressions.py spells
+    this differently — check(label, ok, detail) — so a call written for one
+    file is silently wrong in the other."""
     ok = got == want
     print(f"  {'PASS' if ok else 'FAIL'}  {label}")
     if not ok:
@@ -229,6 +232,33 @@ def main():
         finally:
             _rq.get = saved
         check(label, got, want)
+
+    # Pagination. pageSize is capped at 50 by the server, and the response
+    # carries the whole curve, so fifty records is two or three DAYS. Without
+    # paging, a month-long window is truncated silently — which is exactly how
+    # this series ended up with twelve observations.
+    pages = {}
+
+    def paged(*a, **k):
+        n = int(k["params"]["pageNum"])
+        pages[n] = pages.get(n, 0) + 1
+        if n == 1:
+            return FakeResp({"records": [rec(f"2026-03-{d:02d}", "1.0", "1.80")
+                                         for d in range(1, 26)]
+                                        + [rec(f"2026-03-{d:02d}", "5.0", "2.50")
+                                           for d in range(1, 26)]})   # exactly 50
+        if n == 2:
+            return FakeResp({"records": [rec("2026-03-26", "1.0", "1.85")]})
+        return FakeResp({"records": []})
+
+    _rq.get = paged
+    try:
+        got = rd._ncd_records("CYCC999", "20260301", "20260331", term="1")
+    finally:
+        _rq.get = saved
+    check("a full page triggers the next one", sorted(pages), [1, 2])
+    check("page 2's observation survives", ["2026-03-26", 1.85] in got, True)
+    check("both pages' 1y points are kept, 5y dropped", len(got), 26)
 
     # And the tenor actually asked for is honoured, not hard-coded to 1.
     _rq.get = lambda *a, **k: FakeResp({"records": [

@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 """
-Fourth probe. Two failures from the refresh dry run that guessing cannot fix.
+Fifth probe. One question left: can the quarterly 贷款投向 reports be enumerated?
 
-  1. ClsYldCurvHis returned 403 on every 2015 window once pageSize went from
-     50 to 1000. Is that the page size, the request rate, or the age of the
-     window? The previous dataset only ever held four recent months, which
-     hints the endpoint does not serve deep history at all — but that was
-     never established, only inferred from an already-broken fetcher.
+The parser works — it was verified verbatim against 2025 Q3 and 2025 Q1. What
+is missing is a list of report URLs. PBoC's own column is a dead end: the
+fifteen articles it lists are JavaScript shells that render only site chrome,
+index_1.html and friends 404, and index.html?page=2 returns the same fifteen.
 
-  2. The 贷款投向 crawl found 15 articles and none was the report. The list
-     page yields only the most recent items, so either pagination is spelled
-     differently or the report lives in another column.
+gov.cn republishes the identical text and is server-rendered, so this asks
+whether its search or its monthly archives can produce the list PBoC will not.
 """
 from __future__ import annotations
 
 import json
 import re
 import sys
-import time
 import traceback
 
 import requests
@@ -25,123 +22,88 @@ import requests
 UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
 H = {"User-Agent": UA, "Accept-Language": "zh-CN,zh;q=0.9"}
+KEY = "贷款投向"
 
 
-def rule(t):
-    print("\n" + "=" * 72 + f"\n{t}\n" + "=" * 72)
-
-
-def curve(page_size, start, end, pause=0.0):
-    if pause:
-        time.sleep(pause)
+def show(url, **kw):
     try:
-        r = requests.get(
-            "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
-            params={"lang": "CN", "reference": "1,2,3", "bondType": "CYCC82D",
-                    "startDate": start, "endDate": end, "termId": "3",
-                    "pageNum": "1", "pageSize": str(page_size)},
-            headers=H, timeout=30)
+        r = requests.get(url, headers=H, timeout=30, **kw)
     except Exception as exc:
-        return f"EXC {type(exc).__name__}"
+        print(f"  FAIL {type(exc).__name__}: {str(exc)[:80]}  {url[:88]}")
+        return None
+    print(f"  {r.status_code}  {len(r.content):>8} bytes  {url[:88]}")
     if r.status_code != 200:
-        return f"HTTP {r.status_code}"
-    try:
-        recs = (r.json() or {}).get("records") or []
-    except Exception:
-        return "unparseable JSON"
-    if not recs:
-        return "200, 0 records"
-    dates = sorted({str(x.get("newDateValueCN")) for x in recs})
-    return f"200, {len(recs)} records, {dates[0]} .. {dates[-1]}"
-
-
-def probe_curve_limits():
-    rule("ClsYldCurvHis — is the 403 about page size, rate, or window age?")
-
-    print("\n[1] Same recent window, increasing page size (1s apart)")
-    for ps in (50, 100, 200, 500, 1000):
-        print(f"  pageSize={ps:<5} -> {curve(ps, '2026-09-01', '2026-09-11', pause=1.0)}")
-
-    print("\n[2] Same page size (50), walking backwards in time (1s apart)")
-    for y in (2026, 2025, 2024, 2022, 2020, 2018, 2015):
-        print(f"  {y}-03 -> {curve(50, f'{y}-03-01', f'{y}-03-31', pause=1.0)}")
-
-    print("\n[3] Rate: ten rapid identical calls, no pause")
-    for i in range(10):
-        res = curve(50, "2026-08-01", "2026-08-31")
-        print(f"  call {i+1:>2} -> {res}")
-        if res.startswith("HTTP 403"):
-            print("        -> 403 appeared after "
-                  f"{i+1} rapid calls; this is rate limiting, not page size")
-            break
-
-
-def probe_loan_listing():
-    rule("贷款投向 — where does the report actually live?")
-
-    known = "https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/5877760/index.html"
-    print(f"\n[1] The known 2025 Q3 report is reachable: ", end="")
-    try:
-        r = requests.get(known, headers=H, timeout=30)
-        print(f"HTTP {r.status_code}, {len(r.content)} bytes")
-    except Exception as exc:
-        print(f"FAIL {exc}")
-
-    print("\n[2] Pagination spellings on column 113469")
-    base = "https://www.pbc.gov.cn/goutongjiaoliu/113456/113469"
-    for spell in ("index_1.html", "index_2.html", "index1.html",
-                  "index.html?page=2", "index_1.htm"):
-        url = f"{base}/{spell}"
-        try:
-            r = requests.get(url, headers=H, timeout=30)
-            n = len(set(re.findall(
-                r'href="(/goutongjiaoliu/113456/113469/[^"]+/index\.html)"', r.text)))
-            print(f"  {spell:<22} HTTP {r.status_code}, {len(r.content):>7} bytes, {n} article links")
-        except Exception as exc:
-            print(f"  {spell:<22} FAIL {exc}")
-
-    print("\n[3] Is 贷款投向 in column 113469 at all? Open every listed article.")
-    try:
-        r = requests.get(f"{base}/index.html", headers=H, timeout=30)
-        r.encoding = r.apparent_encoding or "utf-8"
-        arts = sorted(set(re.findall(
-            r'href="(/goutongjiaoliu/113456/113469/[^"]+/index\.html)"', r.text)))
-    except Exception as exc:
-        print(f"  list failed: {exc}")
-        arts = []
-    print(f"  {len(arts)} articles listed")
-    for a in arts[:20]:
-        try:
-            rr = requests.get("https://www.pbc.gov.cn" + a, headers=H, timeout=30)
-            rr.encoding = rr.apparent_encoding or "utf-8"
-            t = re.sub(r"<[^>]+>", "", rr.text)
-            t = re.sub(r"[ \t\r\n　]+", "", t)
-            title = re.search(r"(.{0,40}统计报告|.{0,40}数据报告|.{0,30}公告)", t)
-            print(f"    {a.split('/')[-2]:<22} "
-                  f"{'HAS 贷款投向' if '贷款投向' in t else '           '} "
-                  f"{title.group(0)[:38] if title else ''}")
-        except Exception as exc:
-            print(f"    {a}: {exc}")
-
-    print("\n[4] PBoC site search for the report")
-    for url in ("https://www.pbc.gov.cn/search/whitepaper?keyword=%E8%B4%B7%E6%AC%BE%E6%8A%95%E5%90%91",
-                "http://www.pbc.gov.cn/zhengwugongkai/4081330/4081344/4081395/4081132/index.html"):
-        try:
-            r = requests.get(url, headers=H, timeout=30)
-            print(f"  HTTP {r.status_code}, {len(r.content)} bytes  {url[:70]}")
-        except Exception as exc:
-            print(f"  FAIL {exc}  {url[:70]}")
+        return None
+    r.encoding = r.apparent_encoding or "utf-8"
+    return r.text
 
 
 def main():
-    for f in (probe_curve_limits, probe_loan_listing):
+    print("=" * 72 + "\n[1] gov.cn search API\n" + "=" * 72)
+    # gov.cn's public search backend. If it answers with JSON carrying titles
+    # and URLs, the whole enumeration problem collapses.
+    for url in (
+        "https://sousuo.www.gov.cn/search-gov/data"
+        "?t=zhengcelibrary_bm&q=%E8%B4%B7%E6%AC%BE%E6%8A%95%E5%90%91&n=20&p=1",
+        "https://sousuo.www.gov.cn/search-gov/data"
+        "?t=paper&q=%E8%B4%B7%E6%AC%BE%E6%8A%95%E5%90%91&n=20",
+        "https://sousuo.www.gov.cn/sousuo/search.shtml"
+        "?code=17da70961a7&searchWord=%E8%B4%B7%E6%AC%BE%E6%8A%95%E5%90%91",
+    ):
+        body = show(url)
+        if not body:
+            continue
+        snippet = body[:400]
+        print(f"        {snippet!r}")
         try:
-            f()
+            j = json.loads(body)
+            # Walk for anything that looks like a result list.
+            def walk(o, path=""):
+                if isinstance(o, dict):
+                    for k, v in o.items():
+                        walk(v, f"{path}.{k}")
+                elif isinstance(o, list) and o and isinstance(o[0], dict):
+                    print(f"        list at {path}: {len(o)} items, "
+                          f"keys {list(o[0])[:10]}")
+                    for it in o[:5]:
+                        t = str(it.get("title") or it.get("titleO") or "")[:40]
+                        u = it.get("url") or it.get("link") or ""
+                        print(f"          {KEY in t and '*' or ' '} {t}  {u[:70]}")
+            walk(j)
         except Exception:
-            traceback.print_exc()
+            pass
+
+    print("\n" + "=" * 72 + "\n[2] gov.cn monthly archives\n" + "=" * 72)
+    # The known mirror sits at /lianbo/bumen/202505/content_7025931.htm, so the
+    # month node is the obvious place a quarterly report would be listed.
+    for ym in ("202505", "202508", "202502", "202411"):
+        body = show(f"https://www.gov.cn/lianbo/bumen/{ym}/")
+        if not body:
+            continue
+        links = sorted(set(re.findall(r'href="(/lianbo/bumen/\d{6}/content_\d+\.htm)"', body)))
+        print(f"        {len(links)} content links")
+        print(f"        mentions {KEY} on the index page: {KEY in body}")
+
+    print("\n" + "=" * 72 + "\n[3] The PBoC article ID neighbourhood\n" + "=" * 72)
+    # The reports live at short numeric IDs (2025 Q3 = 5877760, 2023 annual =
+    # 5221508) while everything the column lists uses timestamp IDs. If the
+    # numeric IDs are dense, they are enumerable; if sparse, they are not.
+    for pid in (5877760, 5221508, 5877761, 5877759, 5877700):
+        body = show(f"https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/{pid}/index.html")
+        if body:
+            t = re.sub(r"<[^>]+>", "", body)
+            t = re.sub(r"[ \t\r\n　]+", "", t)
+            title = re.search(r"(.{0,30}(?:统计报告|数据报告|公告|通知))", t)
+            print(f"        {KEY in t and 'HAS 贷款投向' or '            '}  "
+                  f"{title.group(0)[:40] if title else '(no title found)'}")
+
     print("\nprobe complete")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except Exception:
+        traceback.print_exc()
+        sys.exit(0)

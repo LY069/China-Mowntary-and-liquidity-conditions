@@ -354,18 +354,34 @@ def _ncd_records(symbol_code, s_, e_, term="1"):
     """
     import requests
     want = float(term)
-    r = requests.get(
-        "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
-        params={"lang": "CN", "reference": "1,2,3", "bondType": symbol_code,
-                "startDate": f"{s_[:4]}-{s_[4:6]}-{s_[6:]}",
-                "endDate": f"{e_[:4]}-{e_[4:6]}-{e_[6:]}",
-                "termId": term, "pageNum": "1", "pageSize": "1000"},
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                               "AppleWebKit/537.36 (KHTML, like Gecko) "
-                               "Chrome/108.0.0.0 Safari/537.36"},
-        timeout=30)
-    r.raise_for_status()
-    records = (r.json() or {}).get("records") or []
+    hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                         "AppleWebKit/537.36 (KHTML, like Gecko) "
+                         "Chrome/108.0.0.0 Safari/537.36"}
+    # pageSize is CAPPED AT 50. Probing a fixed recent window returned 200 at
+    # 50 and 403 at 100, 200, 500 and 1000 — so raising it to cover a month in
+    # one call does not work, it just gets the request rejected. And because
+    # the response carries the whole curve (about nineteen tenors a day), fifty
+    # records is only two or three DAYS. A single call therefore truncates a
+    # month silently, which is why this series never had more than a handful of
+    # observations.
+    #
+    # So: page through with pageNum until a page comes back short. Not rate
+    # limited — ten rapid identical calls all returned 200.
+    records, page = [], 1
+    while page <= 40:                              # ~100 trading days, ample
+        r = requests.get(
+            "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
+            params={"lang": "CN", "reference": "1,2,3", "bondType": symbol_code,
+                    "startDate": f"{s_[:4]}-{s_[4:6]}-{s_[6:]}",
+                    "endDate": f"{e_[:4]}-{e_[4:6]}-{e_[6:]}",
+                    "termId": term, "pageNum": str(page), "pageSize": "50"},
+            headers=hdr, timeout=30)
+        r.raise_for_status()
+        batch = (r.json() or {}).get("records") or []
+        records.extend(batch)
+        if len(batch) < 50:
+            break
+        page += 1
     out, seen_terms, matched = [], set(), 0
     for rec in records:
         # Read by NAME. The positional read that was here before depended on

@@ -20,6 +20,10 @@ FAILURES = []
 
 
 def check(label, ok, detail=""):
+    """Assert `ok` is truthy; `detail` is a message shown ON FAILURE, not an
+    expected value — passing an expectation there degrades the assertion to a
+    truthiness test. NOTE: tests/test_refresh_fetchers.py spells this
+    differently — check(label, got, want)."""
     print(f"  {'PASS' if ok else 'FAIL'}  {label}" + (f"\n        {detail}" if not ok and detail else ""))
     if not ok:
         FAILURES.append(label)
