@@ -829,3 +829,131 @@ you must crawl the hub each year.** ✅ The sub-domain `camlmac.pbc.gov.cn` serv
 - https://www.huilvwang.com/CFETS.html
 - https://www.ceicdata.com/zh-hans/china/exchange-rate-index/cn-rmb-exchange-rate-index-cfets-currency-basket
 - https://guoyanwang.clcn.net.cn/DRCNet.Mirror.Documents.Web/DocSummary.aspx?DocID=8189606&leafID=17583
+
+---
+
+## 3. Probe results — what live endpoints actually returned
+
+Everything above was desk research: URLs read, shapes inferred, feasibility
+estimated. This section records what happened when the endpoints were **called
+from a runner with real network**, in three passes on 2026-09-14. Where a
+finding here contradicts the table in §1, this section wins — it is the only
+part of this document written against live responses rather than documentation.
+
+### 3.1 `cfets` — SOURCED, with a hard limit on history
+
+§2.9 concluded "no machine-readable route found; HTML parse." That was wrong,
+but so was the reason it looked wrong: the endpoint **appears in no page source
+and in no public code search**, which is why six independent searches missed it.
+
+```
+GET https://www.chinamoney.com.cn/ags/ms/cm-u-bk-fx/RmbIdxHis
+    Referer: https://www.chinamoney.com.cn/chinese/bkrmbidx/
+ -> 200 application/json, ~54 weekly records
+```
+
+**The limit that matters: the endpoint ignores date parameters.** Nine
+spellings were tried one at a time — `startDate`/`endDate`, `beginDate`,
+`lang=cn`, `pageSize=5000`, `pageNo`, `type=1`, `dateInterval=5Y`, and the bare
+call — and **all nine returned the identical rolling one-year window**
+(2025-09-15 → 2026-09-14, 54 records). Six sibling route names
+(`RmbIdx`, `RmbIdxHisCSV`, `RmbIdxChrtCSV`, `CfetsRmbIdx`, `RmbIdxList`,
+`RmbIdxHisNew`) all 404.
+
+So the series **backfills one year and accumulates forward** as the weekly
+refresh runs. It cannot reach the 2015-12 start §2.9 hoped for. The
+extend-only merge is what makes the accumulation safe. The documented
+`bmkidxrud` article-list fallback **404s** and should be struck.
+
+### 3.2 `corp_mlt_loans_yoy` — SOURCED, and §2.6's caution was misplaced
+
+§2.6 warned that the figure might describe 各项贷款 rather than 企事业单位贷款.
+Printing section 一 verbatim settles it — the figure sits **inside** the
+corporate section, under 分期限看:
+
+> 一、企事业单位贷款增长较为平稳2025年三季度末，本外币**企事业单位**贷款余额
+> 184.3万亿元，同比增长8.2%…**分期限看**，短期贷款及票据融资余额62.77万亿元…
+> **中长期贷款余额117.89万亿元，同比增长7.8%**…
+
+It is the corporate cut. The decomposition checks: 62.77 + 117.89 = 180.66
+against a corporate total of 184.3, the remainder being 各项垫款 and similar.
+The parser anchors on the section heading and asserts that identity, so a
+future rewrite of the prose fails loudly instead of silently picking one of the
+**six** other 中长期贷款余额 figures the same article states (industry, heavy
+industry, light industry, services, property, infrastructure).
+
+Both pbc.gov.cn and the gov.cn mirror serve identical text; PBoC was reachable
+from the runner throughout, so the mirror is a fallback rather than a necessity.
+
+### 3.3 `household_time_deposit_share` — NOT SOURCEABLE, for a new reason
+
+§2.5 called this "PDF parse only, Medium–Hard." The parse is in fact **easy** —
+`pdfplumber` extracts the lines cleanly as text:
+
+```
+1.住户存款 Deposits of Households      1265275.07 1273200.73 …
+（1）活期存款 Demand Deposits           396348.74  379553.56 …
+（2）定期及其他存款 Time & Other Deposits 868926.33  893647.17 …
+```
+
+One file carries **twelve monthly columns**, and the year node names nine
+sibling tables, of which the fourth is 金融机构人民币信贷收支表.
+
+**The blocker is discovery, not parsing.** pbc.gov.cn exposes a node for the
+current year only:
+
+| URL | Result |
+|---|---|
+| `…/116219/116319/2026ntjsj/jrjgxdsztj/index.html` | **200**, 9 PDFs |
+| `…/116219/116319/2025ntjsj/jrjgxdsztj/index.html` | 404 |
+| `…/116219/116319/2024ntjsj/…` · `2023ntjsj/…` | 404 |
+| statistics hub, scanned for per-year links | **0 found** (63 links, none per-year) |
+
+Archival PDFs are addressed by *publication* date, not content year — the
+asset verified in §2.5 was published 2025-11 and contains **2023** data — so
+there is no enumerable path from a year to its file. A series built from the
+one reachable node would be a single year, which cannot be z-scored. **This
+stays unsourced, and the registry now states this reason rather than the
+earlier guess.**
+
+### 3.4 `cgb_1y` 2015-06 — the sanity gate was wrong, not the data
+
+The gate flagged 2015-06 = 1.7727 as "likely a mis-parsed row." Re-fetching
+June 2015 from ChinaBond returned **all 21 values identical to the ones held**,
+to four decimals, mean 1.7727. The published curve genuinely kinks: on
+2015-06-01 the 国债 curve reads 3M 2.0238, 6M 2.0627, **1Y 1.9947**, 3Y 2.9240 —
+the one-year point below both shorter tenors and 93bp below the three-year.
+
+The daily path rules out a bad row independently: the 3-year and 10-year sit
+flat while only the 1-year makes a smooth six-week excursion down to 1.6407 and
+back. The whole of 2015 H2 runs anomalously steep (1y–3y at −5.6σ in June,
+−2.4σ to −2.7σ in July–September), which is a property of the published curve.
+
+**The defect was in the check.** It compared monthly means, which is the wrong
+resolution in both directions — a genuine multi-week move makes the trough
+month look like a spike, and averaging thirty days dilutes one genuinely bad
+row below the threshold. Moving it to daily resolution cleared this and the
+July 2011 SHIBOR flag (the real mid-2011 squeeze), and immediately surfaced a
+**real** defect the monthly check had been hiding: see §3.5.
+
+### 3.5 A bug the probes found that nobody was looking for
+
+`ClsYldCurvHis` **ignores its `termId` parameter** and returns the entire curve
+for every date in the window — roughly nineteen tenors a day, newest first:
+
+```json
+{"newDateValueCN":"2026-09-09","yearTermStr":"5.0","maturityYieldStr":"1.7848", …}
+{"newDateValueCN":"2026-09-09","yearTermStr":"3.0","maturityYieldStr":"1.6943", …}
+```
+
+The fetcher read a yield out of every record without checking `yearTermStr`, so
+it collected whichever tenors happened to land in a `pageSize=50` page. The
+stored "3-year AA+ note yield" was the **15-year** point on some dates and the
+**5-year** on others, and `credit_spread_aa` was built on top of it.
+
+Nothing about the output looked wrong — every value was a real yield off a real
+curve. This is the fourth bug in this project of exactly that shape, and the
+third caused by **trusting a request to constrain a response** rather than
+verifying the reply (the others: a rating matched by substring, and a date
+format assumed rather than read). `mtn_aa_3y` and `ncd_1y_aaa` were purged and
+refetched against a tenor-verified parser.

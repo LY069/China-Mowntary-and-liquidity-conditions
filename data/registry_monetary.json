@@ -1,339 +1,339 @@
 {
-  "m1_yoy": {
-    "name": "M1 growth",
-    "name_zh": "M1同比",
-    "block": "monetary",
-    "group": "Money & deposits",
-    "unit": "% y/y",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": true,
-    "read": "Narrow money held largely by corporates. Accelerating M1 means cash is moving into transaction balances — firms are paying, restocking and investing rather than parking money in term deposits.",
-    "implications": {
-      "growth": "Classic 2-3 quarter leading indicator of nominal activity, industrial profits and PPI. A sustained M1 upturn is the single best confirmation that easing is reaching corporate balance sheets.",
-      "inflation": "Leads PPI more reliably than CPI in China. Persistent sub-zero M1 is a deflation warning.",
-      "policy": "Weak M1 alongside adequate M2 tells the PBoC that liquidity is being supplied but not activated — argues for demand-side/fiscal action rather than more rate cuts."
-    },
-    "false_signals": "Two large breaks: the 2024 crackdown on manual interest supplementation (手工补息) pushed corporate demand deposits out of M1 into wealth products, and the January 2025 redefinition added household demand deposits and non-bank payment institutions' client reserves. Pre- and post-2025 M1 are not the same aggregate — never read the level shift as an economic signal."
+ "m1_yoy": {
+  "name": "M1 growth",
+  "name_zh": "M1同比",
+  "block": "monetary",
+  "group": "Money & deposits",
+  "unit": "% y/y",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": true,
+  "read": "Narrow money held largely by corporates. Accelerating M1 means cash is moving into transaction balances — firms are paying, restocking and investing rather than parking money in term deposits.",
+  "implications": {
+   "growth": "Classic 2-3 quarter leading indicator of nominal activity, industrial profits and PPI. A sustained M1 upturn is the single best confirmation that easing is reaching corporate balance sheets.",
+   "inflation": "Leads PPI more reliably than CPI in China. Persistent sub-zero M1 is a deflation warning.",
+   "policy": "Weak M1 alongside adequate M2 tells the PBoC that liquidity is being supplied but not activated — argues for demand-side/fiscal action rather than more rate cuts."
   },
-  "m2_yoy": {
-    "name": "M2 growth",
-    "name_zh": "M2同比",
-    "block": "monetary",
-    "group": "Money & deposits",
-    "unit": "% y/y",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": true,
-    "read": "Broad money. Now largely a mirror of bank credit creation and government bond issuance rather than an independent policy target.",
-    "implications": {
-      "growth": "Weak direct read on growth. Its information content is mostly in the gap to nominal GDP growth — a widening positive gap means money is accumulating faster than it is being spent.",
-      "inflation": "The historical M2-to-inflation link has broken down; velocity has fallen persistently. Treat high M2 growth with deflation as evidence of a velocity/confidence problem, not latent inflation.",
-      "policy": "The PBoC formally de-emphasised M2/TSF quantity targets in the 2024 framework reform. A miss versus nominal GDP growth no longer mechanically triggers action."
-    },
-    "false_signals": "Inflated by government bond issuance and by deposit migration between bank and non-bank channels. M2 can accelerate purely because wealth-management money returns to deposits, with no new credit created."
+  "false_signals": "Two large breaks: the 2024 crackdown on manual interest supplementation (手工补息) pushed corporate demand deposits out of M1 into wealth products, and the January 2025 redefinition added household demand deposits and non-bank payment institutions' client reserves. Pre- and post-2025 M1 are not the same aggregate — never read the level shift as an economic signal."
+ },
+ "m2_yoy": {
+  "name": "M2 growth",
+  "name_zh": "M2同比",
+  "block": "monetary",
+  "group": "Money & deposits",
+  "unit": "% y/y",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": true,
+  "read": "Broad money. Now largely a mirror of bank credit creation and government bond issuance rather than an independent policy target.",
+  "implications": {
+   "growth": "Weak direct read on growth. Its information content is mostly in the gap to nominal GDP growth — a widening positive gap means money is accumulating faster than it is being spent.",
+   "inflation": "The historical M2-to-inflation link has broken down; velocity has fallen persistently. Treat high M2 growth with deflation as evidence of a velocity/confidence problem, not latent inflation.",
+   "policy": "The PBoC formally de-emphasised M2/TSF quantity targets in the 2024 framework reform. A miss versus nominal GDP growth no longer mechanically triggers action."
   },
-  "m1_m2_gap": {
-    "name": "M1 − M2 gap (scissors gap)",
-    "name_zh": "M1-M2剪刀差",
-    "block": "monetary",
-    "group": "Money & deposits",
-    "unit": "pp",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": true,
-    "derived": "m1_yoy - m2_yoy",
-    "read": "The corporate animal-spirits gauge. Negative and widening means money is being created but sits idle in term deposits; positive and widening means it is being mobilised into transactions.",
-    "implications": {
-      "growth": "One of the better China-specific leading indicators for industrial profits and the inventory cycle, typically leading by 2-3 quarters.",
-      "inflation": "A sustained deeply negative gap is consistent with entrenched deflation — the hallmark of a balance-sheet recession where money is hoarded.",
-      "policy": "A deeply negative gap is the strongest quantitative argument that monetary transmission is impaired and that the binding constraint is demand, not supply, of credit."
-    },
-    "false_signals": "Inherits both M1 breaks. The 2024-25 distortions mean the level of the gap is not comparable with pre-2024 history; watch the direction of change instead."
+  "false_signals": "Inflated by government bond issuance and by deposit migration between bank and non-bank channels. M2 can accelerate purely because wealth-management money returns to deposits, with no new credit created."
+ },
+ "m1_m2_gap": {
+  "name": "M1 − M2 gap (scissors gap)",
+  "name_zh": "M1-M2剪刀差",
+  "block": "monetary",
+  "group": "Money & deposits",
+  "unit": "pp",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": true,
+  "derived": "m1_yoy - m2_yoy",
+  "read": "The corporate animal-spirits gauge. Negative and widening means money is being created but sits idle in term deposits; positive and widening means it is being mobilised into transactions.",
+  "implications": {
+   "growth": "One of the better China-specific leading indicators for industrial profits and the inventory cycle, typically leading by 2-3 quarters.",
+   "inflation": "A sustained deeply negative gap is consistent with entrenched deflation — the hallmark of a balance-sheet recession where money is hoarded.",
+   "policy": "A deeply negative gap is the strongest quantitative argument that monetary transmission is impaired and that the binding constraint is demand, not supply, of credit."
   },
-  "tsf_stock_yoy": {
-    "name": "Total social financing, stock",
-    "name_zh": "社会融资规模存量同比",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "% y/y",
-    "freq": "Q",
-    "looser_when": "higher",
-    "core": true,
-    "read": "The broadest measure of credit supplied to the real economy — bank loans plus bonds, shadow credit, equity and government bonds. The PBoC's preferred headline aggregate.",
-    "implications": {
-      "growth": "The level of TSF growth relative to nominal GDP growth defines whether leverage is rising or falling. Growth above nominal GDP growth means the economy is releveraging.",
-      "inflation": "Indirect. Works through the credit-to-demand channel with a long and currently unreliable lag.",
-      "policy": "The PBoC's stated aim is TSF growth 'broadly matching' nominal GDP growth. A sustained shortfall is the clearest official trigger for easing."
-    },
-    "false_signals": "Increasingly driven by government bond issuance rather than private credit demand. Always decompose: TSF excluding government bonds is the true read on private-sector credit appetite. The LGFV debt swap (化债) also mechanically shrinks measured credit as hidden debt is refinanced into bonds.",
-    "notes": "Quarterly in this build: the only verified source is the quarterly PBoC Monetary Policy Report. The published series is monthly."
+  "false_signals": "Inherits both M1 breaks. The 2024-25 distortions mean the level of the gap is not comparable with pre-2024 history; watch the direction of change instead."
+ },
+ "tsf_stock_yoy": {
+  "name": "Total social financing, stock",
+  "name_zh": "社会融资规模存量同比",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "% y/y",
+  "freq": "Q",
+  "looser_when": "higher",
+  "core": true,
+  "read": "The broadest measure of credit supplied to the real economy — bank loans plus bonds, shadow credit, equity and government bonds. The PBoC's preferred headline aggregate.",
+  "implications": {
+   "growth": "The level of TSF growth relative to nominal GDP growth defines whether leverage is rising or falling. Growth above nominal GDP growth means the economy is releveraging.",
+   "inflation": "Indirect. Works through the credit-to-demand channel with a long and currently unreliable lag.",
+   "policy": "The PBoC's stated aim is TSF growth 'broadly matching' nominal GDP growth. A sustained shortfall is the clearest official trigger for easing."
   },
-  "tsf_flow": {
-    "name": "TSF new flow",
-    "name_zh": "新增社融",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "RMB bn",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": false,
-    "read": "Monthly gross new financing to the real economy. Highly seasonal — January is always the 'good start' (开门红) surge.",
-    "implications": {
-      "growth": "Only meaningful year-on-year or as a 12-month rolling sum. The composition matters more than the total.",
-      "inflation": "Minimal direct read.",
-      "policy": "Large downside surprises reliably precede policy support announcements."
-    },
-    "false_signals": "Never compare month-on-month. Quarter-end and year-start window dressing, plus bill financing (票据融资) used to hit quotas, distort the monthly print.",
-    "stateless": "Strongly seasonal monthly flow. A z-score against unadjusted history conflates the seasonal pattern — the January 'good start' surge, quarter-end window dressing — with a genuine change in conditions. Judge it through the credit impulse, which is built from the 12-month rolling sum.",
-    "stateless_label": "Seasonal flow"
+  "false_signals": "Increasingly driven by government bond issuance rather than private credit demand. Always decompose: TSF excluding government bonds is the true read on private-sector credit appetite. The LGFV debt swap (化债) also mechanically shrinks measured credit as hidden debt is refinanced into bonds.",
+  "notes": "Quarterly in this build: the only verified source is the quarterly PBoC Monetary Policy Report. The published series is monthly."
+ },
+ "tsf_flow": {
+  "name": "TSF new flow",
+  "name_zh": "新增社融",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "RMB bn",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": false,
+  "read": "Monthly gross new financing to the real economy. Highly seasonal — January is always the 'good start' (开门红) surge.",
+  "implications": {
+   "growth": "Only meaningful year-on-year or as a 12-month rolling sum. The composition matters more than the total.",
+   "inflation": "Minimal direct read.",
+   "policy": "Large downside surprises reliably precede policy support announcements."
   },
-  "new_loans": {
-    "name": "New RMB loans",
-    "name_zh": "新增人民币贷款",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "RMB bn",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": false,
-    "read": "The bank-credit core of TSF. The quality read is in the split: corporate medium-and-long-term loans signal genuine capex; bill financing signals quota-filling.",
-    "implications": {
-      "growth": "Corporate MLT loan growth is the component that maps to fixed asset investment. Household MLT loans map to the property cycle.",
-      "inflation": "Indirect, via demand.",
-      "policy": "A print dominated by bills tells the PBoC that banks cannot find borrowers — a signal that rate cuts alone will not work."
-    },
-    "false_signals": "Bill financing surges flatter the headline while signalling the opposite of credit strength. Always strip bills before drawing a conclusion.",
-    "stateless": "Strongly seasonal monthly flow. A z-score against unadjusted history conflates the seasonal pattern — the January 'good start' surge, quarter-end window dressing — with a genuine change in conditions. Judge it through the credit impulse, which is built from the 12-month rolling sum.",
-    "stateless_label": "Seasonal flow"
+  "false_signals": "Never compare month-on-month. Quarter-end and year-start window dressing, plus bill financing (票据融资) used to hit quotas, distort the monthly print.",
+  "stateless": "Strongly seasonal monthly flow. A z-score against unadjusted history conflates the seasonal pattern — the January 'good start' surge, quarter-end window dressing — with a genuine change in conditions. Judge it through the credit impulse, which is built from the 12-month rolling sum.",
+  "stateless_label": "Seasonal flow"
+ },
+ "new_loans": {
+  "name": "New RMB loans",
+  "name_zh": "新增人民币贷款",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "RMB bn",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": false,
+  "read": "The bank-credit core of TSF. The quality read is in the split: corporate medium-and-long-term loans signal genuine capex; bill financing signals quota-filling.",
+  "implications": {
+   "growth": "Corporate MLT loan growth is the component that maps to fixed asset investment. Household MLT loans map to the property cycle.",
+   "inflation": "Indirect, via demand.",
+   "policy": "A print dominated by bills tells the PBoC that banks cannot find borrowers — a signal that rate cuts alone will not work."
   },
-  "credit_impulse": {
-    "name": "Credit impulse",
-    "name_zh": "信贷脉冲",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "pp of GDP",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": true,
-    "derived": "12m change in the 12m rolling flow of TSF, as % of nominal GDP",
-    "read": "The second derivative of credit — the change in the flow of new credit relative to GDP. It is the acceleration of credit, not its level, that moves activity.",
-    "implications": {
-      "growth": "The classic 2-3 quarter leading indicator for fixed asset investment, industrial production and commodity demand. Turning points matter more than levels.",
-      "inflation": "Historically a good lead on PPI and on global industrial commodity prices via China's investment cycle.",
-      "policy": "A negative impulse while growth targets are at risk is the standard precondition for a coordinated monetary-fiscal push."
-    },
-    "false_signals": "The credit intensity of Chinese growth has fallen sharply — the same impulse now buys less activity than a decade ago. Government-bond-driven impulses transmit far more weakly than property-driven ones."
+  "false_signals": "Bill financing surges flatter the headline while signalling the opposite of credit strength. Always strip bills before drawing a conclusion.",
+  "stateless": "Strongly seasonal monthly flow. A z-score against unadjusted history conflates the seasonal pattern — the January 'good start' surge, quarter-end window dressing — with a genuine change in conditions. Judge it through the credit impulse, which is built from the 12-month rolling sum.",
+  "stateless_label": "Seasonal flow"
+ },
+ "credit_impulse": {
+  "name": "Credit impulse",
+  "name_zh": "信贷脉冲",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "pp of GDP",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": true,
+  "derived": "12m change in the 12m rolling flow of TSF, as % of nominal GDP",
+  "read": "The second derivative of credit — the change in the flow of new credit relative to GDP. It is the acceleration of credit, not its level, that moves activity.",
+  "implications": {
+   "growth": "The classic 2-3 quarter leading indicator for fixed asset investment, industrial production and commodity demand. Turning points matter more than levels.",
+   "inflation": "Historically a good lead on PPI and on global industrial commodity prices via China's investment cycle.",
+   "policy": "A negative impulse while growth targets are at risk is the standard precondition for a coordinated monetary-fiscal push."
   },
-  "omo_7d": {
-    "name": "7-day reverse repo rate (policy rate)",
-    "name_zh": "7天期逆回购利率",
-    "block": "monetary",
-    "group": "Policy rates",
-    "unit": "%",
-    "freq": "D",
-    "looser_when": "lower",
-    "core": true,
-    "read": "Since the June 2024 framework overhaul this is the PBoC's single primary policy rate. It anchors the money market and, via the LPR, the cost of credit.",
-    "implications": {
-      "growth": "The headline stance signal. Cuts are necessary but, given weak credit demand, far from sufficient.",
-      "inflation": "With deflation, a constant nominal policy rate means passively tightening real conditions.",
-      "policy": "This is now the rate to watch for the stance. The MLF rate has been demoted to a liquidity-provision tool."
-    },
-    "false_signals": "The nominal level badly understates tightness when the GDP deflator is negative. Always read alongside the real policy rate."
+  "false_signals": "The credit intensity of Chinese growth has fallen sharply — the same impulse now buys less activity than a decade ago. Government-bond-driven impulses transmit far more weakly than property-driven ones."
+ },
+ "omo_7d": {
+  "name": "7-day reverse repo rate (policy rate)",
+  "name_zh": "7天期逆回购利率",
+  "block": "monetary",
+  "group": "Policy rates",
+  "unit": "%",
+  "freq": "D",
+  "looser_when": "lower",
+  "core": true,
+  "read": "Since the June 2024 framework overhaul this is the PBoC's single primary policy rate. It anchors the money market and, via the LPR, the cost of credit.",
+  "implications": {
+   "growth": "The headline stance signal. Cuts are necessary but, given weak credit demand, far from sufficient.",
+   "inflation": "With deflation, a constant nominal policy rate means passively tightening real conditions.",
+   "policy": "This is now the rate to watch for the stance. The MLF rate has been demoted to a liquidity-provision tool."
   },
-  "mlf_1y": {
-    "name": "1-year MLF rate",
-    "name_zh": "中期借贷便利利率",
-    "block": "monetary",
-    "group": "Policy rates",
-    "unit": "%",
-    "freq": "M",
-    "looser_when": "lower",
-    "core": false,
-    "read": "Formerly the medium-term policy anchor and the LPR reference. Explicitly demoted in 2024 to a pure liquidity-provision instrument priced by multi-price bidding.",
-    "implications": {
-      "growth": "Historical relevance only; no longer the stance signal.",
-      "inflation": "n/a",
-      "policy": "Still useful as the reference against which bank marginal funding (NCD rates) is judged."
-    },
-    "false_signals": "Treating an MLF move as a stance change is now a category error. Watch the 7-day OMO rate instead.",
-    "valid_to": "2025-03",
-    "notes": "Series ENDS March 2025 by construction. From that month's operation the PBoC moved the MLF to multiple-price bidding, so no single announced MLF rate exists thereafter. Forward-filling past this point invents a policy rate, and any spread computed against it is meaningless — which is why ncd_mlf_spread is expected to be unbuildable for recent periods."
+  "false_signals": "The nominal level badly understates tightness when the GDP deflator is negative. Always read alongside the real policy rate."
+ },
+ "mlf_1y": {
+  "name": "1-year MLF rate",
+  "name_zh": "中期借贷便利利率",
+  "block": "monetary",
+  "group": "Policy rates",
+  "unit": "%",
+  "freq": "M",
+  "looser_when": "lower",
+  "core": false,
+  "read": "Formerly the medium-term policy anchor and the LPR reference. Explicitly demoted in 2024 to a pure liquidity-provision instrument priced by multi-price bidding.",
+  "implications": {
+   "growth": "Historical relevance only; no longer the stance signal.",
+   "inflation": "n/a",
+   "policy": "Still useful as the reference against which bank marginal funding (NCD rates) is judged."
   },
-  "lpr_1y": {
-    "name": "Loan prime rate, 1-year",
-    "name_zh": "1年期LPR",
-    "block": "monetary",
-    "group": "Policy rates",
-    "unit": "%",
-    "freq": "M",
-    "looser_when": "lower",
-    "core": true,
-    "read": "The benchmark for corporate working-capital lending, quoted monthly by 20 banks as a spread over the policy rate.",
-    "implications": {
-      "growth": "The direct pass-through channel to corporate borrowing costs.",
-      "inflation": "Indirect.",
-      "policy": "Pass-through is constrained by bank net interest margins, which are at historic lows — this is now the binding limit on how far the LPR can fall."
-    },
-    "false_signals": "The quoted LPR understates actual easing — the weighted average lending rate has fallen further than the LPR as banks compete for scarce good borrowers."
+  "false_signals": "Treating an MLF move as a stance change is now a category error. Watch the 7-day OMO rate instead.",
+  "valid_to": "2025-03",
+  "notes": "Series ENDS March 2025 by construction. From that month's operation the PBoC moved the MLF to multiple-price bidding, so no single announced MLF rate exists thereafter. Forward-filling past this point invents a policy rate, and any spread computed against it is meaningless — which is why ncd_mlf_spread is expected to be unbuildable for recent periods."
+ },
+ "lpr_1y": {
+  "name": "Loan prime rate, 1-year",
+  "name_zh": "1年期LPR",
+  "block": "monetary",
+  "group": "Policy rates",
+  "unit": "%",
+  "freq": "M",
+  "looser_when": "lower",
+  "core": true,
+  "read": "The benchmark for corporate working-capital lending, quoted monthly by 20 banks as a spread over the policy rate.",
+  "implications": {
+   "growth": "The direct pass-through channel to corporate borrowing costs.",
+   "inflation": "Indirect.",
+   "policy": "Pass-through is constrained by bank net interest margins, which are at historic lows — this is now the binding limit on how far the LPR can fall."
   },
-  "lpr_5y": {
-    "name": "Loan prime rate, 5-year",
-    "name_zh": "5年期以上LPR",
-    "block": "monetary",
-    "group": "Policy rates",
-    "unit": "%",
-    "freq": "M",
-    "looser_when": "lower",
-    "core": true,
-    "read": "The mortgage and long-term investment benchmark — in practice the property policy rate.",
-    "implications": {
-      "growth": "The main monetary lever on the property cycle, which remains the dominant swing factor in Chinese domestic demand.",
-      "inflation": "Works on housing-related demand and, through the collateral channel, on household confidence.",
-      "policy": "Asymmetric 5-year cuts are the PBoC's standard way of easing property without easing broad credit."
-    },
-    "false_signals": "Cuts do little when the constraint is expected house-price declines rather than the cost of finance — the real mortgage rate can rise even as the nominal LPR falls."
+  "false_signals": "The quoted LPR understates actual easing — the weighted average lending rate has fallen further than the LPR as banks compete for scarce good borrowers."
+ },
+ "lpr_5y": {
+  "name": "Loan prime rate, 5-year",
+  "name_zh": "5年期以上LPR",
+  "block": "monetary",
+  "group": "Policy rates",
+  "unit": "%",
+  "freq": "M",
+  "looser_when": "lower",
+  "core": true,
+  "read": "The mortgage and long-term investment benchmark — in practice the property policy rate.",
+  "implications": {
+   "growth": "The main monetary lever on the property cycle, which remains the dominant swing factor in Chinese domestic demand.",
+   "inflation": "Works on housing-related demand and, through the collateral channel, on household confidence.",
+   "policy": "Asymmetric 5-year cuts are the PBoC's standard way of easing property without easing broad credit."
   },
-  "walr_general": {
-    "name": "Weighted average lending rate, general loans",
-    "name_zh": "一般贷款加权平均利率",
-    "block": "monetary",
-    "group": "Policy rates",
-    "unit": "%",
-    "freq": "Q",
-    "looser_when": "lower",
-    "core": true,
-    "read": "The actual price the real economy pays for credit, from the PBoC Monetary Policy Report. The single truest measure of the cost of credit — better than any policy or benchmark rate.",
-    "implications": {
-      "growth": "The rate that actually enters firms' investment decisions.",
-      "inflation": "Deflated by the GDP deflator this is the key real cost-of-capital variable.",
-      "policy": "The PBoC cites this series as evidence of successful transmission. Its floor is set by bank margin viability."
-    },
-    "false_signals": "Falling WALR can reflect a shift in the borrower mix toward state-owned and policy-favoured borrowers rather than genuine easing for the marginal private borrower."
+  "false_signals": "Cuts do little when the constraint is expected house-price declines rather than the cost of finance — the real mortgage rate can rise even as the nominal LPR falls."
+ },
+ "walr_general": {
+  "name": "Weighted average lending rate, general loans",
+  "name_zh": "一般贷款加权平均利率",
+  "block": "monetary",
+  "group": "Policy rates",
+  "unit": "%",
+  "freq": "Q",
+  "looser_when": "lower",
+  "core": true,
+  "read": "The actual price the real economy pays for credit, from the PBoC Monetary Policy Report. The single truest measure of the cost of credit — better than any policy or benchmark rate.",
+  "implications": {
+   "growth": "The rate that actually enters firms' investment decisions.",
+   "inflation": "Deflated by the GDP deflator this is the key real cost-of-capital variable.",
+   "policy": "The PBoC cites this series as evidence of successful transmission. Its floor is set by bank margin viability."
   },
-  "real_policy_rate": {
-    "name": "Real policy rate (CPI-deflated)",
-    "name_zh": "实际政策利率",
-    "block": "monetary",
-    "group": "Real rates",
-    "unit": "%",
-    "freq": "M",
-    "looser_when": "lower",
-    "core": true,
-    "derived": "omo_7d - cpi_yoy",
-    "read": "The 7-day policy rate deflated by headline CPI. The stance as borrowers and savers actually experience it. A core-CPI version is also built where data allows; with core inflation near zero the two tell a similar story.",
-    "implications": {
-      "growth": "What matters for intertemporal decisions. A rising real rate tightens even as the nominal rate falls.",
-      "inflation": "Self-reinforcing: falling inflation raises the real rate, which suppresses demand and lowers inflation further — the debt-deflation trap.",
-      "policy": "The core argument for front-loaded, larger nominal cuts. Passivity is not neutrality when prices are falling."
-    },
-    "false_signals": "The choice of deflator changes the answer materially. Core CPI gives the mildest read, the GDP deflator the harshest. Show more than one."
+  "false_signals": "Falling WALR can reflect a shift in the borrower mix toward state-owned and policy-favoured borrowers rather than genuine easing for the marginal private borrower."
+ },
+ "real_policy_rate": {
+  "name": "Real policy rate (CPI-deflated)",
+  "name_zh": "实际政策利率",
+  "block": "monetary",
+  "group": "Real rates",
+  "unit": "%",
+  "freq": "M",
+  "looser_when": "lower",
+  "core": true,
+  "derived": "omo_7d - cpi_yoy",
+  "read": "The 7-day policy rate deflated by headline CPI. The stance as borrowers and savers actually experience it. A core-CPI version is also built where data allows; with core inflation near zero the two tell a similar story.",
+  "implications": {
+   "growth": "What matters for intertemporal decisions. A rising real rate tightens even as the nominal rate falls.",
+   "inflation": "Self-reinforcing: falling inflation raises the real rate, which suppresses demand and lowers inflation further — the debt-deflation trap.",
+   "policy": "The core argument for front-loaded, larger nominal cuts. Passivity is not neutrality when prices are falling."
   },
-  "real_lending_rate": {
-    "name": "Real lending rate (CPI-deflated)",
-    "name_zh": "实际贷款利率",
-    "block": "monetary",
-    "group": "Real rates",
-    "unit": "%",
-    "freq": "Q",
-    "looser_when": "lower",
-    "core": true,
-    "derived": "walr_general - cpi_yoy",
-    "read": "The weighted average rate actually paid on general loans, deflated by consumer prices. The most policy-relevant cost-of-capital measure available. The GDP-deflator version is the theoretically preferred construction but is not built here — the December 2024 economic census revised the nominal GDP base, so a deflator spanning that break would be wrong.",
-    "implications": {
-      "growth": "Directly measures the burden on corporate borrowers. High and rising real lending rates with falling nominal rates is the signature of a debt-deflation dynamic.",
-      "inflation": "A high real rate suppresses investment and wages, reinforcing deflation.",
-      "policy": "The strongest quantitative case for decisive easing. Nominal cuts that merely track falling inflation deliver no easing at all."
-    },
-    "false_signals": "CPI understates China's deflation relative to the GDP deflator or PPI, so this series is the mildest of the three real-rate reads. Check the PPI-deflated version alongside it — for industrial borrowers that is the rate that bites."
+  "false_signals": "The choice of deflator changes the answer materially. Core CPI gives the mildest read, the GDP deflator the harshest. Show more than one."
+ },
+ "real_lending_rate": {
+  "name": "Real lending rate (CPI-deflated)",
+  "name_zh": "实际贷款利率",
+  "block": "monetary",
+  "group": "Real rates",
+  "unit": "%",
+  "freq": "Q",
+  "looser_when": "lower",
+  "core": true,
+  "derived": "walr_general - cpi_yoy",
+  "read": "The weighted average rate actually paid on general loans, deflated by consumer prices. The most policy-relevant cost-of-capital measure available. The GDP-deflator version is the theoretically preferred construction but is not built here — the December 2024 economic census revised the nominal GDP base, so a deflator spanning that break would be wrong.",
+  "implications": {
+   "growth": "Directly measures the burden on corporate borrowers. High and rising real lending rates with falling nominal rates is the signature of a debt-deflation dynamic.",
+   "inflation": "A high real rate suppresses investment and wages, reinforcing deflation.",
+   "policy": "The strongest quantitative case for decisive easing. Nominal cuts that merely track falling inflation deliver no easing at all."
   },
-  "rrr_large": {
-    "name": "Reserve requirement ratio, large banks",
-    "name_zh": "大型存款类机构存款准备金率",
-    "block": "monetary",
-    "group": "Quantity instruments",
-    "unit": "%",
-    "freq": "D",
-    "looser_when": "lower",
-    "core": true,
-    "read": "The share of deposits banks must hold at the PBoC. Cuts release permanent, zero-cost long-term liquidity — distinct from the temporary liquidity of OMOs.",
-    "implications": {
-      "growth": "Works by relieving the funding constraint and supporting bank margins rather than by lowering the price of credit.",
-      "inflation": "Minimal direct effect.",
-      "policy": "Highly visible signalling tool. The PBoC has indicated a practical floor around 5%, so the remaining room is finite and shrinking."
-    },
-    "false_signals": "A cut is often mistaken for a stance change. When credit demand is weak, released liquidity simply accumulates as excess reserves or flows into bonds."
+  "false_signals": "CPI understates China's deflation relative to the GDP deflator or PPI, so this series is the mildest of the three real-rate reads. Check the PPI-deflated version alongside it — for industrial borrowers that is the rate that bites."
+ },
+ "rrr_large": {
+  "name": "Reserve requirement ratio, large banks",
+  "name_zh": "大型存款类机构存款准备金率",
+  "block": "monetary",
+  "group": "Quantity instruments",
+  "unit": "%",
+  "freq": "D",
+  "looser_when": "lower",
+  "core": true,
+  "read": "The share of deposits banks must hold at the PBoC. Cuts release permanent, zero-cost long-term liquidity — distinct from the temporary liquidity of OMOs.",
+  "implications": {
+   "growth": "Works by relieving the funding constraint and supporting bank margins rather than by lowering the price of credit.",
+   "inflation": "Minimal direct effect.",
+   "policy": "Highly visible signalling tool. The PBoC has indicated a practical floor around 5%, so the remaining room is finite and shrinking."
   },
-  "usdcny": {
-    "name": "USD/CNY",
-    "name_zh": "美元对人民币",
-    "block": "monetary",
-    "group": "Exchange rate",
-    "unit": "CNY per USD",
-    "freq": "D",
-    "looser_when": "higher",
-    "core": false,
-    "read": "A higher print is a weaker renminbi, which loosens monetary conditions via net exports.",
-    "implications": {
-      "growth": "Depreciation supports the export channel, which has been the main offset to weak domestic demand.",
-      "inflation": "Imported inflation via commodities, but the pass-through to Chinese CPI is modest.",
-      "policy": "FX stability is a hard constraint. A weakening currency and a wide US-China rate differential limit how far the PBoC can cut without triggering outflows."
-    },
-    "false_signals": "Bilateral USD/CNY conflates dollar strength with renminbi weakness. Judge the renminbi against the CFETS basket, not the dollar.",
-    "history_from": "2005-07",
-    "notes": "Trimmed to July 2005, the start of the managed float. Earlier history exists in the source but is not comparable: the rate was pegged at 8.28 for the decade before that, and was a dual-track administered rate before the 1994 unification. Including it would make the z-score measure a regime change rather than currency conditions."
+  "false_signals": "A cut is often mistaken for a stance change. When credit demand is weak, released liquidity simply accumulates as excess reserves or flows into bonds."
+ },
+ "usdcny": {
+  "name": "USD/CNY",
+  "name_zh": "美元对人民币",
+  "block": "monetary",
+  "group": "Exchange rate",
+  "unit": "CNY per USD",
+  "freq": "D",
+  "looser_when": "higher",
+  "core": false,
+  "read": "A higher print is a weaker renminbi, which loosens monetary conditions via net exports.",
+  "implications": {
+   "growth": "Depreciation supports the export channel, which has been the main offset to weak domestic demand.",
+   "inflation": "Imported inflation via commodities, but the pass-through to Chinese CPI is modest.",
+   "policy": "FX stability is a hard constraint. A weakening currency and a wide US-China rate differential limit how far the PBoC can cut without triggering outflows."
   },
-  "cfets": {
-    "name": "CFETS RMB index",
-    "name_zh": "CFETS人民币汇率指数",
-    "block": "monetary",
-    "group": "Exchange rate",
-    "unit": "index",
-    "freq": "W",
-    "looser_when": "lower",
-    "core": true,
-    "read": "The trade-weighted renminbi against a basket of 25 currencies — the PBoC's own preferred measure and the true competitiveness signal.",
-    "implications": {
-      "growth": "A falling basket index is genuine loosening of external monetary conditions.",
-      "inflation": "The relevant channel for imported price pressure.",
-      "policy": "The PBoC manages the basket, not the dollar cross. Basket stability amid dollar strength implies tolerated bilateral depreciation."
-    },
-    "false_signals": "The basket can stay flat while the real effective exchange rate appreciates sharply, because China's deflation raises relative prices. In a deflation the REER is the binding measure."
+  "false_signals": "Bilateral USD/CNY conflates dollar strength with renminbi weakness. Judge the renminbi against the CFETS basket, not the dollar.",
+  "history_from": "2005-07",
+  "notes": "Trimmed to July 2005, the start of the managed float. Earlier history exists in the source but is not comparable: the rate was pegged at 8.28 for the decade before that, and was a dual-track administered rate before the 1994 unification. Including it would make the z-score measure a regime change rather than currency conditions."
+ },
+ "cfets": {
+  "name": "CFETS RMB index",
+  "name_zh": "CFETS人民币汇率指数",
+  "block": "monetary",
+  "group": "Exchange rate",
+  "unit": "index",
+  "freq": "W",
+  "looser_when": "lower",
+  "core": true,
+  "read": "The trade-weighted renminbi against a basket of 25 currencies — the PBoC's own preferred measure and the true competitiveness signal.",
+  "implications": {
+   "growth": "A falling basket index is genuine loosening of external monetary conditions.",
+   "inflation": "The relevant channel for imported price pressure.",
+   "policy": "The PBoC manages the basket, not the dollar cross. Basket stability amid dollar strength implies tolerated bilateral depreciation."
   },
-  "reer": {
-    "name": "Real effective exchange rate",
-    "name_zh": "实际有效汇率",
-    "block": "monetary",
-    "group": "Exchange rate",
-    "unit": "index",
-    "freq": "M",
-    "looser_when": "lower",
-    "core": true,
-    "read": "The trade-weighted renminbi adjusted for relative price levels — the true measure of external competitiveness and the FX component of any monetary conditions index.",
-    "implications": {
-      "growth": "The correct external-demand variable. REER appreciation tightens monetary conditions.",
-      "inflation": "Appreciation is disinflationary; in China's case it compounds domestic deflation.",
-      "policy": "REER depreciation via domestic deflation is the wrong kind of competitiveness gain — it signals the deflation problem rather than solving it."
-    },
-    "false_signals": "Different providers (BIS broad vs narrow, IMF, Bruegel) give materially different levels. Be consistent about which series is used."
+  "false_signals": "The basket can stay flat while the real effective exchange rate appreciates sharply, because China's deflation raises relative prices. In a deflation the REER is the binding measure. History is limited: CFETS serves only a rolling one-year window, so this series accumulates forward from first fetch and cannot be z-scored against a long history yet."
+ },
+ "reer": {
+  "name": "Real effective exchange rate",
+  "name_zh": "实际有效汇率",
+  "block": "monetary",
+  "group": "Exchange rate",
+  "unit": "index",
+  "freq": "M",
+  "looser_when": "lower",
+  "core": true,
+  "read": "The trade-weighted renminbi adjusted for relative price levels — the true measure of external competitiveness and the FX component of any monetary conditions index.",
+  "implications": {
+   "growth": "The correct external-demand variable. REER appreciation tightens monetary conditions.",
+   "inflation": "Appreciation is disinflationary; in China's case it compounds domestic deflation.",
+   "policy": "REER depreciation via domestic deflation is the wrong kind of competitiveness gain — it signals the deflation problem rather than solving it."
   },
-  "tsf_minus_ngdp": {
-    "name": "TSF growth − nominal GDP growth",
-    "name_zh": "社融增速与名义GDP增速之差",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "pp",
-    "freq": "Q",
-    "looser_when": "higher",
-    "core": true,
-    "derived": "tsf_stock_yoy - nominal_gdp_yoy",
-    "read": "The PBoC's own stated benchmark: credit growth 'broadly matching' nominal GDP growth. The gap is the cleanest measure of whether the economy is releveraging or deleveraging.",
-    "implications": {
-      "growth": "A positive gap means debt is growing faster than the income available to service it. Sustained positive gaps in a deflation are how leverage ratios spiral.",
-      "inflation": "A persistent positive gap with no inflation is evidence that credit is financing balance-sheet repair and asset purchases rather than spending.",
-      "policy": "The ratio the PBoC watches to judge whether the quantity of credit is appropriate."
-    },
-    "false_signals": "Widens mechanically in a deflation even with no change in credit policy, because nominal GDP growth collapses. Decompose before concluding that credit policy has loosened."
-  }
+  "false_signals": "Different providers (BIS broad vs narrow, IMF, Bruegel) give materially different levels. Be consistent about which series is used."
+ },
+ "tsf_minus_ngdp": {
+  "name": "TSF growth − nominal GDP growth",
+  "name_zh": "社融增速与名义GDP增速之差",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "pp",
+  "freq": "Q",
+  "looser_when": "higher",
+  "core": true,
+  "derived": "tsf_stock_yoy - nominal_gdp_yoy",
+  "read": "The PBoC's own stated benchmark: credit growth 'broadly matching' nominal GDP growth. The gap is the cleanest measure of whether the economy is releveraging or deleveraging.",
+  "implications": {
+   "growth": "A positive gap means debt is growing faster than the income available to service it. Sustained positive gaps in a deflation are how leverage ratios spiral.",
+   "inflation": "A persistent positive gap with no inflation is evidence that credit is financing balance-sheet repair and asset purchases rather than spending.",
+   "policy": "The ratio the PBoC watches to judge whether the quantity of credit is appropriate."
+  },
+  "false_signals": "Widens mechanically in a deflation even with no change in credit policy, because nominal GDP growth collapses. Decompose before concluding that credit policy has loosened."
+ }
 }

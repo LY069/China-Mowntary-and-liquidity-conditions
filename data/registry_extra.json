@@ -1,456 +1,473 @@
 {
-  "ncd_issuance_war": {
-    "name": "3-month NCD issuance rate",
-    "name_zh": "3个月同业存单发行利率",
-    "block": "liquidity",
-    "group": "Bank funding",
-    "unit": "%",
-    "freq": "Q",
-    "looser_when": "lower",
-    "core": true,
-    "read": "The rate banks pay to issue 3-month negotiable certificates of deposit, from the PBoC Monetary Policy Report. A direct read on the marginal cost of short-term wholesale bank funding.",
-    "implications": {
-      "growth": "Indirect. Bank funding costs set the floor under lending rates, so a sustained rise limits how far loan pricing can fall.",
-      "inflation": "None directly.",
-      "policy": "Rising NCD costs compress net interest margins, which are the binding constraint on further LPR cuts. The PBoC watches this as a transmission limit."
-    },
-    "false_signals": "This is the 3-month point, not the 1-year AAA benchmark most strategists quote, and not an all-tenor average — the two sit at different levels and are not interchangeable. Quarter-end regulatory ratios distort issuance and pricing."
+ "ncd_issuance_war": {
+  "name": "3-month NCD issuance rate",
+  "name_zh": "3个月同业存单发行利率",
+  "block": "liquidity",
+  "group": "Bank funding",
+  "unit": "%",
+  "freq": "Q",
+  "looser_when": "lower",
+  "core": true,
+  "read": "The rate banks pay to issue 3-month negotiable certificates of deposit, from the PBoC Monetary Policy Report. A direct read on the marginal cost of short-term wholesale bank funding.",
+  "implications": {
+   "growth": "Indirect. Bank funding costs set the floor under lending rates, so a sustained rise limits how far loan pricing can fall.",
+   "inflation": "None directly.",
+   "policy": "Rising NCD costs compress net interest margins, which are the binding constraint on further LPR cuts. The PBoC watches this as a transmission limit."
   },
-  "ncd_omo_spread": {
-    "name": "3m NCD − policy rate spread",
-    "name_zh": "同业存单发行利率与政策利率利差",
-    "block": "liquidity",
-    "group": "Bank funding",
-    "unit": "bp",
-    "freq": "Q",
-    "looser_when": "lower",
-    "core": true,
-    "derived": "ncd_issuance_war - omo_7d",
-    "read": "What banks pay for 3-month wholesale funding relative to the central bank's policy rate. The workable substitute for the conventional 1-year NCD versus MLF spread, now that the MLF has no single announced rate.",
-    "implications": {
-      "growth": "Indirect, via the cost and availability of bank credit.",
-      "inflation": "None directly.",
-      "policy": "A wide positive spread means market funding is dearer than central bank funding, so banks lean on PBoC facilities and pressure builds for injections. A narrow or negative spread signals genuinely ample liquidity."
-    },
-    "false_signals": "Compares a 3-month funding rate against a 7-day policy rate, so the level carries a structural term premium — read it as a change from its own history, not against zero."
+  "false_signals": "This is the 3-month point, not the 1-year AAA benchmark most strategists quote, and not an all-tenor average — the two sit at different levels and are not interchangeable. Quarter-end regulatory ratios distort issuance and pricing."
+ },
+ "ncd_omo_spread": {
+  "name": "3m NCD − policy rate spread",
+  "name_zh": "同业存单发行利率与政策利率利差",
+  "block": "liquidity",
+  "group": "Bank funding",
+  "unit": "bp",
+  "freq": "Q",
+  "looser_when": "lower",
+  "core": true,
+  "derived": "ncd_issuance_war - omo_7d",
+  "read": "What banks pay for 3-month wholesale funding relative to the central bank's policy rate. The workable substitute for the conventional 1-year NCD versus MLF spread, now that the MLF has no single announced rate.",
+  "implications": {
+   "growth": "Indirect, via the cost and availability of bank credit.",
+   "inflation": "None directly.",
+   "policy": "A wide positive spread means market funding is dearer than central bank funding, so banks lean on PBoC facilities and pressure builds for injections. A narrow or negative spread signals genuinely ample liquidity."
   },
-  "m2_level": {
-    "name": "M2 stock",
-    "name_zh": "M2余额",
-    "block": "monetary",
-    "group": "Money & deposits",
-    "unit": "RMB bn",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": false,
-    "read": "The level of broad money. Useful mainly as the denominator for velocity and for scaling against nominal GDP.",
-    "implications": {
-      "growth": "The level says little; the growth rate and the ratio to nominal GDP carry the information.",
-      "inflation": "China's M2-to-GDP ratio is among the highest in the world without corresponding inflation — the clearest single piece of evidence that the quantity theory does not describe this economy.",
-      "policy": "Context for the PBoC's shift away from quantity targets."
-    },
-    "false_signals": "A large and rising stock invites the inference that inflation must follow. It has not, for over a decade, because velocity has fallen as fast as the stock has grown.",
-    "stateless": "Trending level series. A z-score against its own history would read as permanently 'loose', because the level only ever rises — that says nothing about conditions. Read the growth rate instead.",
-    "stateless_label": "Level series"
+  "false_signals": "Compares a 3-month funding rate against a 7-day policy rate, so the level carries a structural term premium — read it as a change from its own history, not against zero."
+ },
+ "m2_level": {
+  "name": "M2 stock",
+  "name_zh": "M2余额",
+  "block": "monetary",
+  "group": "Money & deposits",
+  "unit": "RMB bn",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": false,
+  "read": "The level of broad money. Useful mainly as the denominator for velocity and for scaling against nominal GDP.",
+  "implications": {
+   "growth": "The level says little; the growth rate and the ratio to nominal GDP carry the information.",
+   "inflation": "China's M2-to-GDP ratio is among the highest in the world without corresponding inflation — the clearest single piece of evidence that the quantity theory does not describe this economy.",
+   "policy": "Context for the PBoC's shift away from quantity targets."
   },
-  "tsf_stock_level": {
-    "name": "TSF stock",
-    "name_zh": "社会融资规模存量",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "RMB bn",
-    "freq": "Q",
-    "looser_when": "higher",
-    "core": false,
-    "read": "The outstanding level of all financing to the real economy — the denominator for leverage ratios.",
-    "implications": {
-      "growth": "The ratio of this stock to nominal GDP is the macro leverage ratio, which constrains how much further credit-financed stimulus is possible.",
-      "inflation": "None directly.",
-      "policy": "The stock's growth rate against nominal GDP growth is the PBoC's stated benchmark for whether credit supply is appropriate."
-    },
-    "false_signals": "Definitional expansions over time — local government special bonds, asset-backed securities and loan write-offs were added in 2018 — mean the long history is not a consistent series.",
-    "stateless": "Trending level series. A z-score against its own history would read as permanently 'loose', because the level only ever rises — that says nothing about conditions. Read the growth rate instead.",
-    "stateless_label": "Level series"
+  "false_signals": "A large and rising stock invites the inference that inflation must follow. It has not, for over a decade, because velocity has fallen as fast as the stock has grown.",
+  "stateless": "Trending level series. A z-score against its own history would read as permanently 'loose', because the level only ever rises — that says nothing about conditions. Read the growth rate instead.",
+  "stateless_label": "Level series"
+ },
+ "tsf_stock_level": {
+  "name": "TSF stock",
+  "name_zh": "社会融资规模存量",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "RMB bn",
+  "freq": "Q",
+  "looser_when": "higher",
+  "core": false,
+  "read": "The outstanding level of all financing to the real economy — the denominator for leverage ratios.",
+  "implications": {
+   "growth": "The ratio of this stock to nominal GDP is the macro leverage ratio, which constrains how much further credit-financed stimulus is possible.",
+   "inflation": "None directly.",
+   "policy": "The stock's growth rate against nominal GDP growth is the PBoC's stated benchmark for whether credit supply is appropriate."
   },
-  "fx_reserves": {
-    "name": "FX reserves",
-    "name_zh": "外汇储备",
-    "block": "monetary",
-    "group": "Exchange rate",
-    "unit": "USD bn",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": false,
-    "read": "Official foreign exchange reserves. Historically the main channel through which balance-of-payments flows created domestic base money.",
-    "implications": {
-      "growth": "No direct read. Matters as a measure of the buffer available to defend the currency.",
-      "inflation": "Historically, reserve accumulation created base money and was sterilised through RRR increases — the reason China's RRR reached 21% in 2011.",
-      "policy": "Sharp declines signal capital outflow pressure and tighten the constraint on domestic easing. Stability around the $3.2trn mark has been a policy preference for years."
-    },
-    "false_signals": "Monthly changes are dominated by valuation effects — dollar moves and bond price changes — rather than intervention. Never read a monthly change as intervention without adjusting for valuation."
+  "false_signals": "Definitional expansions over time — local government special bonds, asset-backed securities and loan write-offs were added in 2018 — mean the long history is not a consistent series.",
+  "stateless": "Trending level series. A z-score against its own history would read as permanently 'loose', because the level only ever rises — that says nothing about conditions. Read the growth rate instead.",
+  "stateless_label": "Level series"
+ },
+ "fx_reserves": {
+  "name": "FX reserves",
+  "name_zh": "外汇储备",
+  "block": "monetary",
+  "group": "Exchange rate",
+  "unit": "USD bn",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": false,
+  "read": "Official foreign exchange reserves. Historically the main channel through which balance-of-payments flows created domestic base money.",
+  "implications": {
+   "growth": "No direct read. Matters as a measure of the buffer available to defend the currency.",
+   "inflation": "Historically, reserve accumulation created base money and was sterilised through RRR increases — the reason China's RRR reached 21% in 2011.",
+   "policy": "Sharp declines signal capital outflow pressure and tighten the constraint on domestic easing. Stability around the $3.2trn mark has been a policy preference for years."
   },
-  "rrr_small": {
-    "name": "Reserve requirement ratio, small and medium banks",
-    "name_zh": "中小型存款类机构存款准备金率",
-    "block": "monetary",
-    "group": "Quantity instruments",
-    "unit": "%",
-    "freq": "D",
-    "looser_when": "lower",
-    "core": false,
-    "read": "The reserve requirement for smaller banks, typically set 2 percentage points below the large-bank ratio, with additional targeted reductions for rural and small-business lenders.",
-    "implications": {
-      "growth": "Targeted cuts here are aimed at small and private enterprise credit, where the transmission blockage is most severe.",
-      "inflation": "Minimal direct effect.",
-      "policy": "The spread to the large-bank ratio shows how much of policy is structural and targeted rather than aggregate."
-    },
-    "false_signals": "The headline ratio understates actual easing for the smallest institutions, many of which already sit at the 5% floor and are unaffected by further cuts."
+  "false_signals": "Monthly changes are dominated by valuation effects — dollar moves and bond price changes — rather than intervention. Never read a monthly change as intervention without adjusting for valuation."
+ },
+ "rrr_small": {
+  "name": "Reserve requirement ratio, small and medium banks",
+  "name_zh": "中小型存款类机构存款准备金率",
+  "block": "monetary",
+  "group": "Quantity instruments",
+  "unit": "%",
+  "freq": "D",
+  "looser_when": "lower",
+  "core": false,
+  "read": "The reserve requirement for smaller banks, typically set 2 percentage points below the large-bank ratio, with additional targeted reductions for rural and small-business lenders.",
+  "implications": {
+   "growth": "Targeted cuts here are aimed at small and private enterprise credit, where the transmission blockage is most severe.",
+   "inflation": "Minimal direct effect.",
+   "policy": "The spread to the large-bank ratio shows how much of policy is structural and targeted rather than aggregate."
   },
-  "real_gdp_yoy_q": {
-    "name": "Real GDP, single quarter",
-    "name_zh": "实际GDP当季同比",
-    "block": "context",
-    "group": "Prices & activity",
-    "unit": "% y/y",
-    "freq": "Q",
-    "looser_when": "higher",
-    "core": false,
-    "read": "Single-quarter rather than cumulative year-to-date growth — the cleaner read on quarterly momentum.",
-    "implications": {
-      "growth": "Turning points show up here a quarter or more before they appear in the cumulative series.",
-      "inflation": "The output gap implied by momentum drives price pressure.",
-      "policy": "Quarterly momentum against the annual target is what determines the urgency of stimulus."
-    },
-    "false_signals": "Noisier than the cumulative series and subject to revision."
+  "false_signals": "The headline ratio understates actual easing for the smallest institutions, many of which already sit at the 5% floor and are unaffected by further cuts."
+ },
+ "real_gdp_yoy_q": {
+  "name": "Real GDP, single quarter",
+  "name_zh": "实际GDP当季同比",
+  "block": "context",
+  "group": "Prices & activity",
+  "unit": "% y/y",
+  "freq": "Q",
+  "looser_when": "higher",
+  "core": false,
+  "read": "Single-quarter rather than cumulative year-to-date growth — the cleaner read on quarterly momentum.",
+  "implications": {
+   "growth": "Turning points show up here a quarter or more before they appear in the cumulative series.",
+   "inflation": "The output gap implied by momentum drives price pressure.",
+   "policy": "Quarterly momentum against the annual target is what determines the urgency of stimulus."
   },
-  "nominal_gdp_level_cum": {
-    "name": "Nominal GDP, cumulative YTD",
-    "name_zh": "名义GDP累计值",
-    "block": "context",
-    "group": "Prices & activity",
-    "unit": "RMB bn",
-    "freq": "Q",
-    "looser_when": "higher",
-    "core": false,
-    "read": "Year-to-date nominal GDP in current prices. Resets each Q1, so the series is a sawtooth and must be differenced within a year before use.",
-    "implications": {
-      "growth": "Nominal GDP is what services debt and generates tax revenue — the honest measure of economic performance in a deflation.",
-      "inflation": "Nominal growth falling below real growth is the definition of economy-wide deflation.",
-      "policy": "The benchmark against which credit growth is judged."
-    },
-    "false_signals": "The December 2024 economic census revised the 2023 base upward substantially, so growth rates computed across that break are wrong. This is precisely why no nominal GDP growth rate or GDP deflator is derived in this build.",
-    "stateless": "Cumulative year-to-date level that resets each Q1. A z-score on a sawtooth is meaningless.",
-    "stateless_label": "YTD level"
+  "false_signals": "Noisier than the cumulative series and subject to revision."
+ },
+ "nominal_gdp_level_cum": {
+  "name": "Nominal GDP, cumulative YTD",
+  "name_zh": "名义GDP累计值",
+  "block": "context",
+  "group": "Prices & activity",
+  "unit": "RMB bn",
+  "freq": "Q",
+  "looser_when": "higher",
+  "core": false,
+  "read": "Year-to-date nominal GDP in current prices. Resets each Q1, so the series is a sawtooth and must be differenced within a year before use.",
+  "implications": {
+   "growth": "Nominal GDP is what services debt and generates tax revenue — the honest measure of economic performance in a deflation.",
+   "inflation": "Nominal growth falling below real growth is the definition of economy-wide deflation.",
+   "policy": "The benchmark against which credit growth is judged."
   },
-  "real_lending_rate_ppi": {
-    "name": "Real lending rate (PPI-deflated)",
-    "name_zh": "实际贷款利率(PPI平减)",
-    "block": "monetary",
-    "group": "Real rates",
-    "unit": "%",
-    "freq": "Q",
-    "looser_when": "lower",
-    "core": true,
-    "derived": "walr_general - ppi_yoy",
-    "read": "The cost of credit deflated by factory-gate prices — the real borrowing cost faced by the industrial sector, which is where most corporate debt sits.",
-    "implications": {
-      "growth": "The single harshest and most relevant real-rate measure for Chinese manufacturing. With PPI deflation running for an extended period, industrial borrowers have faced double-digit real rates at times even as nominal rates fell to record lows.",
-      "inflation": "Self-reinforcing: high real rates suppress capex, worsening overcapacity and deepening PPI deflation.",
-      "policy": "The strongest quantitative argument that nominal easing has been insufficient. Closing this gap requires either far lower nominal rates or reflation of producer prices through capacity discipline and demand support."
-    },
-    "false_signals": "PPI is dominated by commodity base effects, so this series swings far more than the true cost of capital. Read the trend over several quarters, not a single print."
+  "false_signals": "The December 2024 economic census revised the 2023 base upward substantially, so growth rates computed across that break are wrong. This is precisely why no nominal GDP growth rate or GDP deflator is derived in this build.",
+  "stateless": "Cumulative year-to-date level that resets each Q1. A z-score on a sawtooth is meaningless.",
+  "stateless_label": "YTD level"
+ },
+ "real_lending_rate_ppi": {
+  "name": "Real lending rate (PPI-deflated)",
+  "name_zh": "实际贷款利率(PPI平减)",
+  "block": "monetary",
+  "group": "Real rates",
+  "unit": "%",
+  "freq": "Q",
+  "looser_when": "lower",
+  "core": true,
+  "derived": "walr_general - ppi_yoy",
+  "read": "The cost of credit deflated by factory-gate prices — the real borrowing cost faced by the industrial sector, which is where most corporate debt sits.",
+  "implications": {
+   "growth": "The single harshest and most relevant real-rate measure for Chinese manufacturing. With PPI deflation running for an extended period, industrial borrowers have faced double-digit real rates at times even as nominal rates fell to record lows.",
+   "inflation": "Self-reinforcing: high real rates suppress capex, worsening overcapacity and deepening PPI deflation.",
+   "policy": "The strongest quantitative argument that nominal easing has been insufficient. Closing this gap requires either far lower nominal rates or reflation of producer prices through capacity discipline and demand support."
   },
-  "real_policy_rate_core": {
-    "name": "Real policy rate (core CPI)",
-    "name_zh": "实际政策利率(核心CPI平减)",
-    "block": "monetary",
-    "group": "Real rates",
-    "unit": "%",
-    "freq": "Q",
-    "looser_when": "lower",
-    "core": false,
-    "derived": "omo_7d - core_cpi_yoy",
-    "read": "The policy rate deflated by core CPI — the cleanest measure of the stance stripped of food and energy noise.",
-    "implications": {
-      "growth": "The right rate for intertemporal decisions once volatile components are removed.",
-      "inflation": "With core inflation near zero, holding the nominal rate constant means the real stance tightens passively.",
-      "policy": "The technically correct series for judging whether nominal cuts have delivered real easing."
-    },
-    "false_signals": "Only a handful of quarterly observations are available in this build, so the z-score is not meaningful. Treat as directional only."
+  "false_signals": "PPI is dominated by commodity base effects, so this series swings far more than the true cost of capital. Read the trend over several quarters, not a single print."
+ },
+ "real_policy_rate_core": {
+  "name": "Real policy rate (core CPI)",
+  "name_zh": "实际政策利率(核心CPI平减)",
+  "block": "monetary",
+  "group": "Real rates",
+  "unit": "%",
+  "freq": "Q",
+  "looser_when": "lower",
+  "core": false,
+  "derived": "omo_7d - core_cpi_yoy",
+  "read": "The policy rate deflated by core CPI — the cleanest measure of the stance stripped of food and energy noise.",
+  "implications": {
+   "growth": "The right rate for intertemporal decisions once volatile components are removed.",
+   "inflation": "With core inflation near zero, holding the nominal rate constant means the real stance tightens passively.",
+   "policy": "The technically correct series for judging whether nominal cuts have delivered real easing."
   },
-  "cgb10y_omo_spread": {
-    "name": "10y CGB − policy rate spread",
-    "name_zh": "10年国债与政策利率利差",
-    "block": "liquidity",
-    "group": "Bond market",
-    "unit": "bp",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": true,
-    "derived": "cgb_10y - omo_7d",
-    "read": "How much term premium the long bond offers over the cost of funding it. The carry cushion available to leveraged bond positions.",
-    "implications": {
-      "growth": "A compressed spread reflects the market pricing a weak nominal growth path, not easy policy.",
-      "inflation": "Compression embeds falling inflation expectations.",
-      "policy": "A compressed spread combined with crowded overnight funding is the fragility configuration the PBoC warned about when it intervened verbally in the bond market and began selling duration. Below roughly 30bp there is almost no cushion against a funding shock."
-    },
-    "false_signals": "Reads as 'loose' when it widens, but widening can equally mean the market has lost confidence in the growth outlook at the long end. Always read alongside the level of the 10-year yield."
+  "false_signals": "Only a handful of quarterly observations are available in this build, so the z-score is not meaningful. Treat as directional only."
+ },
+ "cgb10y_omo_spread": {
+  "name": "10y CGB − policy rate spread",
+  "name_zh": "10年国债与政策利率利差",
+  "block": "liquidity",
+  "group": "Bond market",
+  "unit": "bp",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": true,
+  "derived": "cgb_10y - omo_7d",
+  "read": "How much term premium the long bond offers over the cost of funding it. The carry cushion available to leveraged bond positions.",
+  "implications": {
+   "growth": "A compressed spread reflects the market pricing a weak nominal growth path, not easy policy.",
+   "inflation": "Compression embeds falling inflation expectations.",
+   "policy": "A compressed spread combined with crowded overnight funding is the fragility configuration the PBoC warned about when it intervened verbally in the bond market and began selling duration. Below roughly 30bp there is almost no cushion against a funding shock."
   },
-  "tsf_ex_govt_yoy": {
-    "name": "TSF excluding government bonds",
-    "name_zh": "社融(剔除政府债券)同比",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "% y/y",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": true,
-    "read": "Total social financing stripped of central and local government bond issuance — the true read on private-sector credit appetite.",
-    "implications": {
-      "growth": "The series that actually maps to private investment. Headline TSF has been carried by government bonds while this measure has kept decelerating.",
-      "inflation": "Private credit is the channel through which money becomes spending and therefore prices. Government bond issuance that funds debt swaps creates neither.",
-      "policy": "The gap between headline TSF and this series is the clearest evidence of whether stimulus is monetary or fiscal in substance."
-    },
-    "false_signals": "Requires a consistent government bond series to subtract; definitional changes to what counts as government financing break comparability across the 2018 revision.",
-    "derived": "year-on-year change in the trailing 12m sum of tsf_ex_govt_flow"
+  "false_signals": "Reads as 'loose' when it widens, but widening can equally mean the market has lost confidence in the growth outlook at the long end. Always read alongside the level of the 10-year yield."
+ },
+ "tsf_ex_govt_yoy": {
+  "name": "TSF excluding government bonds",
+  "name_zh": "社融(剔除政府债券)同比",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "% y/y",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": true,
+  "read": "Total social financing stripped of central and local government bond issuance — the true read on private-sector credit appetite.",
+  "implications": {
+   "growth": "The series that actually maps to private investment. Headline TSF has been carried by government bonds while this measure has kept decelerating.",
+   "inflation": "Private credit is the channel through which money becomes spending and therefore prices. Government bond issuance that funds debt swaps creates neither.",
+   "policy": "The gap between headline TSF and this series is the clearest evidence of whether stimulus is monetary or fiscal in substance."
   },
-  "corp_mlt_loans_yoy": {
-    "name": "Corporate medium & long-term loans",
-    "name_zh": "企业中长期贷款同比",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "% y/y",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": true,
-    "read": "Growth in the outstanding stock of corporate loans of maturity over one year — the credit that finances actual capital expenditure.",
-    "implications": {
-      "growth": "The highest-quality credit signal available: it maps directly to fixed asset investment and is immune to the bill-financing games that distort the monthly headline.",
-      "inflation": "Capex-driven credit is what eventually tightens capacity and lifts producer prices.",
-      "policy": "Sustained weakness here, alongside strong headline loans, tells the PBoC that banks are meeting quotas with short-dated paper rather than financing investment."
-    },
-    "false_signals": "Can be inflated by policy-directed lending to infrastructure and state-owned enterprises. Cross-check against private-sector fixed asset investment.",
-    "unavailable": "Not populated in this build — requires the PBoC loan maturity breakdown."
+  "false_signals": "Requires a consistent government bond series to subtract; definitional changes to what counts as government financing break comparability across the 2018 revision.",
+  "derived": "year-on-year change in the trailing 12m sum of tsf_ex_govt_flow"
+ },
+ "corp_mlt_loans_yoy": {
+  "name": "Corporate medium & long-term loans",
+  "name_zh": "企业中长期贷款同比",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "% y/y",
+  "freq": "Q",
+  "looser_when": "higher",
+  "core": true,
+  "read": "Growth in the outstanding stock of corporate loans of maturity over one year — the credit that finances actual capital expenditure. 本外币 (local and foreign currency), read from section 一 of the PBoC's quarterly loan-direction report.",
+  "implications": {
+   "growth": "The highest-quality credit signal available: it maps directly to fixed asset investment and is immune to the bill-financing games that distort the monthly headline.",
+   "inflation": "Capex-driven credit is what eventually tightens capacity and lifts producer prices.",
+   "policy": "Sustained weakness here, alongside strong headline loans, tells the PBoC that banks are meeting quotas with short-dated paper rather than financing investment."
   },
-  "household_time_deposit_share": {
-    "name": "Household time-deposit share",
-    "name_zh": "住户定期存款占比",
-    "block": "monetary",
-    "group": "Money & deposits",
-    "unit": "%",
-    "freq": "M",
-    "looser_when": "lower",
-    "core": false,
-    "read": "The share of household deposits held in time rather than demand accounts — the 'termification' (定期化) gauge of precautionary saving.",
-    "implications": {
-      "growth": "A rising time share means households are hoarding rather than spending. It is the behavioural signature of a balance-sheet recession and the reason rate cuts have not lifted consumption.",
-      "inflation": "Directly measures the velocity collapse that has kept inflation near zero despite rapid money growth.",
-      "policy": "A falling time share would be the earliest credible evidence that confidence is returning and that easing is finally working through the household channel."
-    },
-    "false_signals": "Partly driven by the relative yield on deposits versus wealth-management products, so it moves on regulatory and rate-structure changes as well as on confidence.",
-    "unavailable": "Not populated in this build — requires the PBoC household deposit breakdown."
+  "false_signals": "Can be inflated by policy-directed lending to infrastructure and state-owned enterprises. Cross-check against private-sector fixed asset investment. Quarterly and released three to four weeks after quarter end, so it confirms a turn rather than calling one."
+ },
+ "household_time_deposit_share": {
+  "name": "Household time-deposit share",
+  "name_zh": "住户定期存款占比",
+  "block": "monetary",
+  "group": "Money & deposits",
+  "unit": "%",
+  "freq": "M",
+  "looser_when": "lower",
+  "core": false,
+  "read": "The share of household deposits held in time rather than demand accounts — the 'termification' (定期化) gauge of precautionary saving.",
+  "implications": {
+   "growth": "A rising time share means households are hoarding rather than spending. It is the behavioural signature of a balance-sheet recession and the reason rate cuts have not lifted consumption.",
+   "inflation": "Directly measures the velocity collapse that has kept inflation near zero despite rapid money growth.",
+   "policy": "A falling time share would be the earliest credible evidence that confidence is returning and that easing is finally working through the household channel."
   },
-  "overnight_repo_share": {
-    "name": "Overnight share of repo turnover",
-    "name_zh": "隔夜回购成交占比",
-    "block": "liquidity",
-    "group": "Money market rates",
-    "unit": "%",
-    "freq": "D",
-    "looser_when": "higher",
-    "core": false,
-    "read": "The proportion of pledged repo volume transacted overnight. High readings mean the system is financing long positions with the shortest possible money.",
-    "implications": {
-      "growth": "None directly.",
-      "inflation": "None.",
-      "policy": "The purest gauge of crowded carry. Above roughly 88-90% the market is one bad funding day from a forced unwind, and the PBoC has historically leaned against liquidity at exactly these moments."
-    },
-    "false_signals": "A high share looks like abundant liquidity and is recorded here as 'looser', but it is simultaneously a fragility signal. This is the one indicator where loose and dangerous are the same reading.",
-    "unavailable": "Not populated in this build — requires CFETS or exchange repo turnover microdata."
+  "false_signals": "Partly driven by the relative yield on deposits versus wealth-management products, so it moves on regulatory and rate-structure changes as well as on confidence.",
+  "unavailable": "No machine-readable route to history. The 金融机构人民币信贷收支表 PDF does parse cleanly — 住户存款 / 活期存款 / 定期及其他存款 extract as text, twelve months to a file — but pbc.gov.cn exposes a node for the CURRENT year only: 2026ntjsj resolves, 2023/2024/2025 all 404, and the statistics hub carries no per-year links. A series from the one reachable file would be a single year, which is not enough to z-score."
+ },
+ "overnight_repo_share": {
+  "name": "Overnight share of repo turnover",
+  "name_zh": "隔夜回购成交占比",
+  "block": "liquidity",
+  "group": "Money market rates",
+  "unit": "%",
+  "freq": "D",
+  "looser_when": "higher",
+  "core": false,
+  "read": "The proportion of pledged repo volume transacted overnight. High readings mean the system is financing long positions with the shortest possible money.",
+  "implications": {
+   "growth": "None directly.",
+   "inflation": "None.",
+   "policy": "The purest gauge of crowded carry. Above roughly 88-90% the market is one bad funding day from a forced unwind, and the PBoC has historically leaned against liquidity at exactly these moments."
   },
-  "dr001": {
-    "name": "DR001",
-    "name_zh": "银行间存款类机构隔夜质押式回购利率",
-    "block": "liquidity",
-    "group": "Money market rates",
-    "unit": "%",
-    "freq": "D",
-    "looser_when": "lower",
-    "core": true,
-    "read": "The overnight pledged repo rate among depository institutions. As of the Q1 2026 Monetary Policy Report this — not DR007 — is the PBoC's designated operating anchor, to be held within ±25bp of the 7-day policy rate.",
-    "implications": {
-      "growth": "None directly.",
-      "inflation": "None.",
-      "policy": "This is now the primary real-time read on whether the PBoC is delivering its intended stance. Because the band is explicit and narrow, a breach is a genuinely informative event rather than routine noise — which was never true of the old corridor."
-    },
-    "false_signals": "Overnight rates are the most sensitive to the daily settlement calendar, so single-day spikes around tax dates, quarter-ends and Chinese New Year carry no policy information. Read the 5-day average.",
-    "unavailable": "Not populated in this build. Available daily from CFETS; this is the highest-priority series to add, since the 2026 framework makes it the operating target."
+  "false_signals": "A high share looks like abundant liquidity and is recorded here as 'looser', but it is simultaneously a fragility signal. This is the one indicator where loose and dangerous are the same reading.",
+  "unavailable": "Not populated in this build — requires CFETS or exchange repo turnover microdata."
+ },
+ "dr001": {
+  "name": "DR001",
+  "name_zh": "银行间存款类机构隔夜质押式回购利率",
+  "block": "liquidity",
+  "group": "Money market rates",
+  "unit": "%",
+  "freq": "D",
+  "looser_when": "lower",
+  "core": true,
+  "read": "The overnight pledged repo rate among depository institutions. As of the Q1 2026 Monetary Policy Report this — not DR007 — is the PBoC's designated operating anchor, to be held within ±25bp of the 7-day policy rate.",
+  "implications": {
+   "growth": "None directly.",
+   "inflation": "None.",
+   "policy": "This is now the primary real-time read on whether the PBoC is delivering its intended stance. Because the band is explicit and narrow, a breach is a genuinely informative event rather than routine noise — which was never true of the old corridor."
   },
-  "dr001_omo_spread": {
-    "name": "DR001 − policy rate spread",
-    "name_zh": "DR001与政策利率利差",
-    "block": "liquidity",
-    "group": "Money market rates",
-    "unit": "bp",
-    "freq": "D",
-    "looser_when": "lower",
-    "core": true,
-    "derived": "dr001 - omo_7d",
-    "read": "The deviation of the overnight anchor from the policy rate, against an explicit ±25bp band set in June 2026 when the corridor was narrowed from 70bp to 50bp.",
-    "implications": {
-      "growth": "None directly.",
-      "inflation": "None.",
-      "policy": "The successor to the DR007 spread as the headline liquidity gauge. Inside the band, policy is being delivered as intended; a sustained breach means the PBoC is either unable or unwilling to hold its own target, which is the single most informative liquidity event available."
-    },
-    "thresholds": {
-      "corridor_floor": -25,
-      "corridor_ceiling": 25
-    },
-    "false_signals": "The band was only formalised in June 2026, so applying it to earlier history is anachronistic. Before 2026 the informative spread is DR007 − OMO.",
-    "unavailable": "Not populated in this build — requires DR001."
+  "false_signals": "Overnight rates are the most sensitive to the daily settlement calendar, so single-day spikes around tax dates, quarter-ends and Chinese New Year carry no policy information. Read the 5-day average.",
+  "unavailable": "Not populated in this build. Available daily from CFETS; this is the highest-priority series to add, since the 2026 framework makes it the operating target."
+ },
+ "dr001_omo_spread": {
+  "name": "DR001 − policy rate spread",
+  "name_zh": "DR001与政策利率利差",
+  "block": "liquidity",
+  "group": "Money market rates",
+  "unit": "bp",
+  "freq": "D",
+  "looser_when": "lower",
+  "core": true,
+  "derived": "dr001 - omo_7d",
+  "read": "The deviation of the overnight anchor from the policy rate, against an explicit ±25bp band set in June 2026 when the corridor was narrowed from 70bp to 50bp.",
+  "implications": {
+   "growth": "None directly.",
+   "inflation": "None.",
+   "policy": "The successor to the DR007 spread as the headline liquidity gauge. Inside the band, policy is being delivered as intended; a sustained breach means the PBoC is either unable or unwilling to hold its own target, which is the single most informative liquidity event available."
   },
-  "tsf_swap_adjusted": {
-    "name": "TSF adjusted for the LGFV debt swap",
-    "name_zh": "社融(剔除化债置换)",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "% y/y",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": true,
-    "read": "Total social financing with the local-government hidden-debt swap programme stripped out. Swap bonds refinance existing obligations; they create no new spending power, but they inflate measured credit.",
-    "implications": {
-      "growth": "The adjusted series is what actually maps to demand. Unadjusted TSF will overstate the credit impulse for as long as the swap programme runs, which on current plans extends for several years.",
-      "inflation": "Refinancing generates no new spending and therefore no price pressure. Reading swap-inflated TSF as stimulus is how a forecaster ends up expecting reflation that does not arrive.",
-      "policy": "The PBoC and MoF both know the distinction; an external analyst who does not will systematically misjudge how much stimulus has actually been delivered."
-    },
-    "false_signals": "There is no official adjusted series — it must be constructed from the swap issuance calendar, so the adjustment is an estimate and different desks will get different numbers.",
-    "unavailable": "Not populated in this build. Flagged by the literature scan as the single highest-value indicator to construct next: without it, measured stimulus is overstated for years."
+  "thresholds": {
+   "corridor_floor": -25,
+   "corridor_ceiling": 25
   },
-  "r001": {
-    "name": "R001",
-    "name_zh": "银行间隔夜质押式回购利率(全市场)",
-    "block": "liquidity",
-    "group": "Money market rates",
-    "unit": "%",
-    "freq": "D",
-    "looser_when": "lower",
-    "core": false,
-    "read": "The all-market overnight pledged repo rate, including non-banks. Paired with DR001 it gives the overnight equivalent of the R–DR stratification spread.",
-    "implications": {
-      "growth": "None directly.",
-      "inflation": "None.",
-      "policy": "The overnight R−DR gap is the fastest-moving read on whether liquidity is reaching beyond the large banks, and it moves before the 7-day gap does."
-    },
-    "false_signals": "The most volatile rate on the board. Single-day spikes around tax dates, quarter-ends and Chinese New Year carry no policy information."
+  "false_signals": "The band was only formalised in June 2026, so applying it to earlier history is anachronistic. Before 2026 the informative spread is DR007 − OMO.",
+  "unavailable": "Not populated in this build — requires DR001."
+ },
+ "tsf_swap_adjusted": {
+  "name": "TSF adjusted for the LGFV debt swap",
+  "name_zh": "社融(剔除化债置换)",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "% y/y",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": true,
+  "read": "Total social financing with the local-government hidden-debt swap programme stripped out. Swap bonds refinance existing obligations; they create no new spending power, but they inflate measured credit.",
+  "implications": {
+   "growth": "The adjusted series is what actually maps to demand. Unadjusted TSF will overstate the credit impulse for as long as the swap programme runs, which on current plans extends for several years.",
+   "inflation": "Refinancing generates no new spending and therefore no price pressure. Reading swap-inflated TSF as stimulus is how a forecaster ends up expecting reflation that does not arrive.",
+   "policy": "The PBoC and MoF both know the distinction; an external analyst who does not will systematically misjudge how much stimulus has actually been delivered."
   },
-  "r_dr_spread_001": {
-    "name": "R001 − DR001 spread",
-    "name_zh": "R001与DR001利差",
-    "block": "liquidity",
-    "group": "Money market rates",
-    "unit": "bp",
-    "freq": "D",
-    "looser_when": "lower",
-    "core": false,
-    "derived": "r001 - dr001",
-    "read": "Overnight funding stratification: what non-banks pay over banks for overnight money.",
-    "implications": {
-      "growth": "None directly.",
-      "inflation": "None.",
-      "policy": "The earliest warning of non-bank funding stress — it widens before the 7-day equivalent does."
-    },
-    "false_signals": "Quarter-end MPA assessment widens it mechanically as banks withdraw from lending to non-banks."
+  "false_signals": "There is no official adjusted series — it must be constructed from the swap issuance calendar, so the adjustment is an estimate and different desks will get different numbers.",
+  "unavailable": "Not populated in this build. Flagged by the literature scan as the single highest-value indicator to construct next: without it, measured stimulus is overstated for years."
+ },
+ "r001": {
+  "name": "R001",
+  "name_zh": "银行间隔夜质押式回购利率(全市场)",
+  "block": "liquidity",
+  "group": "Money market rates",
+  "unit": "%",
+  "freq": "D",
+  "looser_when": "lower",
+  "core": false,
+  "read": "The all-market overnight pledged repo rate, including non-banks. Paired with DR001 it gives the overnight equivalent of the R–DR stratification spread.",
+  "implications": {
+   "growth": "None directly.",
+   "inflation": "None.",
+   "policy": "The overnight R−DR gap is the fastest-moving read on whether liquidity is reaching beyond the large banks, and it moves before the 7-day gap does."
   },
-  "govt_deposits_level": {
-    "name": "Government deposits at the PBoC",
-    "name_zh": "政府存款",
-    "block": "liquidity",
-    "group": "Autonomous factors",
-    "unit": "RMB bn",
-    "freq": "M",
-    "looser_when": "lower",
-    "core": false,
-    "stateless": "Trending level series — read the monthly change, which is what actually drains or adds bank reserves.",
-    "stateless_label": "Level series",
-    "read": "The Treasury Single Account balance on the PBoC's balance sheet. Money sitting here is money withdrawn from the banking system.",
-    "implications": {
-      "growth": "A sustained build-up means fiscal revenue is being raised but not spent — a drag on demand as well as on liquidity.",
-      "inflation": "Indirect, via the fiscal impulse.",
-      "policy": "The PBoC's daily operations are largely designed to offset moves in this account."
-    },
-    "false_signals": "Dominated by the tax calendar. Only the deviation from the seasonal norm carries information."
+  "false_signals": "The most volatile rate on the board. Single-day spikes around tax dates, quarter-ends and Chinese New Year carry no policy information."
+ },
+ "r_dr_spread_001": {
+  "name": "R001 − DR001 spread",
+  "name_zh": "R001与DR001利差",
+  "block": "liquidity",
+  "group": "Money market rates",
+  "unit": "bp",
+  "freq": "D",
+  "looser_when": "lower",
+  "core": false,
+  "derived": "r001 - dr001",
+  "read": "Overnight funding stratification: what non-banks pay over banks for overnight money.",
+  "implications": {
+   "growth": "None directly.",
+   "inflation": "None.",
+   "policy": "The earliest warning of non-bank funding stress — it widens before the 7-day equivalent does."
   },
-  "pboc_claims_odc": {
-    "name": "PBoC claims on banks",
-    "name_zh": "对其他存款性公司债权",
-    "block": "liquidity",
-    "group": "Central bank operations",
-    "unit": "RMB bn",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": false,
-    "stateless": "Trending level series — the change is the signal, not the level.",
-    "stateless_label": "Level series",
-    "read": "The stock of all PBoC lending to banks: open market operations, MLF, PSL and outright reverse repo combined. Changes in this stock ARE net liquidity injection.",
-    "implications": {
-      "growth": "None directly — this is plumbing, not stance.",
-      "inflation": "None.",
-      "policy": "Far more robust than summing daily operation announcements, because it captures every facility at once and cannot miss one."
-    },
-    "false_signals": "Rising claims can reflect banks rolling maturing facilities rather than new support. Judge the change against what needed offsetting — bond supply, tax drains — not against zero."
+  "false_signals": "Quarter-end MPA assessment widens it mechanically as banks withdraw from lending to non-banks."
+ },
+ "govt_deposits_level": {
+  "name": "Government deposits at the PBoC",
+  "name_zh": "政府存款",
+  "block": "liquidity",
+  "group": "Autonomous factors",
+  "unit": "RMB bn",
+  "freq": "M",
+  "looser_when": "lower",
+  "core": false,
+  "stateless": "Trending level series — read the monthly change, which is what actually drains or adds bank reserves.",
+  "stateless_label": "Level series",
+  "read": "The Treasury Single Account balance on the PBoC's balance sheet. Money sitting here is money withdrawn from the banking system.",
+  "implications": {
+   "growth": "A sustained build-up means fiscal revenue is being raised but not spent — a drag on demand as well as on liquidity.",
+   "inflation": "Indirect, via the fiscal impulse.",
+   "policy": "The PBoC's daily operations are largely designed to offset moves in this account."
   },
-  "tsf_ex_govt_flow": {
-    "name": "TSF excluding government bonds, flow",
-    "name_zh": "社融(剔除政府债券)增量",
-    "block": "monetary",
-    "group": "Credit & financing",
-    "unit": "RMB bn",
-    "freq": "M",
-    "looser_when": "higher",
-    "core": false,
-    "stateless": "Strongly seasonal monthly flow — judge it through the year-on-year series rather than the monthly print.",
-    "stateless_label": "Seasonal flow",
-    "read": "The sum of every non-government financing component the PBoC breaks out — the monthly flow of private-sector credit.",
-    "implications": {
-      "growth": "This is the series that maps to private investment; headline TSF has been carried by government bonds while this decelerated.",
-      "inflation": "Private credit is how money becomes spending. Government bonds funding debt swaps create neither.",
-      "policy": "The gap to headline TSF shows whether stimulus is monetary or fiscal in substance."
-    },
-    "false_signals": "A construction, not a published series: small components outside the published breakdown (ABS, loan write-offs) are excluded, so it is slightly below a true TSF-minus-government-bonds."
+  "false_signals": "Dominated by the tax calendar. Only the deviation from the seasonal norm carries information."
+ },
+ "pboc_claims_odc": {
+  "name": "PBoC claims on banks",
+  "name_zh": "对其他存款性公司债权",
+  "block": "liquidity",
+  "group": "Central bank operations",
+  "unit": "RMB bn",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": false,
+  "stateless": "Trending level series — the change is the signal, not the level.",
+  "stateless_label": "Level series",
+  "read": "The stock of all PBoC lending to banks: open market operations, MLF, PSL and outright reverse repo combined. Changes in this stock ARE net liquidity injection.",
+  "implications": {
+   "growth": "None directly — this is plumbing, not stance.",
+   "inflation": "None.",
+   "policy": "Far more robust than summing daily operation announcements, because it captures every facility at once and cannot miss one."
   },
-  "cgb_3y": {
-    "name": "3-year CGB yield",
-    "name_zh": "3年期国债收益率",
-    "block": "liquidity",
-    "group": "Bond market",
-    "unit": "%",
-    "freq": "D",
-    "looser_when": "lower",
-    "core": false,
-    "read": "The 3-year point of the government curve — the risk-free benchmark for the 3-year credit spread.",
-    "implications": {
-      "growth": "Minimal direct read.",
-      "inflation": "Minimal.",
-      "policy": "Sits between the policy-anchored short end and the growth-expectations long end."
-    },
-    "false_signals": "Distorted by bank demand at quarter-ends."
+  "false_signals": "Rising claims can reflect banks rolling maturing facilities rather than new support. Judge the change against what needed offsetting — bond supply, tax drains — not against zero."
+ },
+ "tsf_ex_govt_flow": {
+  "name": "TSF excluding government bonds, flow",
+  "name_zh": "社融(剔除政府债券)增量",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "RMB bn",
+  "freq": "M",
+  "looser_when": "higher",
+  "core": false,
+  "stateless": "Strongly seasonal monthly flow — judge it through the year-on-year series rather than the monthly print.",
+  "stateless_label": "Seasonal flow",
+  "read": "The sum of every non-government financing component the PBoC breaks out — the monthly flow of private-sector credit.",
+  "implications": {
+   "growth": "This is the series that maps to private investment; headline TSF has been carried by government bonds while this decelerated.",
+   "inflation": "Private credit is how money becomes spending. Government bonds funding debt swaps create neither.",
+   "policy": "The gap to headline TSF shows whether stimulus is monetary or fiscal in substance."
   },
-  "mtn_aa_3y": {
-    "name": "3-year AA+ medium-term note yield",
-    "name_zh": "3年期AA+中票收益率",
-    "block": "liquidity",
-    "group": "Bond market",
-    "unit": "%",
-    "freq": "D",
-    "looser_when": "lower",
-    "core": false,
-    "read": "The yield on 3-year AA+ medium-term notes — the cost of market funding for a decent but not top-tier corporate borrower.",
-    "implications": {
-      "growth": "Rising yields tighten financing for the marginal private borrower before bank lending rates move.",
-      "inflation": "None directly.",
-      "policy": "Sharp rises, especially in urban investment paper, trigger targeted support rather than broad easing."
-    },
-    "false_signals": "Implicit government support compresses quasi-sovereign spreads, so the level understates true credit risk."
-  }
+  "false_signals": "A construction, not a published series: small components outside the published breakdown (ABS, loan write-offs) are excluded, so it is slightly below a true TSF-minus-government-bonds."
+ },
+ "cgb_3y": {
+  "name": "3-year CGB yield",
+  "name_zh": "3年期国债收益率",
+  "block": "liquidity",
+  "group": "Bond market",
+  "unit": "%",
+  "freq": "D",
+  "looser_when": "lower",
+  "core": false,
+  "read": "The 3-year point of the government curve — the risk-free benchmark for the 3-year credit spread.",
+  "implications": {
+   "growth": "Minimal direct read.",
+   "inflation": "Minimal.",
+   "policy": "Sits between the policy-anchored short end and the growth-expectations long end."
+  },
+  "false_signals": "Distorted by bank demand at quarter-ends."
+ },
+ "mtn_aa_3y": {
+  "name": "3-year AA+ medium-term note yield",
+  "name_zh": "3年期AA+中票收益率",
+  "block": "liquidity",
+  "group": "Bond market",
+  "unit": "%",
+  "freq": "D",
+  "looser_when": "lower",
+  "core": false,
+  "read": "The yield on 3-year AA+ medium-term notes — the cost of market funding for a decent but not top-tier corporate borrower.",
+  "implications": {
+   "growth": "Rising yields tighten financing for the marginal private borrower before bank lending rates move.",
+   "inflation": "None directly.",
+   "policy": "Sharp rises, especially in urban investment paper, trigger targeted support rather than broad easing."
+  },
+  "false_signals": "Implicit government support compresses quasi-sovereign spreads, so the level understates true credit risk."
+ },
+ "corp_mlt_loans_level": {
+  "name": "Corporate medium & long-term loans, balance",
+  "name_zh": "企事业单位中长期贷款余额",
+  "block": "monetary",
+  "group": "Credit & financing",
+  "unit": "RMB trn",
+  "freq": "Q",
+  "looser_when": "higher",
+  "core": false,
+  "read": "Outstanding stock of corporate medium and long-term loans. Carried as the level the growth rate is computed from, so the two can be reconciled against the published report.",
+  "implications": {
+   "growth": "Read the growth rate, not the level — the stock rises almost monotonically.",
+   "inflation": "No direct read from the level.",
+   "policy": "Useful only to audit the year-on-year figure against the source."
+  },
+  "false_signals": "Can be inflated by policy-directed lending to infrastructure and state-owned enterprises. Cross-check against private-sector fixed asset investment. Quarterly and released three to four weeks after quarter end, so it confirms a turn rather than calling one.",
+  "stateless": true
+ }
 }
