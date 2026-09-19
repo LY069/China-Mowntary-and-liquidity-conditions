@@ -1,7 +1,7 @@
 {
  "meta": {
-  "generated": "2026-09-13",
-  "note": "Refreshed 2026-09-13 by scripts/refresh_data.py via akshare. Series not listed as refreshed retain their earlier provenance.",
+  "generated": "2026-09-19",
+  "note": "Refreshed 2026-09-19 by scripts/refresh_data.py via akshare. Series not listed as refreshed retain their earlier provenance.",
   "gaps": [
    "omo_7d (7-day reverse repo policy rate): OMITTED. No complete verified step series obtainable. Verified anchors only, from PBoC MPR text: 2.55% through 2019-Q1..2019-Q3; 1.50% at 2025-03; 'cut from 1.5% to 1.4%' during 2025-Q4; 1.40% at 2026-03. Forward-filling four anchors across 2019-2026 would inject wrong levels for every intervening cut (2020, 2022, 2023, 2024), so no series is emitted.",
    "mlf_1y (1-year MLF rate): OMITTED. Same reason - the MPR text describes MLF changes qualitatively ('down 20bp', 'down 30bp') without a dated level series, and no machine-readable source was reachable.",
@@ -33,7 +33,7 @@
    "provenance": {
     "source_name": "PBoC money & credit statistics via akshare (East Money mirror)",
     "source_url": "https://data.eastmoney.com/cjsj/hbgyl.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "M1 was redefined in January 2025; pre- and post-2025 values are different aggregates.",
@@ -593,6 +593,10 @@
     [
      "2026-07",
      4.0
+    ],
+    [
+     "2026-08",
+     4.1
     ]
    ]
   },
@@ -605,7 +609,7 @@
    "provenance": {
     "source_name": "PBoC money & credit statistics via akshare (East Money mirror)",
     "source_url": "https://data.eastmoney.com/cjsj/hbgyl.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Cross-checked: 2025-04..2025-12 values match an independent mirror (lightfor econ-m2-sf.json) exactly, and 2026-06 (8.0) matches the PBoC English indicator card dated 2026-07-16. Matched PBoC money & credit releases (note 07).",
@@ -1165,6 +1169,10 @@
     [
      "2026-07",
      7.7
+    ],
+    [
+     "2026-08",
+     7.5
     ]
    ]
   },
@@ -1177,7 +1185,7 @@
    "provenance": {
     "source_name": "PBoC money & credit statistics via akshare (East Money mirror)",
     "source_url": "https://data.eastmoney.com/cjsj/hbgyl.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Converted from 100mn RMB to RMB bn.",
@@ -1737,6 +1745,10 @@
     [
      "2026-07",
      355507.724
+    ],
+    [
+     "2026-08",
+     356808.36
     ]
    ]
   },
@@ -2317,7 +2329,7 @@
    "provenance": {
     "source_name": "PBoC TSF increment via akshare (MOFCOM republication)",
     "source_url": "https://data.mofcom.gov.cn/gnmy/shrzgm.shtml",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "MOFCOM republishes the PBoC headline two to three months late. Converted from 100mn RMB to RMB bn.",
@@ -4289,7 +4301,7 @@
    "provenance": {
     "source_name": "NIFC loan prime rate fixing via akshare",
     "source_url": "https://www.chinamoney.com.cn/english/bmklpr/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Monthly fixing, published on the 20th.",
@@ -4865,7 +4877,7 @@
    "provenance": {
     "source_name": "NIFC loan prime rate fixing via akshare",
     "source_url": "https://www.chinamoney.com.cn/english/bmklpr/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Monthly fixing, published on the 20th.",
@@ -5589,7 +5601,7 @@
    "provenance": {
     "source_name": "CFETS repo fixing history (FrrHis) via akshare",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/FrrHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "PROXY: this is the CFETS FDR007 fixing, not DR007 itself. The two track closely but are distinct series. Replace with the true weighted rate from CFETS pledged-repo data before relying on the level.",
@@ -15345,6 +15357,26 @@
     [
      "2026-09-11",
      1.42
+    ],
+    [
+     "2026-09-14",
+     1.41
+    ],
+    [
+     "2026-09-15",
+     1.42
+    ],
+    [
+     "2026-09-16",
+     1.43
+    ],
+    [
+     "2026-09-17",
+     1.45
+    ],
+    [
+     "2026-09-18",
+     1.45
     ]
    ]
   },
@@ -15357,7 +15389,7 @@
    "provenance": {
     "source_name": "ChinaBond government bond yield curve via akshare",
     "source_url": "https://yield.chinabond.com.cn/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "ChinaBond closing yield curve, maturity point.",
@@ -27153,6 +27185,26 @@
     [
      "2026-09-11",
      1.6899
+    ],
+    [
+     "2026-09-14",
+     1.6888
+    ],
+    [
+     "2026-09-15",
+     1.6865
+    ],
+    [
+     "2026-09-16",
+     1.6858
+    ],
+    [
+     "2026-09-17",
+     1.6862
+    ],
+    [
+     "2026-09-18",
+     1.682
     ]
    ]
   },
@@ -27165,7 +27217,7 @@
    "provenance": {
     "source_name": "PBoC reserve requirement ratio changes via akshare (East Money)",
     "source_url": "https://data.eastmoney.com/cjsj/ckzbj.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Step series keyed on the EFFECTIVE date (生效时间), not the announcement date. akshare leaves that column as an ISO datetime string. Reconcile against PBoC announcements before relying on it.",
@@ -27413,7 +27465,7 @@
    "provenance": {
     "source_name": "PBoC reserve requirement ratio changes via akshare (East Money)",
     "source_url": "https://data.eastmoney.com/cjsj/ckzbj.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Step series keyed on the EFFECTIVE date (生效时间), not the announcement date. akshare leaves that column as an ISO datetime string. Reconcile against PBoC announcements before relying on it.",
@@ -40169,12 +40221,32 @@
     [
      "2026-09-11",
      1.42
+    ],
+    [
+     "2026-09-14",
+     1.42
+    ],
+    [
+     "2026-09-15",
+     1.43
+    ],
+    [
+     "2026-09-16",
+     1.44
+    ],
+    [
+     "2026-09-17",
+     1.46
+    ],
+    [
+     "2026-09-18",
+     1.48
     ]
    ],
    "provenance": {
     "source_name": "CFETS repo fixing history (FrrHis) via akshare",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/FrrHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "PROXY: this is the CFETS FR007 fixing, not R007 itself. The two track closely but are distinct series. Replace with the true weighted rate from CFETS pledged-repo data before relying on the level.",
@@ -51878,12 +51950,32 @@
     [
      "2026-09-11",
      1.2292
+    ],
+    [
+     "2026-09-14",
+     1.2312
+    ],
+    [
+     "2026-09-15",
+     1.2302
+    ],
+    [
+     "2026-09-16",
+     1.2302
+    ],
+    [
+     "2026-09-17",
+     1.2303
+    ],
+    [
+     "2026-09-18",
+     1.2298
     ]
    ],
    "provenance": {
     "source_name": "ChinaBond government bond yield curve via akshare",
     "source_url": "https://yield.chinabond.com.cn/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "ChinaBond closing yield curve, maturity point.",
@@ -71807,12 +71899,32 @@
     [
      "2026-09-11",
      1.43
+    ],
+    [
+     "2026-09-14",
+     1.43
+    ],
+    [
+     "2026-09-15",
+     1.43
+    ],
+    [
+     "2026-09-16",
+     1.43
+    ],
+    [
+     "2026-09-17",
+     1.43
+    ],
+    [
+     "2026-09-18",
+     1.43
     ]
    ],
    "provenance": {
     "source_name": "SHIBOR 3M via akshare (East Money)",
     "source_url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "unit": "%",
@@ -85047,12 +85159,32 @@
     [
      "2026-09-11",
      1.3779
+    ],
+    [
+     "2026-09-14",
+     1.3336
+    ],
+    [
+     "2026-09-15",
+     1.3471
+    ],
+    [
+     "2026-09-16",
+     1.3679
+    ],
+    [
+     "2026-09-17",
+     1.3724
+    ],
+    [
+     "2026-09-18",
+     1.3935
     ]
    ],
    "provenance": {
     "source_name": "CNH HIBOR overnight via akshare (East Money)",
     "source_url": "https://datacenter-web.eastmoney.com/api/data/v1/get",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "unit": "%",
@@ -85107,12 +85239,24 @@
     [
      "2026-09-11",
      1.4894
+    ],
+    [
+     "2026-09-16",
+     1.49
+    ],
+    [
+     "2026-09-17",
+     1.4909
+    ],
+    [
+     "2026-09-18",
+     1.4857
     ]
    ],
    "provenance": {
     "source_name": "CFETS closing yield curve, AAA NCD (ClsYldCurvHis), called directly",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "1-year point of the AAA negotiable CD curve. Fetched by calling CFETS directly rather than through akshare, whose wrapper breaks on the current response schema.",
@@ -94392,12 +94536,32 @@
     [
      "2026-09-11",
      1.42
+    ],
+    [
+     "2026-09-14",
+     1.41
+    ],
+    [
+     "2026-09-15",
+     1.43
+    ],
+    [
+     "2026-09-16",
+     1.45
+    ],
+    [
+     "2026-09-17",
+     1.48
+    ],
+    [
+     "2026-09-18",
+     1.43
     ]
    ],
    "provenance": {
     "source_name": "CFETS repo fixing history (FrrHis) via akshare",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/FrrHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "PROXY: this is the CFETS FDR001 fixing, not DR001 itself. The two track closely but are distinct series. Replace with the true weighted rate from CFETS pledged-repo data before relying on the level.",
@@ -106073,12 +106237,32 @@
     [
      "2026-09-11",
      1.42
+    ],
+    [
+     "2026-09-14",
+     1.42
+    ],
+    [
+     "2026-09-15",
+     1.44
+    ],
+    [
+     "2026-09-16",
+     1.45
+    ],
+    [
+     "2026-09-17",
+     1.5
+    ],
+    [
+     "2026-09-18",
+     1.43
     ]
    ],
    "provenance": {
     "source_name": "CFETS repo fixing history (FrrHis) via akshare",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/FrrHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "PROXY: this is the CFETS FR001 fixing, not R001 itself. The two track closely but are distinct series. Replace with the true weighted rate from CFETS pledged-repo data before relying on the level.",
@@ -106642,12 +106826,16 @@
     [
      "2026-07",
      6223.619
+    ],
+    [
+     "2026-08",
+     6254.114
     ]
    ],
    "provenance": {
     "source_name": "PBoC monetary authority balance sheet via akshare (Sina)",
     "source_url": "http://www.pbc.gov.cn/diaochatongjisi/116219/116319/index.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Treasury Single Account balance. Converted from 100mn RMB to RMB bn. The month-on-month change is the drain on (or injection into) bank reserves.",
@@ -107211,12 +107399,16 @@
     [
      "2026-07",
      21848.042
+    ],
+    [
+     "2026-08",
+     21339.937
     ]
    ],
    "provenance": {
     "source_name": "PBoC monetary authority balance sheet via akshare (Sina)",
     "source_url": "http://www.pbc.gov.cn/diaochatongjisi/116219/116319/index.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Stock of PBoC lending to banks — OMO, MLF, PSL and outright reverse repo combined. Converted from 100mn RMB to RMB bn. Changes in this stock are net liquidity injection.",
@@ -107413,7 +107605,7 @@
    "provenance": {
     "source_name": "NBS quarterly GDP via akshare (East Money)",
     "source_url": "https://data.eastmoney.com/cjsj/gdp.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Cumulative year-to-date nominal growth, computed by comparing like year-to-date periods a year apart. Pairs correctly with the cumulative real growth rate the same source publishes.",
@@ -107610,7 +107802,7 @@
    "provenance": {
     "source_name": "NBS quarterly GDP via akshare (East Money)",
     "source_url": "https://data.eastmoney.com/cjsj/gdp.html",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Nominal minus real cumulative growth, both legs from the same publisher and the same request, so the series does not straddle data vintages.",
@@ -108079,7 +108271,7 @@
    "provenance": {
     "source_name": "PBoC TSF components via akshare (MOFCOM republication)",
     "source_url": "https://data.mofcom.gov.cn/gnmy/shrzgm.shtml",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Sum of every non-government component the PBoC breaks out: RMB and FX loans, entrusted and trust loans, undiscounted bankers' acceptances, corporate bonds and domestic equity financing. It is a construction, not a published series — small items outside the published breakdown (ABS, loan write-offs) are excluded. Components: 其中-人民币贷款, 其中-委托贷款外币贷款, 其中-委托贷款, 其中-信托贷款, 其中-未贴现银行承兑汇票, 其中-企业债券, 其中-非金融企业境内股票融资",
@@ -108464,7 +108656,7 @@
    "provenance": {
     "source_name": "PBoC TSF components via akshare (MOFCOM republication)",
     "source_url": "https://data.mofcom.gov.cn/gnmy/shrzgm.shtml",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "Sum of every non-government component the PBoC breaks out: RMB and FX loans, entrusted and trust loans, undiscounted bankers' acceptances, corporate bonds and domestic equity financing. It is a construction, not a published series — small items outside the published breakdown (ABS, loan write-offs) are excluded. Components: 其中-人民币贷款, 其中-委托贷款外币贷款, 其中-委托贷款, 其中-信托贷款, 其中-未贴现银行承兑汇票, 其中-企业债券, 其中-非金融企业境内股票融资 Expressed as the year-on-year change in the trailing 12-month sum.",
@@ -109027,21 +109219,21 @@
     ],
     [
      "2026-07",
-     6761.23
+     6891.23
     ],
     [
      "2026-08",
-     8338.05
+     8478.05
     ],
     [
      "2026-09",
-     3426.12
+     5811.11
     ]
    ],
    "provenance": {
     "source_name": "Treasury and local government bond issuance via akshare (CNINFO)",
     "source_url": "https://www.cninfo.com.cn/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "GROSS issuance summed by issue start date — central treasury plus local government bonds. Redemptions are not in this source, so it overstates the net drain on bank reserves. Converted from 100mn RMB to RMB bn.",
@@ -120745,12 +120937,32 @@
     [
      "2026-09-11",
      1.2504
+    ],
+    [
+     "2026-09-14",
+     1.2491
+    ],
+    [
+     "2026-09-15",
+     1.2491
+    ],
+    [
+     "2026-09-16",
+     1.2497
+    ],
+    [
+     "2026-09-17",
+     1.2579
+    ],
+    [
+     "2026-09-18",
+     1.2659
     ]
    ],
    "provenance": {
     "source_name": "ChinaBond government bond yield curve via akshare",
     "source_url": "https://yield.chinabond.com.cn/",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "ChinaBond closing yield curve, maturity point.",
@@ -120806,12 +121018,24 @@
     [
      "2026-09-11",
      2.3795
+    ],
+    [
+     "2026-09-16",
+     1.7725
+    ],
+    [
+     "2026-09-17",
+     2.363
+    ],
+    [
+     "2026-09-18",
+     2.3428
     ]
    ],
    "provenance": {
     "source_name": "CFETS closing yield curve, 中短期票据(AA+) (ClsYldCurvHis), called directly",
     "source_url": "https://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/ClsYldCurvHis",
-    "retrieved": "2026-09-13",
+    "retrieved": "2026-09-19",
     "confidence": "partial"
    },
    "notes": "3-year point of the 中短期票据(AA+) curve, resolved by label match against the published curve map (code CYCC82D). The spread over the 3-year CGB is the credit-risk premium.",
